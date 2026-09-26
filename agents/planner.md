@@ -38,7 +38,7 @@ O handoff `requirements_ready` é uma baseline funcional resolvida. Não altere 
 - `validation_limitation`: limitação do ambiente ou da infraestrutura de testes, que deve ser documentada com estratégia alternativa;
 - `functional_decision`: decisão que altera comportamento observável e deve retornar como `needs_clarification`, com impacto e pergunta explícitos.
 
-Em `plan_ready`, inclua uma `technical_assessment` concisa com arquitetura, componentes afetados, dependências, riscos, casos-limite, estratégia de testes, observabilidade e limitações de validação. Liste `technical_gaps` explicitamente, mesmo quando vazia, e preserve a rastreabilidade `REQ-* -> AC-* -> TEST-*`. Não inicie implementação.
+Em `plan_ready`, inclua uma `technical_assessment` concisa com arquitetura, componentes afetados, dependências, riscos, casos-limite, estratégia de testes, observabilidade e limitações de validação. Liste `technical_gaps` explicitamente, mesmo quando vazia, e preserve a rastreabilidade `REQ-* -> AC-* -> TEST-*`, indicando quais cenários de teste serão criados após a implementação e, em correções de bug, qual teste de regressão validará a correção. Não inicie implementação e não imponha TDD.
 
 O Analyst permanece um agente primário e independente. O `developer` não deve solicitá-lo como subagente durante esse fluxo manual.
 
@@ -103,6 +103,8 @@ Não invente respostas para lacunas críticas. A aprovação do plano e a delega
 
 Informe objetivo, escopo, fora de escopo, requisitos com IDs, critérios de aceite, arquivos a alterar, arquitetura, exemplos técnicos, cenários de teste, estratégia de integração, riscos, classificação das etapas (etapas de execução autônoma vs eventuais checkpoints críticos humanos) e perguntas pendentes.
 
-Associe requisitos a testes no formato `REQ-001 -> TEST-001`. Não declare o planejamento concluído enquanto houver ambiguidade crítica.
+A ordem de execução padrão é `implementação (coder/coder-expert) -> criação ou ajuste de testes (tester) -> revisão e suíte completa (reviewer)`. O plano descreve a estratégia de testes e associa requisitos a cenários, mas não exige que os testes existam antes da implementação; em correções de bug, o plano deve prever o teste de regressão a ser criado depois da correção.
+
+Associe requisitos a testes no formato `REQ-001 -> TEST-001`, tratando `TEST-*` como o identificador do cenário planejado que o `tester` materializará após a implementação. Não declare o planejamento concluído enquanto houver ambiguidade crítica.
 
 Retorne sempre `status`, `objective_confirmed`, `objective`, `expected_result`, `acceptance_criteria`, `requirements`, `files_changed`, `commands_run` como `[]`, `tests`, `decisions`, `risks`, `blockers` e `next_action`. Em `needs_clarification`, `requirements` e `files_changed` devem permanecer vazios e `next_action` deve conter somente as perguntas ou informações necessárias. Em `plan_ready`, `blockers` deve ser `[]` e `next_action` deve informar que o plano aguarda aprovação explícita do developer/usuário.

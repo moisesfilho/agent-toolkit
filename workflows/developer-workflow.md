@@ -2,16 +2,18 @@
 
 ## Objetivo
 
-Configuração global para desenvolvimento orientado por especificações, testes automatizados (TDD), loops de execução autônomos, checkpoints inteligentes baseados em risco, revisão técnica rigorosa, documentação e memória técnica.
+Configuração global para desenvolvimento orientado por especificações, testes automatizados, loops de execução autônomos, checkpoints inteligentes baseados em risco, revisão técnica rigorosa, documentação e memória técnica.
+
+A ordem padrão de execução é `implementação -> testes -> revisão` (`developer -> coder/coder-expert -> tester -> reviewer`). O TDD não é obrigatório: a criação de testes é responsabilidade do `tester` e ocorre depois da implementação entregue pelo `coder`/`coder-expert`, permanecendo obrigatória antes da aprovação final. Em correções de bug, o teste de regressão é criado depois da correção.
 
 ## Agentes
 
 - `developer`: orquestrador e responsável pela máquina de estados, roteamento de handoffs e gestão de loops.
 - `planner`: especialista em requisitos, contexto, critérios de aceite e arquitetura.
-- `tester`: especialista em testes automatizados, criação de suítes, refinamento de testes, guarda de integridade e qualidade da validação.
-- `coder`: especialista na stack do projeto e implementação padrão de código de produção.
+- `tester`: especialista em testes automatizados, criação e expansão de suítes depois da implementação, refino de testes, testes de regressão de bug, guarda de integridade e qualidade da validação.
+- `coder`: especialista na stack do projeto e implementação padrão de código de produção, com verificação local limitada ao contexto alterado e sem execução da suíte de testes.
 - `coder-expert`: especialista em algoritmos complexos, concorrência crítica, refatorações arquiteturais profundas e escalação técnica quando o coder encontrar dificuldades.
-- `reviewer`: especialista em execução de testes, inspeção de qualidade de testes, validação de critérios de aceite, revisão de código, segurança, qualidade técnica, documentação e memória persistente.
+- `reviewer`: especialista em execução da suíte completa de testes e da regressão, inspeção de qualidade de testes, validação de critérios de aceite, revisão de código, segurança, qualidade técnica, documentação e memória persistente.
 - `analyst`: agente primário e independente, acionado manualmente pelo usuário para produzir especificações funcionais detalhadas; não é subagente do `developer`.
 
 ## Fluxo de trabalho
@@ -30,16 +32,16 @@ Configuração global para desenvolvimento orientado por especificações, teste
 12. `planner` entrega requisitos, critérios de aceite, arquitetura, cenários de teste e riscos, preservando a rastreabilidade `REQ-*`/`AC-*`.
 13. Antes de decidir entre alternativas técnicas ou avançar com um plano interno, `developer` consulta obrigatoriamente o Jev para avaliar consistência, aderência aos requisitos, riscos, reversibilidade e manutenção. Com confiança `>= 0.90`, pode adotar automaticamente uma decisão técnica reversível e de baixo risco dentro do escopo aprovado; caso contrário, escala a decisão ao agente responsável ou ao usuário.
 14. **Gate Humano 1**: `developer` solicita aprovação explícita do objetivo e do plano ao usuário. A avaliação do Jev não substitui esse gate.
-15. Após aprovação, `tester` cria a suíte de testes inicial antes da implementação.
-16. `coder` (ou `coder-expert` para tarefas de complexidade inicial elevada) implementa o código de produção de acordo com as especificações e entrega sem executar os testes.
-17. `reviewer` executa a suíte de testes automatizados, inspeciona a qualidade dos testes e do código, analisa segurança, lint e aderência aos critérios de aceite.
+15. Após aprovação do plano, `coder` (ou `coder-expert` para tarefas de complexidade inicial elevada) implementa o código de produção de acordo com as especificações, executa apenas verificações locais limitadas ao contexto alterado e a compilação/build potencialmente afetados, e entrega sem executar a suíte de testes.
+16. `tester` cria ou expande a suíte de testes para os requisitos, critérios de aceite e comportamento implementado, mantendo a guarda de integridade dos testes. Em correções de bug, cria o teste de regressão depois da correção já entregue pelo `coder`/`coder-expert`.
+17. `reviewer` executa a suíte de testes automatizados e a regressão, inspeciona a qualidade dos testes e do código, analisa segurança, lint e aderência aos critérios de aceite.
 18. **Roteamento de Retorno do Reviewer**:
    - **Refinamento/Correção de Testes (`test_refinement_needed`)**: Se o `reviewer` detectar testes frágeis, instáveis, com vazamentos de recursos ou asserções fracas:
      - `developer` aciona o `tester` com o diagnóstico.
      - `tester` julga a solicitação, garante que o propósito do teste não seja subvertido, corrige os testes e, por ter vindo do `reviewer`, **devolve diretamente ao `reviewer`** para reexecução e reavaliação.
      - Se o `tester` considerar que a solicitação subverte o propósito original do teste, responde com `tester_disputed` para mediação do `developer`.
-   - **Novos testes necessários (`needs_more_tests`)**: Se o `reviewer` notar cenários/casos de borda não cobertos:
-     - `developer` aciona o `tester` para criar os novos testes $\rightarrow$ `coder` implementa as alterações de código correspondentes $\rightarrow$ `reviewer` reexecuta os testes e revisa.
+   - **Novos testes necessários (`needs_more_tests`)**: Se o `reviewer` notar cenários/casos de borda, cobertura de requisito ou teste de regressão de bug não cobertos:
+     - `developer` aciona o `tester` para criar os novos testes. Se a implementação já cobrir o cenário, o retorno é direto ao `reviewer`; se os testes revelarem implementação ausente ou incorreta, o `developer` aciona o `coder` para implementar as alterações correspondentes $\rightarrow$ `reviewer` reexecuta a suíte e revisa.
    - **Falhas de teste ou código de produção (`needs_correction`)**:
      - `developer` aciona o `coder` para aplicar os ajustes. Caso o `coder` encontre dificuldades persistentes para solucionar, o `developer` escala para o `coder-expert` antes de acionar intervenção humana (limite total de até 3 ciclos de auto-correção).
 19. Com a revisão e os testes 100% aprovados (`review_approved`), o `reviewer` atualiza a documentação técnica e a memória do projeto.
@@ -47,7 +49,11 @@ Configuração global para desenvolvimento orientado por especificações, teste
 
 ## Máquina de estados
 
-`discovery` -> (`analyst_handoff` -> `bug_diagnosis` -> `bug_reproduction` -> `assisted_reproduction`, se necessário) -> `clarification` -> `objective_ready` -> `awaiting_objective_confirmation` -> `planning` -> `awaiting_plan_approval` -> `test_creation` -> `test_validation` -> `implementation` -> `autonomous_review` -> `test_refinement` (se teste ruim) -> `correction` (loop auto de código) -> `documentation` -> `memory_update` -> `completed`
+`discovery` -> (`analyst_handoff` -> `bug_diagnosis` -> `bug_reproduction` -> `assisted_reproduction`, se necessário) -> `clarification` -> `objective_ready` -> `awaiting_objective_confirmation` -> `planning` -> `awaiting_plan_approval` -> `implementation` -> `local_verification` -> `test_creation` -> `autonomous_review` -> `test_refinement` (se teste ruim) -> `correction` (loop auto de código) -> `documentation` -> `memory_update` -> `completed`
+
+`implementation` e `local_verification` precedem `test_creation`: a suíte de testes é criada e ampliada depois da entrega do código, e não antes. `local_verification` cobre apenas as verificações locais do coder/coder-expert limitadas ao contexto alterado e a compilação/build potencialmente afetados. `test_validation` deixa de ser estado próprio: a validação dos testes acontece em `autonomous_review`, executada pelo `reviewer`.
+
+Em correções de bug, o ciclo é `implementation` (correção) -> `test_creation` (teste de regressão) -> `autonomous_review`, garantindo que o teste de regressão seja criado depois da correção e validado na suíte completa.
 
 `analyst_handoff` é um marcador de contexto dentro de `discovery`, não um agente ou uma nova sessão filha. O fluxo manual continua sendo `usuário -> analyst -> developer -> planner`.
 
@@ -56,14 +62,19 @@ Estados alternativos: `tester_disputed`, `critical_checkpoint` (parada intermedi
 Transições proibidas:
 - Planejamento técnico antes da confirmação explícita do objetivo.
 - Criação de testes ou implementação antes da aprovação do plano.
-- Coder implementar sem testes prévios criados pelo tester.
+- Exigir TDD ou testes prévios do `tester` para autorizar ou iniciar a implementação.
+- Coder ou coder-expert executar a suíte completa de testes ou a regressão completa.
 - Coder alterar ou enfraquecer arquivos de teste.
 - Tester alterar arquivos de código de produção.
+- Concluir a implementação sem testes do `tester` cobrindo os requisitos antes da revisão final.
+- Correção de bug aprovada sem teste de regressão criado pelo `tester` e validado na suíte completa.
 - Conclusão da tarefa com testes falhando, revisão reprovada ou riscos críticos sem tratamento.
 
 ## Diagnóstico e Reprodução de Bugs
 
 O diagnóstico prévio existe para melhorar a precisão do planejamento, não para substituir a análise do `planner` nem para antecipar decisões de implementação.
+
+O teste de regressão de um bug não é exigido antes da correção: o `coder`/`coder-expert` corrige, o `tester` cria o teste de regressão usando as evidências de reprodução registradas abaixo e o `reviewer` valida, na suíte completa, que o teste falha sem a correção e passa com ela. O teste de regressão deve ser derivado de `expected_behavior`, `observed_behavior` e `reproduction_steps`, e não de hipóteses não confirmadas.
 
 O `developer` deve registrar no handoff, quando aplicável:
 
@@ -95,13 +106,18 @@ Cada consulta deve ser registrada no handoff com pergunta, alternativas ou plano
 O `planner` repete inspeção e perguntas até que o objetivo, restrições e critérios de aceite sejam verificáveis e aprovados pelo usuário.
 
 ### 2. Implementação
-O `coder` é o agente padrão de implementação. O `coder-expert` é reservado para demandas pré-identificadas de alta complexidade técnica ou como escalação técnica quando o `coder` estiver travado. Ambos entregam o código implementado sem executar a suíte de testes.
+O `coder` é o agente padrão de implementação. O `coder-expert` é reservado para demandas pré-identificadas de alta complexidade técnica ou como escalação técnica quando o `coder` estiver travado. Ambos entregam o código implementado sem executar a suíte de testes: podem rodar apenas verificações locais limitadas ao contexto alterado e a compilação/build potencialmente afetados, sempre registradas em `commands_run`.
 
-### 3. Execução de Testes, Revisão e Ciclos de Qualidade
-O `reviewer` é o responsável exclusivo por rodar a suíte de testes automatizados e inspecionar a qualidade de código e testes.
+### 3. Criação e Ajuste de Testes
+O `tester` cria e amplia a suíte depois da implementação entregue, e cria o teste de regressão depois da correção de um bug. Ele executa apenas os testes que criou ou alterou, preservando o propósito dos testes existentes, e nunca altera código de produção.
+
+### 4. Execução de Testes, Revisão e Ciclos de Qualidade
+O `reviewer` é o responsável exclusivo por rodar a suíte de testes automatizados, a regressão completa e a inspeção de qualidade de código e testes.
+- **Fluxo padrão**: `coder` (implementa) $\rightarrow$ `tester` (cria/expande) $\rightarrow$ `reviewer` (suíte completa e revisão).
 - **Se teste ruim/instável/vazamento**: `reviewer` $\rightarrow$ `tester` (refina) $\rightarrow$ `reviewer`.
-- **Se novos cenários necessários**: `reviewer` $\rightarrow$ `tester` (cria) $\rightarrow$ `coder` (implementa) $\rightarrow$ `reviewer`.
-- **Se bug no código**: `reviewer` $\rightarrow$ `coder` (corrige) [ou `coder-expert` se escalado] $\rightarrow$ `reviewer`.
+- **Se novos cenários necessários e implementação já correta**: `reviewer` $\rightarrow$ `tester` (cria) $\rightarrow$ `reviewer`.
+- **Se novos cenários necessários e implementação incompleta**: `reviewer` $\rightarrow$ `tester` (cria) $\rightarrow$ `coder` (implementa) $\rightarrow$ `reviewer`.
+- **Se bug no código**: `reviewer` $\rightarrow$ `coder` (corrige) [ou `coder-expert` se escalado] $\rightarrow$ `tester` (cria o teste de regressão) $\rightarrow$ `reviewer`.
 - O sistema opera autonomamente por até **3 ciclos**. Persistindo o problema ou em caso de `tester_disputed` com impacto em regras de negócio, o `developer` aciona o usuário.
 
 ## Política de Checkpoints Inteligentes
@@ -109,6 +125,8 @@ O `reviewer` é o responsável exclusivo por rodar a suíte de testes automatiza
 ### Checkpoints Autônomos (Internos)
 - Execução e validação de testes automatizados pelo `reviewer`.
 - Refinamento de testes pelo `tester` com retorno direto ao `reviewer`.
+- Criação e expansão da suíte pelo `tester` depois da implementação, e teste de regressão depois da correção de bug.
+- Verificações locais limitadas ao contexto alterado e compilação/build potencialmente afetados pelo `coder`/`coder-expert`.
 - Ajustes de implementação e correções de código.
 - Escalação controlada de `coder` para `coder-expert`.
 - Ciclos de correção de revisão (até 3 tentativas).
@@ -131,36 +149,9 @@ O `reviewer` é o responsável exclusivo por rodar a suíte de testes automatiza
 
 ## Rastreabilidade
 
-Cada bug segue a cadeia: `BUG_REPORT -> BUG_EVIDENCE -> REQ -> TEST_REQUEST -> TEST_CREATED_OR_REFINED -> IMPLEMENTATION -> REVIEW`.
+Cada requisito segue a cadeia na ordem padrão `implementação -> testes -> revisão`: `REQ-001 -> implementação -> TEST-001 -> REVIEW-001`.
 
-## Documentação e Memória Técnica
-
-Ao finalizar, o `reviewer` documenta a solução, registra decisões arquiteturais, limitações e riscos residuais, atualizando a memória persistente do projeto com informações verificadas.
-
-## Política de Checkpoints Inteligentes
-
-### Checkpoints Autônomos (Internos)
-- Execução e validação de testes automatizados.
-- Ajustes de implementação e refatorações no loop TDD.
-- Ciclos de correção de revisão (até 3 tentativas).
-- Geração de documentação e atualização de memória.
-
-### Checkpoints Críticos (Humanos / Síncronos)
-1. **Confirmação de Objetivo e Plano**: Alinhamento inicial de escopo e arquitetura antes de qualquer código ser escrito.
-2. **Entrega Final**: Apresentação de diff consolidado, evidências de testes e roteiro de validação manual.
-3. **Paradas por Exceção**:
-   - Dúvidas impeditivas ou decisões de negócio não previstas.
-   - Três ciclos de auto-correção sem convergência.
-   - Ações de alto risco explicitamente marcadas no plano (ex.: migração de banco irreversível).
-
-## Compactação e Handoff
-
-- O `developer` mantém contexto enxuto após cada chamada, preservando apenas objetivo, critérios de aceite, decisões, arquivos alterados, resultados de testes, pendências e riscos. Em correções de bug, preserva também as evidências de reprodução e suas limitações.
-- Todo agente deve retornar `status`, `objective`, `requirements`, `files_changed`, `commands_run`, `tests`, `decisions`, `risks`, `blockers` e `next_action`. Handoffs de bug incluem ainda `bug_report`, `reproduction_status`, `reproduction_steps`, `expected_behavior`, `observed_behavior`, `logs_and_errors`, `environment`, `initial_hypotheses`, `observation_strategy`, `user_actions_requested` e `evidence_limitations`.
-
-## Rastreabilidade
-
-Cada requisito segue a cadeia: `REQ-001 -> TEST-001 -> implementação -> REVIEW-001`.
+Cada bug segue a cadeia: `BUG_REPORT -> BUG_EVIDENCE -> REQ -> IMPLEMENTATION_CORRECTION -> TEST_REGRESSION -> REVIEW`, com o teste de regressão sempre criado depois da correção e validado na suíte completa pelo `reviewer`.
 
 ## Documentação e Memória Técnica
 
