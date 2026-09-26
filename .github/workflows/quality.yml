@@ -1,0 +1,67 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f README.pt-BR.md
+          test -f CONTRIBUTING.md
+          test -f LICENSE
+          test -d agents
+          test -d skills
+          test -d workflows
+          test -d templates
+          test -d docs
+          test -d harnesses
+
+      - name: Validate Markdown links
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            while IFS= read -r link; do
+              target="${link#*](}"
+              target="${target%%)*}"
+              case "$target" in
+                http://*|https://*|mailto:*|'#'*|'') continue ;;
+              esac
+              test -e "$(dirname "$file")/$target"
+            done < <(grep -oE '\[[^]]+\]\([^)]*\)' "$file" || true)
+          done < <(find . -name '*.md' -not -path './.git/*' -print)
+
+      - name: Validate scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile skills/antigravity-session/scripts/recover.py
+          node --check harnesses/typesafe-jev-mcp/index.mjs
+
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo '## Quality Summary'
+            echo
+            echo '| Check | Status |'
+            echo '| --- | --- |'
+            echo '| Repository structure | Completed |'
+            echo '| Markdown links | Completed |'
+          } >> "$GITHUB_STEP_SUMMARY"
