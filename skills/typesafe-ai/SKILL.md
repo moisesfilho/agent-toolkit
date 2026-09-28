@@ -15,6 +15,11 @@ description: >
 
 # Build with TypeSafe
 
+Use esta skill sob demanda, quando a tarefa estiver implementando ou alterando
+uma integracao TypeSafe. O fluxo normal de desenvolvimento nao deve carrega-la
+apenas para decidir se uma chamada Jev e necessaria; nesse caso, siga a politica
+local de `docs/typesafe-jev-policy.md`.
+
 TypeSafe makes units of AI intelligence usable like programming primitives: small
 judgments you can compose into larger capabilities. Its **System One models** return
 fast, focused judgments that software can consume directly. **Jev** is TypeSafe's

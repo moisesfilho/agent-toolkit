@@ -35,9 +35,10 @@ credenciais, logs, caches e memoria privada foram intencionalmente excluidos.
 | `docs/` | Conceitos, convencoes, compatibilidade e guias. |
 | `harnesses/` | Adaptadores e notas para harnesses especificos. |
 
-A colecao inicial inclui os agents configurados, skills reutilizaveis, o
-workflow de desenvolvimento, a documentacao e o harness MCP do TypeSafe Jev,
-alem das politicas de busca e decisoes.
+A colecao inicial inclui os agents configurados, skills reutilizaveis, incluindo
+a baseline compartilhada de clean code, o workflow de desenvolvimento, a
+documentacao e o harness MCP do TypeSafe Jev, alem das politicas de busca e
+decisoes.
 
 ## Portabilidade E Seguranca
 

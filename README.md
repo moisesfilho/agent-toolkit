@@ -34,9 +34,9 @@ logs, caches, and private memory are intentionally excluded.
 | `docs/` | Concepts, conventions, compatibility notes, and guides. |
 | `harnesses/` | Adapters and notes for specific AI coding harnesses. |
 
-The initial collection includes the configured agents, reusable skills, the
-developer workflow, TypeSafe Jev documentation and MCP harness, and search
-and decision policies.
+The initial collection includes the configured agents, reusable skills,
+including the shared clean code baseline, the developer workflow, TypeSafe Jev
+documentation and MCP harness, and search and decision policies.
 
 ## Portability And Security
 

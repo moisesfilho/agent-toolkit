@@ -5,7 +5,7 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
 ## Regras gerais
 
 - Use o Jev apenas quando houver decisao semantica que nao seja determinada por regras, documentacao, comandos ou resultados de testes.
-- Use o Jev de forma proativa ao longo do ciclo, nao apenas diante de `blocking_questions`.
+- Use o Jev somente nos gatilhos fechados definidos abaixo; nao o use por padrao.
 - Envie somente o estado minimo necessario e formule perguntas atomicas.
 - Use `noul` para condicoes booleanas, `choice` para alternativas fechadas e `score` para severidade, risco ou cobertura ordenada.
 - Prefira uma unica chamada com varias perguntas independentes quando isso reduzir latencia sem misturar decisoes.
@@ -28,3 +28,16 @@ Nao use o Jev para confirmar objetivo, escopo, requisitos, criterios de aceite o
 - `tester`: pode priorizar casos de borda, risco de regressao e lacunas de cobertura. Nao pode remover cenarios nem enfraquecer assercoes.
 - `reviewer`: pode classificar severidade, risco residual e prioridade de correcoes. Nao pode aprovar com testes falhando ou substituir um gate humano.
 - `minimal`: nao usa ferramentas, mesmo que a permissao global do MCP exista.
+
+## Gatilhos de baixo custo
+
+Use uma chamada Jev somente quando a resposta nao for determinada por regras,
+documentacao, comandos ou testes e houver uma decisao reversivel e de baixo risco:
+
+- empate real entre alternativas tecnicas ja delimitadas no plano;
+- `blocking_questions` que nao alterem escopo ou comportamento;
+- classificacao de severidade, risco residual ou cobertura.
+
+Agrupe perguntas independentes na mesma chamada. Registre no handoff uma linha
+compacta no formato `jev: pergunta -> resposta/confianca -> decisao`. Nao releia
+a skill de TypeSafe se ela ja estiver no contexto da sessao.

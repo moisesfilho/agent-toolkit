@@ -245,9 +245,9 @@ Regras implementadas:
    pergunta nao for automatizavel.
 6. Registrar pergunta, resposta, probabilidade/confianca, decisao e motivo do
    escalonamento no handoff.
-7. Usar de forma proativa durante o ciclo do developer (diagnostico, escolha de
-   alternativas delimitadas, priorizacao de testes/correcoes, classificacao de
-   risco), nao apenas diante de `blocking_questions`.
+7. Usar somente nos gatilhos fechados de baixo risco: empate real entre
+   alternativas delimitadas, `blocking_questions` reversiveis ou classificacao
+   de severidade, risco e cobertura.
 
 As responsabilidades por agente sao delimitadas na politica global e
 reforcadas nos arquivos dos agentes `planner`, `coder`, `coder-expert`,
@@ -284,7 +284,9 @@ O Developer pode transformar a pergunta em uma decisao Jev:
 Se a resposta tiver confianca suficiente, o Developer pode registrar a decisao
 como automatica. Caso contrario, deve utilizar `question` e aguardar o usuario.
 
-O uso proativo nao depende de `blocking_questions`. Exemplos ao longo do ciclo:
+Outros usos nao sao obrigatorios. Quando um dos gatilhos acima ocorrer, prefira
+uma unica chamada com perguntas independentes e registre apenas uma linha no
+handoff no formato `jev: pergunta -> resposta/confianca -> decisao`.
 
 Priorizacao de correcoes por severidade (`score`):
 
@@ -368,10 +370,10 @@ Depois de alterar configuracoes globais, e necessario reiniciar o OpenCode.
 ## Limitacoes
 
 O MCP nao intercepta automaticamente chamadas diretas a ferramenta `question`.
-A automacao acontece quando o agente Developer (ou um subagente autorizado)
-decide chamar `typesafe-jev_jev_decide` de forma proativa em um ponto de
-decisao tecnica local, inclusive quando nenhum `blocking_questions` foi
-retornado.
+A automacao acontece quando o agente Developer decide chamar
+`typesafe-jev_jev_decide` em um dos gatilhos fechados de baixo risco: empate
+tecnico real, `blocking_questions` reversivel ou classificacao de severidade,
+risco e cobertura.
 
 O Jev nao substitui Gemini, Claude ou GPT na geracao de codigo e texto. Ele e
 uma funcao de decisao estruturada:
