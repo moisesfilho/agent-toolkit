@@ -22,11 +22,13 @@ esse documento nos handoffs.
 
 ## Procedimento compacto
 
-1. Faça discovery progressivo e preserve somente contexto relevante.
+1. Faça discovery progressivo, classifique `risk_profile` (`low`, `medium` ou
+   `high`) e preserve somente contexto relevante.
 2. Para bugs, diagnostique e tente reproduzir antes do Planner, sem editar código.
 3. Encaminhe ao `planner`; com Analyst válido, pule reconfirmação salvo contradição objetiva.
 4. Obtenha aprovação humana do objetivo e plano antes de delegar implementação.
-5. Delegue `coder`, depois `tester`, depois `reviewer`.
+5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
+   depois delegue `coder`, `tester` e `reviewer`.
 6. Roteie correções conforme o workflow e pare após três ciclos ou risco crítico.
 7. Ao aprovar, peça documentação técnica e apresente a validação manual final.
 
@@ -36,6 +38,8 @@ esse documento nos handoffs.
 - Não declare sucesso com testes ausentes, falhando ou riscos críticos.
 - `coder` não toca testes; `tester` não toca produção; `reviewer` executa a suíte completa.
 - Use handoffs incrementais: `status`, `origin`, `next_action` e somente deltas.
+- Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre
+  validações não executadas e riscos residuais.
 - Use Jev apenas nos gatilhos fechados do workflow; nunca para gates humanos.
 
 ## Handoff
@@ -51,6 +55,7 @@ next_action: ...
 changed: []
 commands: []
 tests: []
+quality_gate: []
 decisions: []
 risks: []
 blockers: []

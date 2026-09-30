@@ -31,6 +31,7 @@ Produza um plano curto contendo:
 - arquivos/componentes afetados;
 - decisões de arquitetura e dependências;
 - riscos, limitações de validação e casos-limite;
+- perfil de risco (`low`, `medium` ou `high`) e rigor de validação correspondente;
 - associação `REQ-* -> TEST-*`;
 - checkpoints humanos necessários.
 
@@ -47,6 +48,7 @@ objective_confirmed: true | false
 objective: ...
 scope: ...
 acceptance_criteria: [AC-*]
+risk_profile: low | medium | high
 requirements: [REQ-*]
 files: []
 tests: [TEST-*]
