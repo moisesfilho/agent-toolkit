@@ -7,6 +7,12 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
 - Use o Jev apenas quando houver decisao semantica que nao seja determinada por regras, documentacao, comandos ou resultados de testes.
 - Use o Jev somente nos gatilhos fechados definidos abaixo; nao o use por padrao.
 - Envie somente o estado minimo necessario e formule perguntas atomicas.
+- Ao chamar `typesafe-jev_jev_decide`, envie `questions` como mapa
+   `{id: {type, instructions, criteria}}`, nunca como array. `type` fica na
+   pergunta, nunca em `criteria`.
+- No schema desta ferramenta, `choice` aceita `criteria` como objeto opcional,
+  `score` aceita `criteria` como array opcional e `noul` aceita `criteria` como
+  objeto opcional ou omitido.
 - Use `noul` para condicoes booleanas, `choice` para alternativas fechadas e `score` para severidade, risco ou cobertura ordenada.
 - Prefira uma unica chamada com varias perguntas independentes quando isso reduzir latencia sem misturar decisoes.
 - Limiares de automacao:

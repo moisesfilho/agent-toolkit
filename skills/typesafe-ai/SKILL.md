@@ -114,6 +114,14 @@ answers in **criteria**. Question IDs are for code and are not sent to the model
 include complete meaning in the question. Reference nested state with backticked
 paths such as `ticket.messages[0].text`.
 
+For the local `typesafe-jev_jev_decide` call, `questions` must be a map of
+`{id: {type, instructions, criteria}}`, not an array. Put `type` on the question,
+never inside `criteria`. Follow the MCP schema: `choice` accepts an optional
+object for `criteria`, `score` accepts an optional array, and `noul` accepts an
+optional object or an omitted `criteria` field. For example, a choice may use
+`{"reachability":"..."}`; do not send `questions` as `[{...}]` or nest
+`type` under `criteria`.
+
 Ask one narrow, coherent judgment per question. Split independently useful dimensions,
 without destroying the relationship being judged. A bounded action selection or
 contextual interpretation is valid; atomic does not mean literal fact extraction

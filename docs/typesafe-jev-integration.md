@@ -154,11 +154,52 @@ com timeout de 20s por tentativa, valida respostas HTTP e a presenca de
 `answers` no payload, e so retorna erro quando ambos falham (com o motivo de
 cada um). A resposta inclui `provider` e `model` usados.
 
-A ferramenta recebe um estado e um mapa de perguntas tipadas:
+A ferramenta recebe um estado e um mapa de perguntas tipadas. `questions` e
+sempre um objeto no formato `{id: {type, instructions, criteria}}`, nunca um
+array. `type` pertence a cada pergunta e nunca a `criteria`.
 
-O schema do MCP valida `criteria` conforme o tipo da pergunta: `noul` e
-`choice` usam objeto; `score` usa array. Payloads incompatíveis sao rejeitados
-localmente e nao sao encaminhados ao provedor nem ao fallback.
+O schema efetivo do MCP valida `criteria` conforme o tipo: em `choice`, use um
+objeto opcional; em `score`, use um array opcional; em `noul`, use um objeto
+opcional ou omita o campo. `type` deve ficar diretamente na pergunta, e nao em
+`criteria`.
+
+**Invalido — `questions` como array; nao enviar:**
+
+```json
+{"state": "...", "questions": [{"type": "noul", "instructions": "..."}]}
+```
+
+**Validos — formas de `criteria` por tipo:**
+
+```json
+{
+  "state": "...",
+  "questions": {
+    "reachability": {
+      "type": "choice",
+      "instructions": "Qual alternativa e alcancavel?",
+      "criteria": {"reachability": "alcancavel ou nao alcancavel"}
+    },
+    "severity": {
+      "type": "score",
+      "instructions": "Qual a severidade?",
+      "criteria": ["baixa", "media", "alta"]
+    },
+    "approved": {
+      "type": "noul",
+      "instructions": "A alteracao esta aprovada?",
+      "criteria": {}
+    },
+    "has_context": {
+      "type": "noul",
+      "instructions": "Ha contexto suficiente?"
+    }
+  }
+}
+```
+
+Payloads incompatíveis sao rejeitados localmente e nao sao encaminhados ao
+provedor nem ao fallback.
 
 ```json
 {
@@ -167,7 +208,7 @@ localmente e nao sao encaminhados ao provedor nem ao fallback.
     "id_da_pergunta": {
       "type": "noul | choice | score",
       "instructions": "pergunta atomica",
-      "criteria": "objeto para noul/choice; array para score"
+      "criteria": "objeto opcional para choice/noul; array opcional para score"
     }
   }
 }
@@ -323,11 +364,18 @@ Escolha de alternativa de implementacao ja delimitada no plano (`choice`):
     "abordagem": {
       "type": "choice",
       "instructions": "Qual alternativa tecnica melhor atende o plano aprovado?",
-      "criteria": ["componente separado", "funcao utilitaria", "inline no modulo"]
+      "criteria": {"alternativas": "componente separado, funcao utilitaria ou inline no modulo"}
     }
   }
 }
 ```
+
+### Armadilha do log
+
+Ao interpretar erros ou exemplos registrados em logs, `questions=[{...}]` e
+invalido: o MCP exige `questions` como objeto/mapa no formato
+`{id: {type, instructions, criteria}}`, nunca como array. Alem disso, `type`
+deve permanecer diretamente no objeto da pergunta, e nao dentro de `criteria`.
 
 ## Validacao
 

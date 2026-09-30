@@ -41,6 +41,11 @@ esse documento nos handoffs.
 - Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre
   validações não executadas e riscos residuais.
 - Use Jev apenas nos gatilhos fechados do workflow; nunca para gates humanos.
+- Nas chamadas `typesafe-jev_jev_decide`, envie `questions` como mapa
+   `{id: {type, instructions, criteria}}`, nunca como array. `type` fica na
+   pergunta; `choice` aceita `criteria` como objeto opcional, `score` como
+   array opcional e `noul` como objeto opcional ou campo omitido. Siga a forma
+   permitida pelo tipo da pergunta.
 
 ## Handoff
 
