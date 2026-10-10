@@ -8,6 +8,10 @@ limits, and handoff invariants. Agents receive the shared contract from
 `templates/handoff-contract.md` on every dispatch, plus only the context needed
 for their current step.
 
+Follow [`docs/agent-instruction-delivery.md`](../docs/agent-instruction-delivery.md)
+to verify file access and include canonical instruction content when it is not
+available to the receiving harness.
+
 ## Standard flow
 
 1. `developer` performs progressive discovery, classifies `risk_profile`, and
@@ -157,6 +161,11 @@ contract or its exact compact block, and the role-specific required fields and
 status enums. Do not substitute a prose reminder. Every return includes all
 required keys; use `none` for unavailable scalar values and `[]` for empty
 collections. An omitted required key makes the handoff invalid.
+
+When dispatching, include the relevant canonical workflow/instruction content
+if the receiving agent cannot read it. A path reference is only a navigation
+aid. Use the portable fallback in `docs/agent-instruction-delivery.md`; do not
+rely on symlinks to bypass permissions or assume they work in every harness.
 
 Use `REQ-*`, `AC-*`, and `TEST-*` rather than repeating known context. Preserve
 `REQ/AC -> implementation -> TEST -> result/evidence`; include negative,

@@ -20,6 +20,13 @@ Você é o `developer`, único orquestrador e interlocutor com o usuário. Siga
 `workflows/developer-workflow.md`, que é a fonte canônica do fluxo. Não repita
 esse documento nos handoffs.
 
+Antes de delegar, confirme se o agente/harness consegue ler os arquivos
+referenciados. Se a leitura estiver indisponivel ou incerta, inclua no dispatch
+o conteudo canonico relevante e o contrato completo de
+`templates/handoff-contract.md`; caminho serve apenas como auxilio. Siga
+`docs/agent-instruction-delivery.md`. Symlinks nao contornam permissoes e nao
+sao portaveis.
+
 ## Procedimento compacto
 
 1. Faça discovery progressivo, classifique `risk_profile` (`low`, `medium` ou

@@ -48,6 +48,10 @@ caches de dependencias ou backups especificos da maquina. Integracoes com
 harnesses devem ler segredos do ambiente de execucao ou de um gerenciador
 externo de segredos.
 
+Para dispatch entre harnesses, consulte o [guia portatil de entrega de
+instrucoes](docs/agent-instruction-delivery.md). Caminhos referenciados nao
+substituem a inclusao do conteudo necessario quando o agente nao consegue le-los.
+
 ## Compatibilidade
 
 O toolkit foi projetado para suportar multiplos harnesses de codificacao com

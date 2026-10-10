@@ -45,6 +45,10 @@ absolute home paths, hostnames, LAN addresses, logs, dependency caches, or
 machine-specific backups. Harness integrations must read secrets from the
 runtime environment or an external secret manager.
 
+For cross-harness dispatch, see the [portable instruction delivery
+guide](docs/agent-instruction-delivery.md). Referenced paths are not a
+substitute for including required content when an agent cannot read them.
+
 ## Compatibility
 
 The toolkit is designed to support multiple AI coding harnesses. Resources
