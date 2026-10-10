@@ -40,10 +40,14 @@ escopo, compatibilidade ou validação. Caso contrário, escolha o detalhe técn
 reversível no plano. Não use Jev por padrão; o developer decide se um empate
 fechado exige Jev.
 
-Retorne no máximo 40 linhas:
+Retorne no máximo 40 linhas, com todos os campos comuns do contrato e estes
+campos específicos:
 
 ```text
 status: objective_ready | plan_ready | needs_clarification
+origin: planner
+next_action: developer
+cycle: 0
 objective_confirmed: true | false
 objective: ...
 scope: ...
@@ -51,9 +55,15 @@ acceptance_criteria: [AC-*]
 risk_profile: low | medium | high
 requirements: [REQ-*]
 files: []
-tests: [TEST-*]
+planned_tests: [TEST-*]
+checkpoints: []
+changed: []
+commands: []
+tests: []
+quality_gate: []
 decisions: []
 risks: []
 blockers: []
-next_action: ...
+manual_validation: none | pending | completed: <evidence>
+overrides: []
 ```

@@ -26,16 +26,24 @@ use apenas o checklist de implementação. O plano e as regras do projeto têm
 precedência.
 
 Se houver bloqueio, retorne-o sem perguntar diretamente ao usuário. Entregue um
-handoff incremental de no máximo 25 linhas:
+handoff conforme `templates/handoff-contract.md`, no máximo 25 linhas:
 
 ```text
 status: implementation_ready | implementation_corrected | blocked
 origin: coder
 next_action: tester | developer
+cycle: 0
 changed: [arquivos e REQ-* afetados]
 commands: [somente verificações locais]
-tests: [suíte completa não executada]
+tests: [resultados das verificações executadas]
+quality_gate: []
 decisions: []
 risks: []
 blockers: []
+manual_validation: none | pending | completed: <evidence>
+overrides: []
 ```
+
+Inclua todos os campos comuns exigidos pelo template. Não descreva uma suíte
+nunca executada como resultado de teste; registre essa limitação em `risks` ou
+`manual_validation` conforme aplicável.

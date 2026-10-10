@@ -23,16 +23,24 @@ limite verificações a typecheck, lint, build e escopo afetado.
 
 Leia a skill `clean-code` apenas se ela não estiver no contexto e aplique o
 checklist de implementação. Se a solução exigir mudança de escopo ou arquitetura
-aprovada, retorne `blocked` ao developer.
+aprovada, retorne `blocked` ao developer. Siga `templates/handoff-contract.md`;
+limite o retorno a 25 linhas.
 
 ```text
 status: implementation_ready | implementation_corrected | blocked
 origin: coder-expert
 next_action: tester | developer
+cycle: 0
 changed: []
 commands: []
-tests: [suíte completa não executada]
+tests: []
+quality_gate: []
 decisions: []
 risks: []
 blockers: []
+manual_validation: none | pending | completed: <evidence>
+overrides: []
 ```
+
+Inclua todos os campos comuns. Nunca registre uma suíte não executada como
+resultado de teste; informe a limitação em `risks`.
