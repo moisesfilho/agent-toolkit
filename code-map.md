@@ -1,0 +1,26 @@
+# agent-toolkit Code Map
+
+Colecao portatil de recursos para agentes e harnesses de desenvolvimento com
+IA. O repositorio nao possui runtime proprio; seu produto e documentacao
+reutilizavel e arquivos de configuracao portaveis.
+
+## Organizacao
+
+| Caminho | Responsabilidade |
+| --- | --- |
+| `agents/` | Definições reutilizáveis; `retrospectiv.md` analisa sessões de harness em modo somente leitura. |
+| `skills/` | Capacidades e procedimentos focados. |
+| `workflows/` | Fluxos de planejamento, implementacao, revisao e release. |
+| `templates/` | Modelos reutilizáveis; `handoff-contract.md` é o contrato compartilhado entre agentes. |
+| `docs/` | Conceitos, compatibilidade e guias. |
+| `harnesses/` | Adaptadores para ferramentas de coding. |
+| `tools/validate_handoffs.py` | Valida contrato, limites e invariantes dos handoffs dos agentes. |
+| `tests/test_validate_handoffs.py` | Testes positivos e negativos do validador do contrato. |
+| `CONTRIBUTING.md` | Regras de contribuicao, portabilidade e seguranca. |
+
+## Entrada e validacao
+
+Nao ha ponto de entrada executavel. A validacao e feita pelo workflow CI em
+`.github/workflows/quality.yml`. O README e `README.pt-BR.md` documentam o
+proposito e a estrutura publica. Recursos nao devem conter credenciais,
+caches, logs, memoria privada ou caminhos absolutos da maquina.

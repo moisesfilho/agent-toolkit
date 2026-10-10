@@ -1,159 +1,175 @@
 # Developer Workflow
 
-## Objetivo
+## Objective
 
-Fluxo enxuto para desenvolvimento orientado por requisitos, com implementação,
-testes, revisão e checkpoints humanos sem repetir contexto entre agentes.
+Lean, requirements-led development with implementation, tests, review, and
+human checkpoints. This document is the canonical source for states, routing,
+limits, and handoff invariants. Agents receive the shared contract from
+`templates/handoff-contract.md` on every dispatch, plus only the context needed
+for their current step.
 
-O `workflow` é a fonte canônica para estados, roteamento, limites e contratos.
-Os agentes devem receber apenas o contexto necessário para a etapa atual.
+## Standard flow
 
-## Fluxo padrão
+1. `developer` performs progressive discovery, classifies `risk_profile`, and
+   confirms the objective with the user.
+2. `planner` resolves technical ambiguity and produces a plan. A valid `analyst`
+   handoff may supply requirements without reopening settled questions.
+3. The user explicitly approves the objective and plan before implementation.
+4. For high-risk work, `tester` defines acceptance, boundary, failure, and
+   regression scenarios before implementation. This does not make TDD mandatory
+   for simple work.
+5. `coder` implements. Use `coder-expert` only for high complexity or explicit
+   escalation.
+6. `tester` adds or updates tests against the approved scenarios.
+7. `reviewer` runs the full applicable suite, reviews code/tests, and verifies
+   local and remote quality gates.
+8. After `review_approved`, document the solution and present manual validation
+   instructions. Work is `completed` only after required manual validation is
+   recorded; only the user accepts device/hardware behavior.
 
-1. `developer` faz discovery e classifica a solicitação.
-2. `planner` resolve ambiguidades técnicas e produz o plano.
-3. Gate humano aprova objetivo e plano.
-4. Para risco alto, `tester` define os cenários de aceitação e regressão antes
-   da implementação; isso não torna TDD obrigatório para tarefas simples.
-5. `coder` implementa; `coder-expert` só é usado para alta complexidade ou escalação.
-6. `tester` cria ou amplia os testes conforme os cenários aprovados.
-7. `reviewer` executa a suíte completa, revisa código e testes e integra a
-   validação ao quality gate de CI/CD quando houver um pipeline funcional.
-8. Após `review_approved`, documenta-se a solução e aguarda-se a validação manual final.
+For bugs, reproduce before planning where possible. High-risk bugs require
+`tester` scenarios before the fix; low/medium-risk bugs may be fixed first and
+receive a regression test afterward. Regression coverage is required before
+approval in either path.
 
-O TDD não é obrigatório. Em bugs, o `coder` corrige primeiro, o `tester` cria a
-regressão depois e o `reviewer` valida a suíte completa.
+## Roles and separation
 
-## Estados
+- `developer` is the only orchestrator and user interlocutor. It owns the
+  canonical state ledger and validates every handoff before routing it.
+- `planner` is read-only and defines architecture, risk, files, and test intent.
+- `coder`/`coder-expert` change production only; they do not edit tests or run
+  the full suite.
+- `tester` changes tests only and runs tests created or changed by that step.
+- `reviewer` is the only agent that runs the complete suite and issues a review
+  decision. It does not edit source or tests.
+- `analyst` is an optional primary agent that returns requirements; it does not
+  start implementation.
 
-Estados principais: `discovery`, `clarification`, `planning`, `awaiting_approval`,
-`test_specification`, `implementation`, `test_creation`, `review`, `correction`
-e `completed`.
+User instructions may explicitly override a workflow default only when the
+action is within the user's authority. Record `overrides` with the instruction,
+the affected rule, the chosen behavior, and `source: user`. An override cannot
+be represented as a gate passing: report the skipped/pending validation and
+leave completion or release acceptance to the user.
 
-Estados excepcionais sob demanda: `bug_diagnosis`, `bug_reproduction`,
-`assisted_reproduction`, `test_refinement`, `tester_disputed`,
-`critical_checkpoint`, `blocked` e `cancelled`.
+## State and routing invariants
 
-Um handoff válido do Analyst pode seguir diretamente para `planning`; só reabra
-o objetivo se existir contradição funcional objetiva.
+Main states: `discovery`, `clarification`, `planning`, `awaiting_approval`,
+`test_specification`, `implementation`, `test_creation`, `review`, `correction`,
+`manual_validation`, and `completed`.
 
-## Responsabilidades e limites
+Exceptional states: `bug_diagnosis`, `bug_reproduction`,
+`assisted_reproduction`, `test_refinement`, `tester_disputed`, `blocked`,
+`review_incomplete`, `critical_checkpoint`, and `cancelled`.
 
-- `developer`: único orquestrador, mantém o estado canônico e fala com o usuário.
-- `planner`: somente leitura; define arquitetura, riscos e cenários de teste.
-- `coder`/`coder-expert`: alteram produção, não alteram testes e não executam a suíte completa.
-- `tester`: altera somente testes, executa apenas testes criados ou alterados.
-- `reviewer`: único agente que executa a suíte completa, revisa o quality gate
-  e aprova ou reprova. Pode criar commit e fazer push somente em branches de
-  trabalho, nunca em `main` ou `master`.
-- `analyst`: agente primário opcional; entrega requisitos, não inicia execução.
+Transitions are prohibited when implementation precedes human plan approval;
+the coder edits tests; the tester edits production; a full suite is run by coder
+or tester; a bug lacks regression coverage at approval; or a review is approved
+with a blocker, failed/missing test, stale gate, or inconclusive required check.
 
-No discovery, classifique `risk_profile` como `low`, `medium` ou `high`. Use
-`high` para mudanças de contrato, segurança, dados, concorrência, integrações
-externas, comportamento crítico ou bugs com impacto relevante. O perfil deve
-determinar a profundidade do plano, os cenários exigidos e a validação do gate;
-não deve ser usado para dispensar testes necessários.
+`review_approved` requires all of the following:
 
-Transições proibidas: implementação antes do plano aprovado; aprovação com
-testes ausentes ou falhando; coder alterando testes; tester alterando produção;
-suíte completa executada pelo coder/tester; bug aprovado sem teste de regressão.
+- `blockers: []` and no unresolved critical risk;
+- every applicable `REQ-*`/`AC-*` linked to implementation and test evidence;
+- complete applicable local tests, lint/format/build/coverage checks;
+- remote CI conclusively green when configured and available;
+- all gate evidence tied to the exact reviewed state (`head` plus timestamp).
 
-## Bugs
+If source state changes after a check, that check is `stale` and must be rerun.
+For a dirty worktree, identify the reviewed state with the base HEAD plus a
+stable diff hash or an equivalent harness-supported snapshot identifier. Never
+claim a commit SHA for uncommitted changes.
 
-Antes do planejamento, o `developer` pode reproduzir o bug sem alterar código.
-Preserve somente evidências úteis: `reproduction_status`, passos, esperado,
-observado, comandos/resultados, logs sem segredos, ambiente e limitações.
-Reprodução assistida exige estratégia de observação antes de pedir ação ao usuário.
+`review_incomplete` is not approval. Missing output, malformed handoff, a step
+limit, timeout, unavailable check, pending CI, or unreadable evidence must remain
+incomplete or blocked. The developer may request one format-only correction for
+a malformed handoff; do not route its claims as verified until corrected.
 
-## Roteamento de qualidade
+## Risk and bugs
 
-- `reviewer -> tester -> reviewer`: teste frágil ou cobertura ausente quando a implementação está correta.
-- `reviewer -> coder -> reviewer`: falha ou defeito de produção; depois de uma correção de bug, passe pelo `tester` para criar regressão.
-- `tester_disputed`: sempre retorna ao `developer`.
-- Se o quality gate estiver pendente ou falhar, o `reviewer` retorna ao agente
-  responsável pela correção e não aprova a mudança.
-- Se não houver quality gate funcional, o `reviewer` retorna ao `developer` com
-  uma proposta de criação ou ajuste do pipeline e as ferramentas necessárias.
-- Limite de três ciclos de correção; depois disso, checkpoint humano.
+Classify `risk_profile` as `low`, `medium`, or `high`. `high` includes contract,
+security, data, concurrency, external integration, critical behavior, or
+material-impact bugs. Risk controls depth of planning and evidence, never waives
+necessary tests.
 
-## Quality gate e CI/CD
+For bug reproduction, preserve only useful evidence: `reproduction_status`,
+steps, expected/observed, commands/results, sanitized logs, environment, and
+limitations. Assisted reproduction requires an observation strategy before
+asking the user to act.
 
-Durante a revisão, o `reviewer` deve identificar a stack, os comandos e as
-convenções do projeto e verificar se o CI/CD valida, quando aplicável:
+## Concurrency and correction cycles
 
-- formatação e validação de sintaxe;
-- lint e typecheck;
-- testes unitários, integração e regressão;
-- build e empacotamento;
-- análise de code smells, complexidade, duplicação, vulnerabilidades e outros
-  padrões de qualidade relevantes para a tecnologia utilizada.
+Permit parallel read-only discovery/planning only when inputs are stable and
+scopes are independent. Serialize all edits and reviews against a shared
+worktree; do not start a dependent reviewer or writer while another writer is
+still active. Parallel implementation is allowed only for explicitly disjoint
+files/modules, with one integrator (`developer`) reconciling the result before
+tests/review.
 
-Use plugins, analisadores e ferramentas já adotados pelo projeto. Quando não
-existirem, sugira opções compatíveis com a stack e registre o motivo, o escopo
-e os comandos esperados; não introduza uma ferramenta genérica sem justificar
-o benefício e o custo de manutenção.
+Count each correction loop in `cycle`, from 0 to 3. A return for a production or
+test correction, `test_refinement_needed`, `needs_more_tests`, or
+`needs_correction` consumes one cycle. A format-only handoff repair does not.
+After three cycles without convergence, enter `critical_checkpoint` and ask the
+user to choose how to proceed.
 
-Depois das verificações locais, o `reviewer` pode executar `git commit` e
-`git push` para uma branch de trabalho, como `developer` ou uma branch de
-feature, para disparar e acompanhar o quality gate remoto. Antes disso, deve
-confirmar a branch atual, revisar o diff e o status, incluir somente alterações
-intencionais e não expor segredos. É proibido fazer commit ou push em `main`,
-`master` ou qualquer branch de produção, bem como usar force push.
+Routing:
 
-O quality gate remoto deve ser acompanhado até um estado conclusivo quando a
-integração permitir. Gate pendente, falho, não disparado ou não verificável é
-uma validação incompleta e impede `review_approved`. O handoff deve registrar
-a branch, commit, workflow ou check, URL ou identificador quando disponível,
-resultado, validações não executadas e riscos residuais.
+- `reviewer -> tester -> reviewer` for test defects or missing coverage when
+  production behavior is correct;
+- `reviewer -> coder -> tester -> reviewer` for production defects/regression
+  coverage;
+- `tester_disputed` and architectural/scope disputes return to `developer`;
+- failed gates return to the responsible role; no approval while they remain
+  failed or stale.
+
+## Quality gate and delivery
+
+The reviewer identifies the stack and checks applicable formatting/syntax,
+lint/typecheck, unit/integration/regression tests, build/package, coverage, and
+security/quality analysis. Prefer existing project tools; propose new tools with
+scope, cost, and justification.
+
+The reviewer may inspect Git and run checks. Commit or push requires explicit
+user authorization in the current task, even on a work branch. Never commit,
+push, or force-push to production branches. Before authorized version control
+operations, inspect branch, status, diff, and stage only intended files. Track
+remote checks to a conclusive result when integration permits. Pending, failed,
+not-triggered, or unverifiable CI prevents `review_approved`.
+
+Final delivery records diff/state, commands and exit results, local/remote gate
+state, manual validation requested/completed/pending, residual risks, and any
+user override. Manual device validation must identify the firmware/build state
+and the specific behavior tested; generic smoke checks do not prove a feature.
 
 ## Jev
 
-Use `typesafe-jev_jev_decide` somente quando a resposta não for determinada
-objetivamente e houver um caso fechado de baixo risco:
+Use `typesafe-jev_jev_decide` only for unresolved, reversible, low-risk choices:
+technical ties already bounded by the plan, blocking questions that do not
+change scope, or severity/risk/coverage classification. Never use it to confirm
+goals, approve plans, decide business questions, credentials, deployment,
+migration, deletion, or other human gates. Group independent questions and
+record `jev: question -> answer/confidence -> decision` in `decisions`.
 
-- empate real entre alternativas técnicas já delimitadas no plano;
-- `blocking_questions` reversíveis;
-- classificação de severidade, risco ou cobertura.
+## Handoff contract
 
-Não use Jev para confirmar objetivo, aprovar plano, decidir negócio, credenciais,
-deploy, migração, exclusão ou qualquer ação irreversível. Agrupe perguntas
-independentes numa chamada. Registre apenas uma linha no handoff:
-`jev: pergunta -> resposta/confiança -> decisão`.
+The canonical shared fields, per-role requirements, enums, and size limits are
+in `templates/handoff-contract.md`. Every task dispatch MUST include the shared
+contract or its exact compact block, and the role-specific required fields and
+status enums. Do not substitute a prose reminder. Every return includes all
+required keys; use `none` for unavailable scalar values and `[]` for empty
+collections. An omitted required key makes the handoff invalid.
 
-## Handoff incremental
+Use `REQ-*`, `AC-*`, and `TEST-*` rather than repeating known context. Preserve
+`REQ/AC -> implementation -> TEST -> result/evidence`; include negative,
+boundary, and expected-failure cases for high-risk changes. Keep handoffs within
+their role limit; put detailed logs in tool output and cite the command/result.
 
-O `developer` mantém o contexto canônico. Cada agente retorna no máximo 25 linhas
-e repete somente dados alterados. Campos mínimos:
+## Human gates and traceability
 
-```text
-status:
-origin:
-next_action:
-changed: []
-commands: []
-tests: []
-quality_gate: []
-decisions: []
-risks: []
-blockers: []
-```
+1. Explicit user approval of objective and plan before code changes.
+2. Human acceptance of required manual/device validation; agents report evidence
+   and limitations but do not claim user acceptance.
+3. Business, scope, compatibility, irreversible actions, unresolved conceptual
+   disagreement, and three non-convergent correction cycles require the user.
 
-Use `REQ-*`, `AC-*` e `TEST-*` para referenciar contexto já conhecido, em vez de
-copiá-lo. Inclua detalhes de bug somente quando houver alteração ou evidência nova.
-Não inclua campos vazios nem diffs, logs ou explicações repetidas.
-Para cada requisito relevante, preserve a referência compacta
-`REQ/AC -> TEST -> resultado/evidência`; em risco alto, inclua também os
-cenários negativos, de limite e de falha esperada.
-
-## Gates humanos
-
-1. Aprovação explícita do objetivo e do plano antes de editar código.
-2. Entrega final com diff, testes, riscos residuais e roteiro de validação manual.
-
-Decisões de negócio, escopo, compatibilidade, ações irreversíveis, divergências
-conceituais e três ciclos sem convergência exigem intervenção humana.
-
-## Rastreabilidade
-
-Mantenha a referência compacta `REQ -> implementação -> TEST -> REVIEW`.
-Para bugs: `BUG_REPORT -> evidência -> correção -> TEST_REGRESSION -> REVIEW`.
+Maintain `REQ -> implementation -> TEST -> REVIEW`. For bugs use
+`BUG_REPORT -> reproduction evidence -> fix -> TEST_REGRESSION -> REVIEW`.

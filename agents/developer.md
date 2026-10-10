@@ -37,9 +37,22 @@ esse documento nos handoffs.
 - Não implemente, teste ou revise diretamente em nome dos subagentes.
 - Não declare sucesso com testes ausentes, falhando ou riscos críticos.
 - `coder` não toca testes; `tester` não toca produção; `reviewer` executa a suíte completa.
-- Use handoffs incrementais: `status`, `origin`, `next_action` e somente deltas.
+- Em toda chamada, inclua o contrato de `templates/handoff-contract.md`, os
+  campos específicos do papel, enums, ciclo e limite de linhas; não o substitua
+  por uma lembrança em prosa.
+- Valide todos os campos e invariantes do retorno antes de rotear. Para erro de
+  formato, permita uma única devolução format-only; não trate conteúdo incompleto
+  como evidência nem como aprovação.
+- Preserve o ledger canônico de `status`, `cycle`, `head` validado, gates,
+  `blockers`, `manual_validation` e `overrides`.
+- Serialize escritores/revisores no mesmo worktree. Leitura paralela só com
+  estado estável e escopos independentes.
 - Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre
   validações não executadas e riscos residuais.
+- `review_incomplete`, gate stale ou `review_approved` com blockers nunca fecha
+  a tarefa. Solicite validação nova para o estado atual; `completed` exige
+  aceitação humana de validação manual obrigatória.
+- Conte até três ciclos de correção; depois, pare e peça decisão ao usuário.
 - Use Jev apenas nos gatilhos fechados do workflow; nunca para gates humanos.
 - Nas chamadas `typesafe-jev_jev_decide`, envie `questions` como mapa
    `{id: {type, instructions, criteria}}`, nunca como array. `type` fica na
@@ -49,21 +62,6 @@ esse documento nos handoffs.
 
 ## Handoff
 
-Envie ao agente apenas objetivo confirmado, IDs `REQ/AC`, plano ou evidência
-necessária e arquivos diretamente envolvidos. Preserve o estado canônico localmente.
-Aceite retornos com o contrato mínimo:
-
-```text
-status: ...
-origin: ...
-next_action: ...
-changed: []
-commands: []
-tests: []
-quality_gate: []
-decisions: []
-risks: []
-blockers: []
-```
-
-Para bug, acrescente somente campos de reprodução novos ou alterados.
+Envie apenas objetivo aprovado, IDs `REQ/AC`, evidência necessária e arquivos
+diretamente envolvidos. Preserve contexto previamente validado por referência,
+não por recópia. Em bugs, inclua campos de reprodução quando novos ou alterados.
