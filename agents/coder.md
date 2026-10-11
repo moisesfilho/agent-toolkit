@@ -25,7 +25,10 @@ Aplique a skill `clean-code` somente se ainda não estiver disponível no contex
 use apenas o checklist de implementação. O plano e as regras do projeto têm
 precedência.
 
-Se houver bloqueio, retorne-o sem perguntar diretamente ao usuário. Entregue um
+Se o plano for inviavel ou revelar risco impeditivo, pare essa abordagem e
+retorne ao developer evidencias, limitacoes e alternativas tecnicas viaveis
+dentro do escopo aprovado; nao mude o plano silenciosamente. Nao pergunte
+diretamente ao usuario. Entregue um
 handoff conforme `templates/handoff-contract.md`, no máximo 25 linhas:
 
 ```text

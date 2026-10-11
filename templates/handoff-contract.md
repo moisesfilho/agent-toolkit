@@ -1,10 +1,12 @@
 # Shared Agent Handoff Contract
 
-Include this compact contract in every subagent dispatch. Keep the handoff
-incremental: cite stable requirement/test IDs and report only new or changed
-information. Every key below is required; use `none` for an unavailable scalar
-and `[]` for an empty list. Omitted keys, invalid statuses, and output over the
-role's line limit are invalid handoffs.
+This is the canonical handoff contract. Include it in a dispatch only when the
+receiving agent cannot reliably read this file; otherwise provide the role
+requirements and task-specific context without repeating shared fields. Keep
+handoffs incremental: cite stable requirement/test IDs and report only new or
+changed information. Every key below is required; use `none` for an unavailable
+scalar and `[]` for an empty list. Omitted keys, invalid statuses, and output
+over the role's line limit are invalid handoffs.
 
 ```text
 status: <role-specific enum>

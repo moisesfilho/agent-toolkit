@@ -3,10 +3,10 @@
 ## Objective
 
 Lean, requirements-led development with implementation, tests, review, and
-human checkpoints. This document is the canonical source for states, routing,
-limits, and handoff invariants. Agents receive the shared contract from
-`templates/handoff-contract.md` on every dispatch, plus only the context needed
-for their current step.
+human checkpoints. This is the canonical source for states and routing;
+`templates/handoff-contract.md` owns handoff fields and limits. Dispatch only
+references readable instructions and includes task-specific context. Use the
+explicit-content fallback when readability is unavailable or uncertain.
 
 Follow [`docs/agent-instruction-delivery.md`](../docs/agent-instruction-delivery.md)
 to verify file access and include canonical instruction content when it is not
@@ -100,7 +100,18 @@ steps, expected/observed, commands/results, sanitized logs, environment, and
 limitations. Assisted reproduction requires an observation strategy before
 asking the user to act.
 
-## Concurrency and correction cycles
+## Alternatives and correction cycles
+
+If implementation or review finds the approved approach infeasible, blocked, or
+materially riskier than planned, stop that path and return to `developer` with
+evidence, constraints, and viable alternatives. The developer routes back to the
+planner for a bounded replan; do not silently change scope or keep repeating a
+failing approach. Compare alternatives on feasibility, risk, quality, cost, and
+validation effort. Use Jev for a genuine low-risk semantic tie when its answer
+can change the choice; one call may batch independent judgments over the same
+minimal state. Ask the user when alternatives change scope, behavior,
+compatibility, accepted risk, or require a human checkpoint. Reapproval is
+required if the approved objective, acceptance criteria, or material risk changes.
 
 Permit parallel read-only discovery/planning only when inputs are stable and
 scopes are independent. Serialize all edits and reviews against a shared
@@ -109,11 +120,11 @@ still active. Parallel implementation is allowed only for explicitly disjoint
 files/modules, with one integrator (`developer`) reconciling the result before
 tests/review.
 
-Count each correction loop in `cycle`, from 0 to 3. A return for a production or
-test correction, `test_refinement_needed`, `needs_more_tests`, or
-`needs_correction` consumes one cycle. A format-only handoff repair does not.
-After three cycles without convergence, enter `critical_checkpoint` and ask the
-user to choose how to proceed.
+Count each correction or replan loop in `cycle`, from 0 to 3. A return for a
+production/test correction, `test_refinement_needed`, `needs_more_tests`,
+`needs_correction`, or a new implementation approach after infeasibility/risk
+consumes one cycle. A format-only handoff repair does not. After three cycles
+without convergence, enter `critical_checkpoint` and ask the user how to proceed.
 
 Routing:
 
@@ -121,6 +132,8 @@ Routing:
   production behavior is correct;
 - `reviewer -> coder -> tester -> reviewer` for production defects/regression
   coverage;
+- `coder/reviewer -> developer -> planner` when the approach is infeasible or
+  materially risky; continue only under the existing approval gate;
 - `tester_disputed` and architectural/scope disputes return to `developer`;
 - failed gates return to the responsible role; no approval while they remain
   failed or stale.
@@ -146,21 +159,24 @@ and the specific behavior tested; generic smoke checks do not prove a feature.
 
 ## Jev
 
-Use `typesafe-jev_jev_decide` only for unresolved, reversible, low-risk choices:
-technical ties already bounded by the plan, blocking questions that do not
-change scope, or severity/risk/coverage classification. Never use it to confirm
-goals, approve plans, decide business questions, credentials, deployment,
-migration, deletion, or other human gates. Group independent questions and
-record `jev: question -> answer/confidence -> decision` in `decisions`.
+When an unresolved semantic judgment could change the next action, evaluate
+`typesafe-jev_jev_decide` for a bounded, reversible, low-risk choice: a real
+technical tie, a viable fallback selection, a non-scope blocking question, or
+severity/risk/coverage classification. Skip it for facts determined by code,
+docs, commands or tests, trivial choices, and answers that would not change the
+action. Keep state minimal, batch independent questions, and record one compact
+line in `decisions`. Confidence thresholds and schema are in
+`docs/typesafe-jev-policy.md`. Jev never confirms goals, scope, plan approval,
+business decisions, credentials, deployment, migration, deletion, or other
+human gates; use `question` and await the user where required.
 
 ## Handoff contract
 
 The canonical shared fields, per-role requirements, enums, and size limits are
-in `templates/handoff-contract.md`. Every task dispatch MUST include the shared
-contract or its exact compact block, and the role-specific required fields and
-status enums. Do not substitute a prose reminder. Every return includes all
-required keys; use `none` for unavailable scalar values and `[]` for empty
-collections. An omitted required key makes the handoff invalid.
+in `templates/handoff-contract.md`. Every return includes all required keys; use
+`none` for unavailable scalar values and `[]` for empty collections. Validate
+against the template; include its content in a dispatch only when the receiving
+harness cannot reliably read it.
 
 When dispatching, include the relevant canonical workflow/instruction content
 if the receiving agent cannot read it. A path reference is only a navigation

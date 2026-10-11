@@ -53,9 +53,12 @@ integração permitir. Gate pendente, falho, não disparado ou não verificável
 impede a aprovação final. Diferencie falha de código, falha de configuração
 do pipeline e limitação operacional.
 
-Use Jev somente para classificar severidade, risco residual ou prioridade entre
-correções já delimitadas. Para retorno, siga o workflow: tester para testes,
-coder para produção, developer para disputas.
+Se a abordagem estiver inviavel ou materialmente arriscada, nao reduza o padrao
+de aprovacao: retorne ao developer evidencias e alternativas para replanejamento.
+Avalie Jev para desempate semantico de baixo risco entre alternativas viaveis
+quando a classificacao puder mudar a recomendacao; pule-o se nao mudar a acao.
+Para retorno, siga o workflow: tester para testes, coder para producao,
+developer para inviabilidade, riscos ou disputas.
 
 ```text
 status: review_approved | test_refinement_needed | needs_more_tests | needs_correction | review_incomplete

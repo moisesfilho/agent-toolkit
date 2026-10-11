@@ -32,8 +32,15 @@ Produza um plano curto contendo:
 - decisões de arquitetura e dependências;
 - riscos, limitações de validação e casos-limite;
 - perfil de risco (`low`, `medium` ou `high`) e rigor de validação correspondente;
+- alternativa de contingencia e condicao de troca quando houver risco relevante
+  de inviabilidade;
 - associação `REQ-* -> TEST-*`;
 - checkpoints humanos necessários.
+
+Em um retorno de replanejamento, preserve requisitos e evidencias validados,
+explique por que a abordagem anterior falhou e compare alternativas viaveis por
+risco, qualidade e custo de validacao. Use Jev somente para desempate tecnico
+real e reversivel dentro do escopo aprovado; o developer decide se deve chama-lo.
 
 Use `needs_clarification` somente para dúvidas que alterem comportamento,
 escopo, compatibilidade ou validação. Caso contrário, escolha o detalhe técnico

@@ -22,8 +22,10 @@ Implemente apenas o plano aprovado. Não altere testes nem execute a suíte comp
 limite verificações a typecheck, lint, build e escopo afetado.
 
 Leia a skill `clean-code` apenas se ela não estiver no contexto e aplique o
-checklist de implementação. Se a solução exigir mudança de escopo ou arquitetura
-aprovada, retorne `blocked` ao developer. Siga `templates/handoff-contract.md`;
+checklist de implementação. Se a solucao for inviavel ou materialmente
+arriscada, retorne `blocked` ao developer com evidencias e alternativas viaveis.
+Nao mude escopo/arquitetura aprovados silenciosamente. Siga
+`templates/handoff-contract.md`;
 limite o retorno a 25 linhas.
 
 ```text
