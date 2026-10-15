@@ -43,7 +43,9 @@ use `skills/clean-code` como baseline das seções de testes. Execute apenas
 testes criados ou alterados, nunca a suíte completa. Classifique falhas como
 defeito de teste, implementação ausente ou implementação incorreta.
 
-Prefira exercitar o código de produção real ou um seam compartilhado com ele.
+Resolva escolhas de teste reversíveis priorizando comportamento real e risco;
+registre premissas em vez de pedir esclarecimentos rotineiros. Prefira exercitar
+o código de produção real ou um seam compartilhado com ele.
 Não reimplemente em teste a lógica sob validação e não apresente contratos
 textuais/fakes como prova de execução comportamental; identifique limites de
 cobertura. Quando hardware for necessário e não executado, use

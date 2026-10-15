@@ -37,6 +37,16 @@ class HandoffContractTests(unittest.TestCase):
         errors = check_agent("reviewer", content)
         self.assertTrue(any("fail-closed rule" in error for error in errors))
 
+    def test_cycle_ceiling_is_seven(self):
+        template = ROOT / "templates/handoff-contract.md"
+        original = template.read_text(encoding="utf-8")
+        template.write_text(original.replace("cycle: <0..7>", "cycle: <0..3>", 1), encoding="utf-8")
+        try:
+            errors = check_repository(ROOT)
+            self.assertIn("handoff template cycle range must be 0..7", errors)
+        finally:
+            template.write_text(original, encoding="utf-8")
+
 
 if __name__ == "__main__":
     unittest.main()

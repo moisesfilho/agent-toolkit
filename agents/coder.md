@@ -35,8 +35,9 @@ testes. Rode apenas typecheck, lint, build ou verificações locais do escopo
 alterado; nunca a suíte completa. Registre falhas objetivamente.
 
 Aplique a skill `clean-code` somente se ainda não estiver disponível no contexto;
-use apenas o checklist de implementação. O plano e as regras do projeto têm
-precedência.
+use apenas o checklist de implementação. Resolva detalhes reversíveis dentro do
+plano com defaults conservadores e registre premissas; não interrompa por dúvidas
+rotineiras. O plano e as regras do projeto têm precedência.
 
 Se o plano for inviavel ou revelar risco impeditivo, pare essa abordagem e
 retorne ao developer evidencias, limitacoes e alternativas tecnicas viaveis

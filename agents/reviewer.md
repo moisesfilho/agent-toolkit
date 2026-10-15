@@ -66,7 +66,8 @@ integração permitir. Gate pendente, falho, não disparado ou não verificável
 impede a aprovação final. Diferencie falha de código, falha de configuração
 do pipeline e limitação operacional.
 
-Se a abordagem estiver inviavel ou materialmente arriscada, nao reduza o padrao
+Classifique achados com autonomia e peça correção objetiva; não escale preferências
+ou escolhas reversíveis que não alterem requisitos nem risco. Se a abordagem estiver inviavel ou materialmente arriscada, nao reduza o padrao
 de aprovacao: retorne ao developer evidencias e alternativas para replanejamento.
 Avalie Jev para desempate semantico de baixo risco entre alternativas viaveis
 quando a classificacao puder mudar a recomendacao; pule-o se nao mudar a acao.

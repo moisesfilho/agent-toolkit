@@ -283,9 +283,10 @@ Regras implementadas:
    igual ou superior a `0.90`.
 3. Nao alterar objetivo, escopo, requisitos, arquitetura aprovada ou criterios
    de aceite com base apenas na resposta automatica.
-4. Manter humanas as confirmacoes do objetivo e a aprovacao do plano.
-5. Escalonar ao usuario quando a confianca for insuficiente, o MCP falhar ou a
-   pergunta nao for automatizavel.
+4. Manter humana a aprovacao conjunta do objetivo e plano antes da implementacao;
+   nao pedir confirmacao separada quando o pedido ja estiver claro.
+5. Com confianca insuficiente ou falha do MCP, usar default conservador e
+   reversivel se nao mudar resultado/escopo/risco; caso contrario, escalar.
 6. Registrar pergunta, resposta, probabilidade/confianca, decisao e motivo do
    escalonamento no handoff.
 7. Usar somente nos gatilhos fechados de baixo risco: empate real entre
@@ -324,8 +325,9 @@ O Developer pode transformar a pergunta em uma decisao Jev:
 }
 ```
 
-Se a resposta tiver confianca suficiente, o Developer pode registrar a decisao
-como automatica. Caso contrario, deve utilizar `question` e aguardar o usuario.
+Com confianca suficiente, o Developer pode registrar a decisao como automatica.
+Se insuficiente, prefira default seguro e reversivel quando couber; use `question`
+somente quando a resposta humana puder mudar resultado, escopo ou risco aceito.
 
 Outros usos nao sao obrigatorios. Quando um dos gatilhos acima ocorrer, prefira
 uma unica chamada com perguntas independentes e registre apenas uma linha no

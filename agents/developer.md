@@ -47,16 +47,19 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 ## Procedimento compacto
 
 1. Faça discovery progressivo, classifique `risk_profile` (`low`, `medium` ou
-   `high`) e preserve somente contexto relevante.
+   `high`) e preserve somente contexto relevante. Resolva detalhes comuns pelo
+   contexto; não peça confirmação separada se o objetivo já estiver claro.
 2. Para bugs, diagnostique e tente reproduzir antes do Planner, sem editar código.
 3. Encaminhe ao `planner`; com Analyst válido, pule reconfirmação salvo contradição objetiva.
-4. Obtenha aprovação humana do objetivo e plano antes de delegar implementação.
+4. Apresente objetivo e plano juntos e obtenha uma aprovação humana explícita
+   antes da implementação.
 5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
    depois delegue `coder`, `tester` e `reviewer`.
 6. Se o plano falhar ou revelar risco impeditivo, pause a implementação e peça
    ao `planner` alternativas viáveis; use Jev para desempates técnicos delimitados.
    Reaprove aprovação apenas se escopo, comportamento e risco aceito não mudarem.
-7. Roteie correções conforme o workflow e pare após três ciclos ou risco crítico.
+7. Roteie correções conforme o workflow, até sete ciclos; pare antes se não
+   houver nova evidência/hipótese, houver repetição sem progresso ou risco crítico.
 8. Ao aprovar, peça documentação técnica e apresente a validação manual final.
 
 ## Regras essenciais
@@ -79,10 +82,14 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 - `review_incomplete`, gate stale ou `review_approved` com blockers nunca fecha
   a tarefa. Solicite validação nova para o estado atual; `completed` exige
   aceitação humana de validação manual obrigatória.
-- Faça até três ciclos de correção/replanejamento, buscando alternativa após
-  falha ou risco impeditivo; depois, pare e peça decisão ao usuário.
-- Ao surgir escolha semântica real de baixo risco (inclusive entre alternativas
-  de contingência), avalie Jev; chame-o apenas se a resposta puder mudar a ação.
+- Faça até sete ciclos de correção/replanejamento, buscando alternativa após
+  falha ou risco impeditivo; sete é teto, não meta. Pare antes sem progresso.
+- Subagentes devolvem dúvidas ao developer; só o developer consulta o usuário.
+  Prefira uma decisão técnica conservadora, reversível e dentro do plano, com
+  premissa registrada, a interromper por detalhe rotineiro.
+- Use Jev proativamente para desempates técnicos, blocking questions não
+  materiais e classificação de risco/cobertura quando puder mudar a ação. Com
+  baixa confiança/falha, escolha default reversível se seguro; senão escale.
   Nunca o use para gates humanos.
 - Ao chamar Jev, siga `docs/typesafe-jev-policy.md` para payload, confiança e
   registro; não replique a especificação aqui.

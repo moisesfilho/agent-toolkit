@@ -14,11 +14,14 @@ available to the receiving harness.
 
 ## Standard flow
 
-1. `developer` performs progressive discovery, classifies `risk_profile`, and
-   confirms the objective with the user.
+1. `developer` performs progressive discovery and classifies `risk_profile`.
+   Resolve ordinary ambiguity from context; ask only when an answer can change
+   expected behavior, scope, compatibility, accepted risk, or a human gate.
 2. `planner` resolves technical ambiguity and produces a plan. A valid `analyst`
    handoff may supply requirements without reopening settled questions.
-3. The user explicitly approves the objective and plan before implementation.
+3. Present objective and plan together for one explicit user approval before
+   implementation. Do not ask separate objective confirmation when the request
+   already establishes it.
 4. For high-risk work, `tester` defines acceptance, boundary, failure, and
    regression scenarios before implementation. This does not make TDD mandatory
    for simple work.
@@ -48,6 +51,9 @@ approval in either path.
   decision. It does not edit source or tests.
 - `analyst` is an optional primary agent that returns requirements; it does not
   start implementation.
+- Subagents report blocking questions to `developer`; only `developer` asks the
+  user. Within approved scope, choose a conservative, reversible technical
+  default and record the assumption instead of interrupting for routine details.
 
 User instructions may explicitly override a workflow default only when the
 action is within the user's authority. Record `overrides` with the instruction,
@@ -120,11 +126,13 @@ still active. Parallel implementation is allowed only for explicitly disjoint
 files/modules, with one integrator (`developer`) reconciling the result before
 tests/review.
 
-Count each correction or replan loop in `cycle`, from 0 to 3. A return for a
+Count each correction or replan loop in `cycle`, from 0 to 7. A return for a
 production/test correction, `test_refinement_needed`, `needs_more_tests`,
 `needs_correction`, or a new implementation approach after infeasibility/risk
-consumes one cycle. A format-only handoff repair does not. After three cycles
+consumes one cycle. A format-only handoff repair does not. After seven cycles
 without convergence, enter `critical_checkpoint` and ask the user how to proceed.
+Seven is a hard ceiling, not a target: stop earlier for repeated failures, no new
+evidence or hypothesis, critical risk, or a blocked human decision.
 
 Routing:
 
@@ -190,11 +198,12 @@ their role limit; put detailed logs in tool output and cite the command/result.
 
 ## Human gates and traceability
 
-1. Explicit user approval of objective and plan before code changes.
+1. One explicit user approval of objective and plan before code changes; omit a
+   separate objective-confirmation round when intent is already clear.
 2. Human acceptance of required manual/device validation; agents report evidence
    and limitations but do not claim user acceptance.
 3. Business, scope, compatibility, irreversible actions, unresolved conceptual
-   disagreement, and three non-convergent correction cycles require the user.
+   disagreement, and up to seven non-convergent correction cycles require the user.
 
 Maintain `REQ -> implementation -> TEST -> REVIEW`. For bugs use
 `BUG_REPORT -> reproduction evidence -> fix -> TEST_REGRESSION -> REVIEW`.

@@ -51,9 +51,10 @@ risco, qualidade e custo de validacao. Use Jev somente para desempate tecnico
 real e reversivel dentro do escopo aprovado; o developer decide se deve chama-lo.
 
 Use `needs_clarification` somente para dúvidas que alterem comportamento,
-escopo, compatibilidade ou validação. Caso contrário, escolha o detalhe técnico
-reversível no plano. Não use Jev por padrão; o developer decide se um empate
-fechado exige Jev.
+escopo, compatibilidade, risco aceito ou gate humano. Caso contrário, escolha o
+default técnico conservador e reversível no plano, registrando a premissa. Use
+Jev para desempate semântico fechado que possa mudar a recomendação; gates humanos
+permanecem com o usuário.
 
 Retorne no máximo 40 linhas, com todos os campos comuns do contrato e estes
 campos específicos:

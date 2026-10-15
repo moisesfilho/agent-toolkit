@@ -125,6 +125,17 @@ def check_repository(root: Path = ROOT) -> list[str]:
             if invariant.lower() not in text.lower():
                 errors.append(f"workflow missing invariant: {invariant}")
 
+    if template.is_file():
+        text = template.read_text(encoding="utf-8")
+        if not re.search(r"(?m)^cycle:\s*<0\.\.7>", text):
+            errors.append("handoff template cycle range must be 0..7")
+    if workflow.is_file():
+        text = workflow.read_text(encoding="utf-8")
+        if "from 0 to 7" not in text:
+            errors.append("workflow cycle ceiling must be 7")
+        if "only `developer` asks the" not in text:
+            errors.append("workflow must route user questions through developer")
+
     for role in ROLE_LIMITS:
         path = root / f"agents/{role}.md"
         if not path.is_file():

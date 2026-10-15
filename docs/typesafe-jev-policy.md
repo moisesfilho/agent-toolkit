@@ -5,9 +5,8 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
 ## Regras gerais
 
 - Use o Jev apenas quando houver decisao semantica que nao seja determinada por regras, documentacao, comandos ou resultados de testes.
-- Avalie Jev nos gatilhos abaixo, sem o chamar por rotina: use-o quando um
-  julgamento semantico puder mudar a proxima acao; omita-o se a resposta for
-  objetiva, trivial ou nao alterar a decisao.
+- Use Jev proativamente nos gatilhos abaixo quando a resposta puder mudar a
+  proxima acao; omita-o se for objetiva, trivial ou nao alterar a decisao.
 - Envie somente o estado minimo necessario e formule perguntas atomicas.
 - Ao chamar `typesafe-jev_jev_decide`, envie `questions` como mapa
    `{id: {type, instructions, criteria}}`, nunca como array. `type` fica na
@@ -22,7 +21,10 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
   - `choice` e `score`: `confidence >= 0.90`.
   - Em qualquer tipo, exige-se decisao reversivel, de baixo risco e dentro do escopo aprovado.
 - Registre no handoff a pergunta, resposta, probabilidade/confianca, decisao adotada e eventual motivo de escalonamento.
-- Se o MCP falhar, a confianca for insuficiente ou houver empate relevante, nao invente uma resposta: encaminhe a decisao ao agente responsavel ou ao usuario.
+- Se o MCP falhar ou a confianca for insuficiente, escolha um default
+  conservador, reversivel e dentro do plano quando isso nao alterar resultado,
+  escopo ou risco aceito; registre a premissa. Caso contrario, encaminhe ao
+  agente responsavel ou ao usuario.
 
 ## Nunca delegar ao Jev
 
@@ -31,8 +33,8 @@ Nao use o Jev para confirmar objetivo, escopo, requisitos, criterios de aceite o
 ## Limites por agente
 
 - `developer`: pode orquestrar decisoes tecnicas locais e resolver `blocking_questions` de baixo risco.
-- `planner`: pode analisar alternativas tecnicas, mas nao pode fechar objetivo, escopo, requisitos ou aprovacao do plano.
-- `coder` e `coder-expert`: podem escolher entre alternativas de implementacao ja contidas no plano aprovado. Nao podem ampliar escopo nem substituir testes ou revisao.
+- `planner`: pode escolher defaults tecnicos conservadores, mas nao pode fechar objetivo, escopo, requisitos ou aprovacao do plano.
+- `coder` e `coder-expert`: podem escolher alternativas reversiveis ja contidas no plano. Nao podem ampliar escopo nem substituir testes ou revisao.
 - `tester`: pode priorizar casos de borda, risco de regressao e lacunas de cobertura. Nao pode remover cenarios nem enfraquecer assercoes.
 - `reviewer`: pode classificar severidade, risco residual e prioridade de correcoes. Nao pode aprovar com testes falhando ou substituir um gate humano.
 - `minimal`: nao usa ferramentas, mesmo que a permissao global do MCP exista.
@@ -49,7 +51,10 @@ documentacao, comandos ou testes e houver uma decisao reversivel e de baixo risc
 - `blocking_questions` que nao alterem escopo ou comportamento;
 - classificacao de severidade, risco residual ou cobertura.
 
-Agrupe perguntas independentes na mesma chamada. Registre no handoff uma linha
+Agentes devem resolver blocking questions nao materiais sem consultar o usuario:
+use contexto, Jev quando aplicavel ou um default reversivel conservador. So
+escale se a decisao puder alterar comportamento, escopo, compatibilidade, risco
+aceito ou gate humano. Agrupe perguntas independentes na mesma chamada. Registre no handoff uma linha
 compacta no formato `jev: pergunta -> resposta/confianca -> decisao`. Nao releia
 a skill de TypeSafe se ela ja estiver no contexto da sessao.
 

@@ -17,8 +17,8 @@ reutilizavel e arquivos de configuracao portaveis.
 | `docs/agent-instruction-delivery.md` | Dispatch portatil de instrucoes, fallback de conteudo e limites de symlinks. |
 | `docs/typesafe-jev-policy.md` | Gatilhos enxutos para Jev, limites humanos e escalonamento. |
 | `harnesses/` | Adaptadores para ferramentas de coding. |
-| `tools/validate_handoffs.py` | Valida contrato, limites, frontmatter `steps` e invariantes dos handoffs. |
-| `tests/test_validate_handoffs.py` | Testes positivos e negativos do validador do contrato e limites de etapas. |
+| `tools/validate_handoffs.py` | Valida contrato, limites de ciclo, frontmatter `steps` e invariantes dos handoffs. |
+| `tests/test_validate_handoffs.py` | Testes positivos e negativos do validador do contrato, ciclo e limites de etapas. |
 | `CONTRIBUTING.md` | Regras de contribuicao, portabilidade e seguranca. |
 
 ## Entrada e validacao

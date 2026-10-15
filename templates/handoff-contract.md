@@ -12,7 +12,7 @@ over the role's line limit are invalid handoffs.
 status: <role-specific enum>
 origin: <agent id>
 next_action: <role-specific enum>
-cycle: <0..3>
+cycle: <0..7>
 changed: []
 commands: []
 tests: []
