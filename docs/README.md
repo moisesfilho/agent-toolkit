@@ -14,6 +14,9 @@ The imported baseline currently covers:
   bounded decision checkpoints;
 - progressive search and structured decision policies.
 
+See [Delivering Agent Instructions](agent-instruction-delivery.md) for the
+portable dispatch procedure, canonical-source rule, and symlink limitations.
+
 `tools/validate_handoffs.py` checks that agent handoff examples and the
 developer workflow remain aligned with `templates/handoff-contract.md`. Run it
 from the repository root with `python3 tools/validate_handoffs.py`.

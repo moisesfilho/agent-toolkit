@@ -5,7 +5,9 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
 ## Regras gerais
 
 - Use o Jev apenas quando houver decisao semantica que nao seja determinada por regras, documentacao, comandos ou resultados de testes.
-- Use o Jev somente nos gatilhos fechados definidos abaixo; nao o use por padrao.
+- Avalie Jev nos gatilhos abaixo, sem o chamar por rotina: use-o quando um
+  julgamento semantico puder mudar a proxima acao; omita-o se a resposta for
+  objetiva, trivial ou nao alterar a decisao.
 - Envie somente o estado minimo necessario e formule perguntas atomicas.
 - Ao chamar `typesafe-jev_jev_decide`, envie `questions` como mapa
    `{id: {type, instructions, criteria}}`, nunca como array. `type` fica na
@@ -41,9 +43,18 @@ Use uma chamada Jev somente quando a resposta nao for determinada por regras,
 documentacao, comandos ou testes e houver uma decisao reversivel e de baixo risco:
 
 - empate real entre alternativas tecnicas ja delimitadas no plano;
+- selecao entre alternativas viaveis quando a abordagem aprovada falhar ou
+  revelar risco impeditivo, desde que a escolha seja de baixo risco e nao mude
+  escopo, comportamento ou risco aceito;
 - `blocking_questions` que nao alterem escopo ou comportamento;
 - classificacao de severidade, risco residual ou cobertura.
 
 Agrupe perguntas independentes na mesma chamada. Registre no handoff uma linha
 compacta no formato `jev: pergunta -> resposta/confianca -> decisao`. Nao releia
 a skill de TypeSafe se ela ja estiver no contexto da sessao.
+
+Quando nao houver alternativa aprovada viavel, retorne ao planner para propor
+outra abordagem. Se a alternativa alterar escopo, comportamento, compatibilidade
+ou risco material, pare e obtenha esclarecimento/aprovacao humana; Jev nao
+substitui esse checkpoint. O fluxo deve tentar alternativas dentro do limite
+de ciclos do workflow e nao repetir uma abordagem que falhou sem nova evidencia.

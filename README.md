@@ -45,11 +45,26 @@ absolute home paths, hostnames, LAN addresses, logs, dependency caches, or
 machine-specific backups. Harness integrations must read secrets from the
 runtime environment or an external secret manager.
 
+For cross-harness dispatch, see the [portable instruction delivery
+guide](docs/agent-instruction-delivery.md). Referenced paths are not a
+substitute for including required content when an agent cannot read them.
+
 ## Compatibility
 
 The toolkit is designed to support multiple AI coding harnesses. Resources
 should identify their target harness, required features, and any conversion
 steps instead of assuming one vendor-specific format.
+
+### OpenCode V2
+
+The reusable agent files in `agents/` and skills in `skills/` are repository
+resources, not OpenCode discovery directories. To use them with OpenCode V2,
+copy or link the agent Markdown files into `.opencode/agents/` and each skill
+directory into `.opencode/skills/` in the target project, or install them in the
+corresponding global directories under `~/.config/opencode/`. Keep the skill
+directory name stable so its skill ID remains unchanged. Validate agent
+permissions and skill discovery in the target OpenCode version before relying
+on the workflow.
 
 ## Contributing
 

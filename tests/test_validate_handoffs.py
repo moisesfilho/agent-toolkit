@@ -25,11 +25,11 @@ class HandoffContractTests(unittest.TestCase):
         errors = check_agent("coder", content)
         self.assertTrue(any("exceeds 25 lines" in error for error in errors))
 
-    def test_reviewer_budget_cannot_drop_below_70(self):
+    def test_reviewer_steps_cannot_drop_below_70(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
-        content = content.replace("maxSteps: 70", "maxSteps: 50", 1)
+        content = content.replace("steps: 70", "steps: 50", 1)
         errors = check_agent("reviewer", content)
-        self.assertIn("reviewer: maxSteps must be at least 70", errors)
+        self.assertIn("reviewer: steps must be at least 70", errors)
 
     def test_reviewer_approval_requires_fail_closed_rules(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")

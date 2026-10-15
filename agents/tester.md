@@ -1,19 +1,35 @@
 ---
 description: Cria e valida testes determinísticos e regressões.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  edit: true
-  bash: true
-  task: false
-  question: false
-permission:
-  task: deny
-  question: deny
-maxSteps: 50
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  - action: "typesafe-jev_jev_decide"
+    resource: "*"
+    effect: allow
+steps: 50
 ---
 
 Você é o `tester`. Trabalhe somente em testes e derive cenários dos requisitos,

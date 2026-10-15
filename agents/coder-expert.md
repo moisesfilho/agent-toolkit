@@ -1,19 +1,32 @@
 ---
 description: Implementação de alta complexidade e escalação técnica.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  edit: true
-  bash: true
-  task: false
-  question: false
-permission:
-  task: deny
-  question: deny
-maxSteps: 80
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+steps: 80
 ---
 
 Você é o `coder-expert`. Use este agente somente para alta complexidade,
@@ -22,8 +35,10 @@ Implemente apenas o plano aprovado. Não altere testes nem execute a suíte comp
 limite verificações a typecheck, lint, build e escopo afetado.
 
 Leia a skill `clean-code` apenas se ela não estiver no contexto e aplique o
-checklist de implementação. Se a solução exigir mudança de escopo ou arquitetura
-aprovada, retorne `blocked` ao developer. Siga `templates/handoff-contract.md`;
+checklist de implementação. Se a solucao for inviavel ou materialmente
+arriscada, retorne `blocked` ao developer com evidencias e alternativas viaveis.
+Nao mude escopo/arquitetura aprovados silenciosamente. Siga
+`templates/handoff-contract.md`;
 limite o retorno a 25 linhas.
 
 ```text

@@ -48,11 +48,25 @@ caches de dependencias ou backups especificos da maquina. Integracoes com
 harnesses devem ler segredos do ambiente de execucao ou de um gerenciador
 externo de segredos.
 
+Para dispatch entre harnesses, consulte o [guia portatil de entrega de
+instrucoes](docs/agent-instruction-delivery.md). Caminhos referenciados nao
+substituem a inclusao do conteudo necessario quando o agente nao consegue le-los.
+
 ## Compatibilidade
 
 O toolkit foi projetado para suportar multiplos harnesses de codificacao com
 IA. Cada recurso deve identificar seu harness-alvo, funcionalidades exigidas
 e etapas de conversao, sem assumir um formato especifico de um fornecedor.
+
+### OpenCode V2
+
+Os agentes em `agents/` e as skills em `skills/` sao recursos do repositorio,
+nao diretorios de descoberta do OpenCode. Para usa-los na v2, copie ou vincule
+os arquivos Markdown dos agentes para `.opencode/agents/` e cada diretorio de
+skill para `.opencode/skills/` no projeto de destino, ou instale-os nos
+diretorios globais correspondentes em `~/.config/opencode/`. Mantenha o nome do
+diretorio da skill para preservar seu ID. Valide as permissoes dos agentes e a
+descoberta das skills na versao-alvo antes de depender do workflow.
 
 ## Contribuicao
 
