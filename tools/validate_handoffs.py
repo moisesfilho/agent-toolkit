@@ -70,11 +70,11 @@ def check_agent(role: str, content: str) -> list[str]:
     except ValueError as error:
         return [f"{role}: {error}"]
 
-    max_steps = re.search(r"(?m)^maxSteps:\s*(\d+)\s*$", header)
-    if not max_steps:
-        errors.append(f"{role}: missing numeric maxSteps")
-    elif role == "reviewer" and int(max_steps.group(1)) < 70:
-        errors.append("reviewer: maxSteps must be at least 70")
+    steps = re.search(r"(?m)^steps:\s*(\d+)\s*$", header)
+    if not steps:
+        errors.append(f"{role}: missing numeric steps")
+    elif role == "reviewer" and int(steps.group(1)) < 70:
+        errors.append("reviewer: steps must be at least 70")
 
     declared = set(re.findall(r"(?m)^([a-z][a-z0-9_-]*):", "\n".join(block)))
     required = set(COMMON_FIELDS) | set(ROLE_FIELDS.get(role, ()))

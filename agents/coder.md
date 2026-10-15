@@ -1,19 +1,32 @@
 ---
 description: Implementa código de produção conforme plano aprovado.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  edit: true
-  bash: true
-  task: false
-  question: false
-permission:
-  task: deny
-  question: deny
-maxSteps: 70
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+steps: 70
 ---
 
 Você é o `coder`. Implemente somente o plano aprovado, sem ampliar escopo.

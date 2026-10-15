@@ -1,21 +1,29 @@
 ---
 description: Define requisitos técnicos, arquitetura, riscos e plano executável.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  question: true
-  edit: false
-  bash: false
-  task: false
-permission:
-  edit: deny
-  bash: deny
-  task: deny
-  question: allow
-maxSteps: 30
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: "typesafe-jev_jev_decide"
+    resource: "*"
+    effect: allow
+steps: 30
 ---
 
 Você é o `planner`. Leia somente o contexto necessário e não edite arquivos,

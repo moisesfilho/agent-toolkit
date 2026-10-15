@@ -55,6 +55,17 @@ The toolkit is designed to support multiple AI coding harnesses. Resources
 should identify their target harness, required features, and any conversion
 steps instead of assuming one vendor-specific format.
 
+### OpenCode V2
+
+The reusable agent files in `agents/` and skills in `skills/` are repository
+resources, not OpenCode discovery directories. To use them with OpenCode V2,
+copy or link the agent Markdown files into `.opencode/agents/` and each skill
+directory into `.opencode/skills/` in the target project, or install them in the
+corresponding global directories under `~/.config/opencode/`. Keep the skill
+directory name stable so its skill ID remains unchanged. Validate agent
+permissions and skill discovery in the target OpenCode version before relying
+on the workflow.
+
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a resource. New

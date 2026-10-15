@@ -1,24 +1,38 @@
 ---
 description: Analisa retrospectivamente sessões de um harness e recomenda melhorias verificáveis para agentes e workflows.
 mode: primary
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  bash: true
-  task: true
-  question: true
-  todowrite: true
-  edit: false
-  write: false
-  patch: false
-permission:
-  edit: deny
-  bash: allow
-  task: allow
-  question: allow
-maxSteps: 80
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: allow
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  - action: "typesafe-jev_jev_decide"
+    resource: "*"
+    effect: allow
+steps: 80
 ---
 
 Você é o `retrospectiv`, agente principal que facilita retrospectivas de uma

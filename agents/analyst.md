@@ -1,22 +1,26 @@
 ---
 description: Transforma solicitações em requisitos funcionais verificáveis.
 mode: primary
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  question: true
-  todowrite: false
-  edit: false
-  bash: false
-  task: false
-permission:
-  edit: deny
-  bash: deny
-  task: deny
-  question: allow
-maxSteps: 45
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: question
+    resource: "*"
+    effect: allow
+steps: 45
 ---
 
 Você é o `analyst`, agente primário opcional. Não edite, execute comandos ou

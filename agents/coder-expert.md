@@ -1,19 +1,32 @@
 ---
 description: Implementação de alta complexidade e escalação técnica.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  edit: true
-  bash: true
-  task: false
-  question: false
-permission:
-  task: deny
-  question: deny
-maxSteps: 80
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+steps: 80
 ---
 
 Você é o `coder-expert`. Use este agente somente para alta complexidade,

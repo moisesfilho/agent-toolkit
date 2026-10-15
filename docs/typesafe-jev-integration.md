@@ -242,13 +242,15 @@ Configuracao utilizada:
 ```json
 {
   "mcp": {
-    "typesafe-jev": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-lc",
-        "source \"<secrets-dir>/opencode-keys.env\"; source \"<secrets-dir>/typesafe-ai.env\" && exec node \"<harness-config-dir>/typesafe-jev-mcp/index.mjs\""
-      ]
+    "servers": {
+      "typesafe-jev": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-lc",
+          "source \"<secrets-dir>/opencode-keys.env\"; source \"<secrets-dir>/typesafe-ai.env\" && exec node \"<harness-config-dir>/typesafe-jev-mcp/index.mjs\""
+        ]
+      }
     }
   }
 }
@@ -413,7 +415,7 @@ Validacoes executadas na atualizacao (22/set/2026):
 - Mesma chamada sem `OPENCODE_API_KEY` (fallback): respondeu
   `provider=typesafe`, `model=jev-1.13.0` (alias de `jev-latest`), `noul=0.95`.
 
-Depois de alterar configuracoes globais, e necessario reiniciar o OpenCode.
+Depois de alterar a configuracao global de MCP, confirme a conexao com `opencode mcp list` e reinicie ou reconecte o cliente se o servidor nao for recarregado na sessao atual. A v2 compartilha configuracao com o servico em segundo plano; nao presuma que toda alteracao de configuracao exige reinicio.
 
 ## Limitacoes
 
@@ -439,4 +441,4 @@ estado nao estruturado + perguntas tipadas
 - API: <https://docs.typesafe.ai/api>
 - System One: <https://docs.typesafe.ai/concepts/system-one>
 - Confianca: <https://docs.typesafe.ai/confidence>
-- OpenCode Zen (Jev free): <https://opencode.ai/docs/zen/>
+- OpenCode provider setup: <https://opencode.ai/v2/docs/providers/>

@@ -1,19 +1,32 @@
 ---
 description: Executa a validação completa e revisa código e testes.
 mode: subagent
-tools:
-  read: true
-  glob: true
-  grep: true
-  list: true
-  edit: false
-  bash: true
-  task: false
-  question: false
-permission:
-  task: deny
-  question: deny
-maxSteps: 70
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
+  - action: "typesafe-jev_jev_decide"
+    resource: "*"
+    effect: allow
+steps: 70
 ---
 
 Você é o `reviewer`, único agente responsável pela suíte completa, regressão,
@@ -78,7 +91,7 @@ overrides: []
 
 Limite o retorno a 40 linhas e inclua todos os campos comuns. `review_approved`
 exige `blockers: []`, testes aplicáveis aprovados, gates conclusivos no `head`
-atual e nenhum risco crítico aberto. Se atingir `maxSteps`, houver timeout,
+atual e nenhum risco crítico aberto. Se atingir o limite de etapas, houver timeout,
 saída truncada, evidência inacessível, CI pendente ou check inconclusivo,
 retorne `review_incomplete`, nunca aprovação. Registre findings compactos como
 `path:line | severity | finding | evidence`.
