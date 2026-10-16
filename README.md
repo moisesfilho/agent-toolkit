@@ -27,7 +27,7 @@ logs, caches, and private memory are intentionally excluded.
 
 | Directory | Purpose |
 | --- | --- |
-| `agents/` | Reusable agent definitions and role instructions. |
+| `agents/` | Reusable agent definitions and role instructions, including read-only, evidence-focused `research`. |
 | `skills/` | Focused, reusable capabilities and operating procedures. |
 | `workflows/` | Development workflows for planning, implementation, review, and release. |
 | `templates/` | Templates for project files, prompts, and documentation. |
@@ -37,6 +37,12 @@ logs, caches, and private memory are intentionally excluded.
 The initial collection includes the configured agents, reusable skills,
 including the shared clean code baseline, the developer workflow, TypeSafe Jev
 documentation and MCP harness, and search and decision policies.
+
+The `research` subagent uses OpenCode V2 `websearch` and `webfetch` to investigate
+bounded technical questions. Web search depends on an integration configured in
+the runtime; the agent does not require a particular provider or embed API keys.
+See the [developer workflow](workflows/developer-workflow.md) for stall signals
+and dispatch rules.
 
 ## Portability And Security
 

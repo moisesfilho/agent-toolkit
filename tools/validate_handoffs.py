@@ -14,6 +14,7 @@ COMMON_FIELDS = (
     "next_action",
     "cycle",
     "changed",
+    "research_request",
     "commands",
     "tests",
     "quality_gate",
@@ -30,22 +31,35 @@ ROLE_LIMITS = {
     "coder-expert": 25,
     "tester": 25,
     "reviewer": 40,
+    "research": 25,
 }
 ROLE_FIELDS = {
     "analyst": ("request_type", "objective", "facts", "assumptions", "scope", "out_of_scope",
                 "requirements", "acceptance_criteria", "edge_cases", "validation"),
     "planner": ("objective_confirmed", "objective", "scope", "acceptance_criteria", "risk_profile",
                 "requirements", "files", "planned_tests", "checkpoints"),
+    "research": ("research_question", "findings", "sources", "recommendation"),
 }
 EXPECTED_STATUS = {
     "analyst": ("requirements_ready", "needs_clarification"),
-    "planner": ("plan_ready", "needs_clarification"),
+    "planner": ("objective_ready", "plan_ready", "needs_clarification"),
     "coder": ("implementation_ready", "implementation_corrected", "blocked"),
     "coder-expert": ("implementation_ready", "implementation_corrected", "blocked"),
     "tester": ("test_specification_ready", "test_ready", "test_refined", "tester_disputed"),
     "reviewer": ("review_approved", "test_refinement_needed", "needs_more_tests",
                  "needs_correction", "review_incomplete"),
+    "research": ("research_complete", "research_inconclusive"),
 }
+EXPECTED_ACTION = {
+    "analyst": ("handoff_to_developer", "request_clarification"),
+    "planner": ("developer",),
+    "coder": ("tester", "developer"),
+    "coder-expert": ("tester", "developer"),
+    "tester": ("reviewer", "coder", "developer"),
+    "reviewer": ("tester", "coder", "developer", "none"),
+    "research": ("developer",),
+}
+ROUTING_FIELDS = ("status", "origin", "next_action", "cycle")
 
 
 def frontmatter(content: str) -> str:
@@ -84,10 +98,28 @@ def check_agent(role: str, content: str) -> list[str]:
     if len(block) > ROLE_LIMITS[role]:
         errors.append(f"{role}: example handoff exceeds {ROLE_LIMITS[role]} lines")
 
-    status_line = next((line for line in block if line.startswith("status:")), "")
-    for status in EXPECTED_STATUS[role]:
-        if status not in status_line:
-            errors.append(f"{role}: status enum missing {status}")
+    values: dict[str, list[str]] = {field: [] for field in ROUTING_FIELDS}
+    for line in block:
+        match = re.match(r"^([a-z][a-z0-9_-]*):\s*(.*)$", line)
+        if match and match.group(1) in values:
+            values[match.group(1)].append(match.group(2).strip())
+    for field, field_values in values.items():
+        if len(field_values) != 1:
+            errors.append(f"{role}: routing field {field} must appear exactly once")
+
+    if values["origin"] and values["origin"] != [role]:
+        errors.append(f"{role}: origin must be the single scalar {role}")
+    if values["cycle"] and not re.fullmatch(r"[0-7]", values["cycle"][0]):
+        errors.append(f"{role}: cycle must be a single integer from 0 to 7")
+    if values["next_action"]:
+        actions = tuple(item.strip() for item in values["next_action"][0].split("|"))
+        if actions != EXPECTED_ACTION[role]:
+            errors.append(f"{role}: next_action must list only its allowed scalar values")
+
+    if values["status"]:
+        statuses = tuple(item.strip() for item in values["status"][0].split("|"))
+        if statuses != EXPECTED_STATUS[role]:
+            errors.append(f"{role}: status must list only its allowed scalar values")
 
     if role == "reviewer":
         required_rules = (
@@ -116,12 +148,14 @@ def check_repository(root: Path = ROOT) -> list[str]:
                 errors.append(f"handoff template missing field {field}")
         if "Max lines" not in text or "25" not in text or "40" not in text:
             errors.append("handoff template must document 25/40 line limits")
+        if "machine-checkable" not in text or "format-only repair" not in text:
+            errors.append("handoff template must define routing and malformed-handoff recovery")
     if not workflow.is_file():
         errors.append("missing workflows/developer-workflow.md")
     else:
         text = workflow.read_text(encoding="utf-8")
         for invariant in ("review_incomplete", "stale", "cycle", "templates/handoff-contract.md",
-                          "user authorization"):
+                          "user authorization", "fresh, bounded", "independently reproduce"):
             if invariant.lower() not in text.lower():
                 errors.append(f"workflow missing invariant: {invariant}")
 

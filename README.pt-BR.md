@@ -28,7 +28,7 @@ credenciais, logs, caches e memoria privada foram intencionalmente excluidos.
 
 | Diretorio | Finalidade |
 | --- | --- |
-| `agents/` | Definicoes de agentes e instrucoes de papeis reutilizaveis. |
+| `agents/` | Definicoes de agentes e instrucoes de papeis reutilizaveis, incluindo `research` somente leitura e orientado a evidencias. |
 | `skills/` | Capacidades e procedimentos operacionais reutilizaveis. |
 | `workflows/` | Workflows para planejamento, implementacao, revisao e release. |
 | `templates/` | Templates de arquivos, prompts e documentacao. |
@@ -39,6 +39,12 @@ A colecao inicial inclui os agents configurados, skills reutilizaveis, incluindo
 a baseline compartilhada de clean code, o workflow de desenvolvimento, a
 documentacao e o harness MCP do TypeSafe Jev, alem das politicas de busca e
 decisoes.
+
+O subagente `research` usa `websearch` e `webfetch` do OpenCode V2 para investigar
+perguntas tecnicas delimitadas. A busca depende de uma integracao configurada no
+ambiente; nenhum provedor ou segredo e fixado pelo toolkit. Consulte o
+[workflow do developer](workflows/developer-workflow.md) para os sinais de
+bloqueio e regras de dispatch.
 
 ## Portabilidade E Seguranca
 

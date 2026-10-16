@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: edit
     resource: "*"
     effect: allow
@@ -51,6 +87,11 @@ textuais/fakes como prova de execução comportamental; identifique limites de
 cobertura. Quando hardware for necessário e não executado, use
 `manual_validation: pending` e registre os passos/evidências esperados.
 
+Se não conseguir definir ou validar um cenário por falta de referência técnica
+externa, ou não houver avanço após tentativa relevante, sinalize
+`research_request` (pergunta; tentativas; evidência faltante) ao developer. Não
+faça delegação aninhada nem reduza asserções para contornar a lacuna.
+
 Se o pedido vier do reviewer e a implementação estiver correta, retorne direto a
 ele. `tester_disputed` sempre retorna ao developer. Use Jev apenas para priorizar
 uma lacuna de cobertura entre opções claras e de baixo risco.
@@ -60,6 +101,7 @@ status: test_specification_ready | test_ready | test_refined | tester_disputed
 origin: tester
 next_action: reviewer | coder | developer
 cycle: 0
+research_request: none | <question; tried; missing evidence>
 changed: [testes e REQ/TEST afetados]
 commands: [somente testes criados/alterados]
 tests: [resultados objetivos]

@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: shell
     resource: "*"
     effect: allow
@@ -55,12 +91,17 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
    antes da implementação.
 5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
    depois delegue `coder`, `tester` e `reviewer`.
-6. Se o plano falhar ou revelar risco impeditivo, pause a implementação e peça
+6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
+   hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
+   subagentes sinalizam `research_request` no handoff e não fazem chamadas
+   aninhadas. Consulte primeiro código/documentação local e não repita pesquisa
+   sem evidência nova.
+7. Se o plano falhar ou revelar risco impeditivo, pause a implementação e peça
    ao `planner` alternativas viáveis; use Jev para desempates técnicos delimitados.
    Reaprove aprovação apenas se escopo, comportamento e risco aceito não mudarem.
-7. Roteie correções conforme o workflow, até sete ciclos; pare antes se não
+8. Roteie correções conforme o workflow, até sete ciclos; pare antes se não
    houver nova evidência/hipótese, houver repetição sem progresso ou risco crítico.
-8. Ao aprovar, peça documentação técnica e apresente a validação manual final.
+9. Ao aprovar, peça documentação técnica e apresente a validação manual final.
 
 ## Regras essenciais
 
@@ -73,6 +114,16 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 - Valide todos os campos e invariantes do retorno antes de rotear. Para erro de
   formato, permita uma única devolução format-only; não trate conteúdo incompleto
   como evidência nem como aprovação.
+- Se a correção de formato também falhar, não encerre o diagnóstico: mantenha o
+  retorno inválido como não verificado e peça uma única nova execução delimitada
+  ao papel responsável para reproduzir/verificar as alegações no estado atual,
+  com handoff válido. Em revisão, registre `review_incomplete` até a nova
+  evidência ser validada. Roteie somente evidência nova validada; se ela também
+  faltar ou for inconclusiva, mantenha bloqueado/incompleto e relate a limitação.
+  Isso não aprova gates, não apaga falhas e não reinicia o limite de ciclos.
+- Quando `research_request` não for `none`, avalie o pedido e, se a busca externa
+  puder resolver a lacuna, delegue ao `research`; encaminhe a síntese ao papel
+  responsável. Pesquisa não prova comportamento local nem libera gates.
 - Preserve o ledger canônico de `status`, `cycle`, `head` validado, gates,
   `blockers`, `manual_validation` e `overrides`.
 - Serialize escritores/revisores no mesmo worktree. Leitura paralela só com

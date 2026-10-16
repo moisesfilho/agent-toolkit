@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: question
     resource: "*"
     effect: allow
@@ -32,6 +68,11 @@ execute comandos ou chame agentes. O workflow global define o contrato e os gate
 Se receber `origin: analyst`, preserve `REQ-*`, `AC-*`, escopo e critérios como
 baseline. Não repita perguntas resolvidas. Se `objective_confirmed: true` estiver
 presente, avance diretamente para o plano, salvo contradição objetiva.
+
+Se uma decisão técnica importante depender de evidência externa ausente, ou a
+abordagem estiver bloqueada sem alternativa sustentada, retorne uma
+`research_request` concisa (pergunta; tentativas; evidência faltante) ao
+developer. Não tente delegação aninhada. Aguarde a síntese para replanejar.
 
 Produza um plano curto contendo:
 
@@ -64,6 +105,7 @@ status: objective_ready | plan_ready | needs_clarification
 origin: planner
 next_action: developer
 cycle: 0
+research_request: none | <question; tried; missing evidence>
 objective_confirmed: true | false
 objective: ...
 scope: ...

@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: shell
     resource: "*"
     effect: allow
@@ -69,6 +105,9 @@ do pipeline e limitação operacional.
 Classifique achados com autonomia e peça correção objetiva; não escale preferências
 ou escolhas reversíveis que não alterem requisitos nem risco. Se a abordagem estiver inviavel ou materialmente arriscada, nao reduza o padrao
 de aprovacao: retorne ao developer evidencias e alternativas para replanejamento.
+Quando a revisão ficar inconclusiva por falta de evidência técnica externa,
+registre `research_request` (pergunta; tentativas; evidência faltante) ao
+developer. Não aprove com base apenas em pesquisa externa: exija validação local.
 Avalie Jev para desempate semantico de baixo risco entre alternativas viaveis
 quando a classificacao puder mudar a recomendacao; pule-o se nao mudar a acao.
 Para retorno, siga o workflow: tester para testes, coder para producao,
@@ -79,6 +118,7 @@ status: review_approved | test_refinement_needed | needs_more_tests | needs_corr
 origin: reviewer
 next_action: tester | coder | developer | none
 cycle: 0
+research_request: none | <question; tried; missing evidence>
 changed: [somente arquivos/requisitos relacionados ao achado]
 commands: [suíte, lint, build e resultados]
 tests: [pass/fail e cobertura relevante]
@@ -96,3 +136,12 @@ atual e nenhum risco crítico aberto. Se atingir o limite de etapas, houver time
 saída truncada, evidência inacessível, CI pendente ou check inconclusivo,
 retorne `review_incomplete`, nunca aprovação. Registre findings compactos como
 `path:line | severity | finding | evidence`.
+
+Mantenha `status`, `origin`, `next_action` e `cycle` como campos escalares em uma
+única linha cada. `next_action` deve conter exatamente um valor permitido pelo
+contrato; coloque explicações/routing adicional em `decisions` ou `blockers`.
+Se pedirem correção de formato, preserve conclusões e evidências: corrija apenas
+a estrutura. Se o formato continuar inválido, não tente reinterpretar o retorno;
+o developer solicitará uma nova verificação delimitada. Nessa nova execução,
+reproduza os achados acionáveis no estado atual e retorne evidência independente
+em handoff válido; não assuma nem repita achados não confirmados.

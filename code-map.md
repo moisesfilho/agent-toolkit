@@ -8,17 +8,17 @@ reutilizavel e arquivos de configuracao portaveis.
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `agents/` | Definições reutilizáveis em frontmatter nativo V2; `retrospectiv.md` analisa sessões de harness em modo somente leitura. |
+| `agents/` | Definições reutilizáveis em frontmatter nativo V2; `research.md` sintetiza evidência web sem escrita; `retrospectiv.md` analisa sessões de harness em modo somente leitura. |
 | `skills/` | Capacidades e procedimentos focados. |
-| `workflows/` | Fluxos de planejamento, alternativas/replanejamento, implementacao, revisao e release. |
-| `templates/` | Modelos reutilizáveis; `handoff-contract.md` é o contrato compartilhado entre agentes. |
+| `workflows/` | Fluxos de planejamento, alternativas/replanejamento, recuperacao limitada de handoff malformado, implementacao, revisao e release. |
+| `templates/` | Modelos reutilizáveis; `handoff-contract.md` define campos/limites e recuperacao de handoff, incluindo sinal de pesquisa e retorno de `research`. |
 | `docs/` | Conceitos, compatibilidade e guias. |
 | `README.md`, `README.pt-BR.md` | Apresentação do toolkit e instruções de descoberta no OpenCode V2. |
 | `docs/agent-instruction-delivery.md` | Dispatch portatil de instrucoes, fallback de conteudo e limites de symlinks. |
 | `docs/typesafe-jev-policy.md` | Gatilhos enxutos para Jev, limites humanos e escalonamento. |
 | `harnesses/` | Adaptadores para ferramentas de coding. |
-| `tools/validate_handoffs.py` | Valida contrato, limites de ciclo, frontmatter `steps` e invariantes dos handoffs. |
-| `tests/test_validate_handoffs.py` | Testes positivos e negativos do validador do contrato, ciclo e limites de etapas. |
+| `tools/validate_handoffs.py` | Valida contrato, campos de roteamento escalares/unicos, enums, limites de ciclo, sinal/retorno de pesquisa, frontmatter `steps` e invariantes dos handoffs. |
+| `tests/test_validate_handoffs.py` | Testes positivos e negativos do validador do contrato, roteamento, retorno de pesquisa, ciclo e limites de etapas. |
 | `CONTRIBUTING.md` | Regras de contribuicao, portabilidade e seguranca. |
 
 ## Entrada e validacao

@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: edit
     resource: "*"
     effect: allow
@@ -42,11 +78,17 @@ Nao mude escopo/arquitetura aprovados silenciosamente. Siga
 `templates/handoff-contract.md`;
 limite o retorno a 25 linhas.
 
+Se faltar evidência externa ou a abordagem não avançar, informe em
+`research_request` a pergunta específica, tentativas e lacuna. Não repita uma
+tentativa sem hipótese nova nem faça delegação aninhada; o developer decide o
+dispatch a `research`.
+
 ```text
 status: implementation_ready | implementation_corrected | blocked
 origin: coder-expert
 next_action: tester | developer
 cycle: 0
+research_request: none | <question; tried; missing evidence>
 changed: []
 commands: []
 tests: []

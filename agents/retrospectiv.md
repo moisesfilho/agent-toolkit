@@ -8,6 +8,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -16,7 +52,7 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: shell
     resource: "*"
     effect: allow
@@ -127,6 +163,10 @@ somente referências técnicas curtas e necessárias.
 8. Se delegar leitura, divida por fontes sem sobreposição, exija referências e
    limitações, aguarde todos os resultados antes da síntese e não permita que
    subagentes alterem arquivos ou executem operações mutáveis.
+   Para recomendações que dependam de fatos técnicos atuais, pode solicitar ao
+   `research` uma pergunta web delimitada; mantenha fontes e datas no relatório e
+   separe evidência atual de evidência da sessão. A pesquisa não amplia nem
+   substitui as fontes históricas nem autoriza alteração de recursos.
 
 ## Dimensoes a avaliar
 

@@ -34,6 +34,22 @@ available to the receiving harness.
    instructions. Work is `completed` only after required manual validation is
    recorded; only the user accepts device/hardware behavior.
 
+## Research on stalled work
+
+Use `research` when a technical decision lacks evidence, or a cycle repeats
+without a new hypothesis, evidence, or measurable progress. Subagents signal this
+in `research_request` as `question; tried; missing evidence`; they do not repeat
+the same failing path or dispatch nested research. The developer first checks
+whether the needed fact is already available in project code/docs, then delegates
+one bounded question to `research` and routes its concise findings to the
+responsible role (planner for a material approach change). OpenCode V2 defaults
+to one subagent nesting level, so the developer owns dispatch. Do not research
+the same question again without new evidence. Research informs decisions; it does
+not validate local behavior, change scope, count as implementation, or waive plan
+approval, tests, review, user decisions, or the cycle ceiling. If research is
+unavailable or inconclusive, record the limitation and use the existing blocked,
+replan, or human-checkpoint route.
+
 For bugs, reproduce before planning where possible. High-risk bugs require
 `tester` scenarios before the fix; low/medium-risk bugs may be fixed first and
 receive a regression test afterward. Regression coverage is required before
@@ -94,6 +110,18 @@ limit, timeout, unavailable check, pending CI, or unreadable evidence must remai
 incomplete or blocked. The developer may request one format-only correction for
 a malformed handoff; do not route its claims as verified until corrected.
 
+If that correction is still malformed, stop format-repair loops. Keep the
+original handoff untrusted, record the role's result as `review_incomplete` when
+it was a review, and dispatch one fresh, bounded return to the responsible role
+to independently reproduce or verify the actionable claims against the current
+source state. This is evidence collection, not approval: route only claims in a
+validated return, preserve any still-unverified claims as limitations, and keep
+the task incomplete if the fresh return is malformed or inconclusive. A fresh
+verification does not erase failed gates or bypass the normal correction,
+review, cycle, or human-approval rules. For non-review handoffs, use the same
+pattern with the originating role; do not ask unrelated roles to infer its
+evidence.
+
 ## Risk and bugs
 
 Classify `risk_profile` as `low`, `medium`, or `high`. `high` includes contract,
@@ -143,6 +171,7 @@ Routing:
 - `coder/reviewer -> developer -> planner` when the approach is infeasible or
   materially risky; continue only under the existing approval gate;
 - `tester_disputed` and architectural/scope disputes return to `developer`;
+- any non-`none` `research_request` returns to `developer` for bounded dispatch;
 - failed gates return to the responsible role; no approval while they remain
   failed or stale.
 

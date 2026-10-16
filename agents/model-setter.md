@@ -9,6 +9,42 @@ permissions:
   - action: read
     resource: "*"
     effect: allow
+  - action: read
+    resource: "*.env"
+    effect: deny
+  - action: read
+    resource: "*.env.*"
+    effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
+  - action: read
+    resource: "*.pem"
+    effect: deny
+  - action: read
+    resource: "*.key"
+    effect: deny
+  - action: read
+    resource: "*id_rsa*"
+    effect: deny
+  - action: read
+    resource: "*id_ed25519*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.ssh/*"
+    effect: deny
+  - action: read
+    resource: "$HOME/.local/share/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/opencode/auth.json"
+    effect: deny
+  - action: read
+    resource: "$HOME/.config/rclone/rclone.conf"
+    effect: ask
+  - action: read
+    resource: "$HOME/.config/opencode/opencode.json"
+    effect: ask
   - action: glob
     resource: "*"
     effect: allow
@@ -17,12 +53,18 @@ permissions:
     effect: allow
   - action: external_directory
     resource: "*"
-    effect: ask
+    effect: allow
   - action: shell
     resource: "*"
     effect: allow
   - action: webfetch
     resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: research
     effect: allow
   - action: edit
     resource: "*"
@@ -67,6 +109,10 @@ Não replique a lógica desses scripts no prompt e não edite `opencode.json` ma
 ## Fluxo obrigatório
 
 1. Leia a configuração global e os arquivos em `~/.config/opencode/agents/`.
+   Use o subagente `research` para pesquisas web delimitadas sobre documentação,
+   anúncios de modelos, preços ou relatos de incidentes; envie a pergunta, data e
+   provedores relevantes. Não delegue verificações operacionais que o utilitário
+   local pode responder. Integre fontes datadas e valide-as contra a fonte oficial.
 2. Execute `catalog` antes de considerar qualquer modelo; ele descobre provedores/modelos declarados em `opencode.json` e tenta casar seus metadados com o catálogo público models.dev consumido pelo OpenCode. Não use `opencode models --verbose`: essa opção não existe na CLI v2. Confira `opencode models --help` para as opções disponíveis. Ao recomendar custos, confira e cite a documentação oficial de preços do provedor. Metadados models.dev são secundários e devem ser rotulados assim até conferência oficial; se não houver preço confiável, marque como não publicado/incomparável.
 3. Considere apenas modelos configurados ou descobertos e compatíveis com o provedor; ausência no catálogo público não significa modelo inválido.
 4. Interprete custos como preço por milhão de tokens conforme metadados disponíveis. A base dos multiplicadores é o menor preço positivo por provedor e categoria, separadamente para entrada, saída, cache lido e cache escrito. Multiplicador `1×` é a base daquela categoria; valor zero/não aplicável não é comparável nessa categoria.

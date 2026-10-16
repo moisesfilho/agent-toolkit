@@ -18,12 +18,42 @@ class HandoffContractTests(unittest.TestCase):
         errors = check_agent("coder", content)
         self.assertTrue(any("missing fields: origin" in error for error in errors))
 
+    def test_research_handoff_requires_sources_and_research_signal(self):
+        content = (ROOT / "agents/research.md").read_text(encoding="utf-8")
+        content = content.replace("research_request: none\n", "", 1)
+        content = content.replace("sources: [title | URL | date | claim]\n", "", 1)
+        errors = check_agent("research", content)
+        self.assertTrue(any("research_request" in error for error in errors))
+        self.assertTrue(any("sources" in error for error in errors))
+
     def test_handoff_over_role_limit_is_rejected(self):
         content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
         extra_lines = "".join(f"extra_{index}: value\n" for index in range(15))
         content = content.replace("origin: coder\n", f"origin: coder\n{extra_lines}", 1)
         errors = check_agent("coder", content)
         self.assertTrue(any("exceeds 25 lines" in error for error in errors))
+
+    def test_routing_field_must_be_a_single_allowed_value(self):
+        content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
+        content = content.replace(
+            "next_action: tester | coder | developer | none",
+            "next_action: coder (tester handles tests)",
+            1,
+        )
+        errors = check_agent("reviewer", content)
+        self.assertTrue(any("next_action must list only" in error for error in errors))
+
+    def test_duplicate_routing_field_is_rejected(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        content = content.replace("origin: coder\n", "origin: coder\norigin: reviewer\n", 1)
+        errors = check_agent("coder", content)
+        self.assertTrue(any("origin must appear exactly once" in error for error in errors))
+
+    def test_cycle_must_be_a_single_integer_in_range(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        content = content.replace("cycle: 0", "cycle: 8", 1)
+        errors = check_agent("coder", content)
+        self.assertTrue(any("cycle must be a single integer" in error for error in errors))
 
     def test_reviewer_steps_cannot_drop_below_70(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
