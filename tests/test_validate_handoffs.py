@@ -63,9 +63,24 @@ class HandoffContractTests(unittest.TestCase):
 
     def test_reviewer_approval_requires_fail_closed_rules(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
-        content = content.replace("nunca aprovação", "pode aprovar", 1)
+        content = content.replace(
+            "review_approved` só é permitido em modo final",
+            "review_approved` pode ser aprovado em qualquer modo",
+            1,
+        )
         errors = check_agent("reviewer", content)
         self.assertTrue(any("fail-closed rule" in error for error in errors))
+
+    def test_reviewer_feedback_status_is_allowed(self):
+        content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
+        self.assertIn("review_feedback_ready", content)
+        errors = check_agent("reviewer", content)
+        self.assertFalse(any("status must list only" in error for error in errors))
+
+    def test_reviewer_development_feedback_cannot_approve(self):
+        content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
+        self.assertIn("review_feedback_ready` só é permitido em modo development", content)
+        self.assertIn("review_approved` só é permitido em modo final", content)
 
     def test_cycle_ceiling_is_seven(self):
         template = ROOT / "templates/handoff-contract.md"

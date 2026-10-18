@@ -8,10 +8,10 @@ reutilizavel e arquivos de configuracao portaveis.
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `agents/` | Definições reutilizáveis em frontmatter nativo V2; `research.md` sintetiza evidência web sem escrita; `retrospectiv.md` analisa sessões de harness em modo somente leitura. |
+| `agents/` | Definições reutilizáveis em frontmatter nativo V2; reviewer separa feedback incremental de aprovação/gates finais; `research.md` sintetiza evidência web sem escrita; `retrospectiv.md` analisa sessões de harness em modo somente leitura. |
 | `skills/` | Capacidades e procedimentos focados. |
-| `workflows/` | Fluxos de planejamento, alternativas/replanejamento, recuperacao limitada de handoff malformado, implementacao, revisao e release. |
-| `templates/` | Modelos reutilizáveis; `handoff-contract.md` define campos/limites e recuperacao de handoff, incluindo sinal de pesquisa e retorno de `research`. |
+| `workflows/` | Fluxos de planejamento, alternativas/replanejamento, feedback de revisão durante desenvolvimento e gates completos na revisão final, recuperacao limitada de handoff malformado, implementacao e release. |
+| `templates/` | Modelos reutilizáveis; `handoff-contract.md` define campos/limites e recuperacao de handoff, incluindo feedback não aprovador intermediário e sinal/retorno de pesquisa. |
 | `docs/` | Conceitos, compatibilidade e guias. |
 | `README.md`, `README.pt-BR.md` | Apresentação do toolkit e instruções de descoberta no OpenCode V2. |
 | `docs/agent-instruction-delivery.md` | Dispatch portatil de instrucoes, fallback de conteudo e limites de symlinks. |

@@ -76,7 +76,11 @@ asserções. Em bugs, crie a regressão depois da correção.
 
 Leia `.opencode/skills/testing/SKILL.md` uma vez se existir; se não existir,
 use `skills/clean-code` como baseline das seções de testes. Execute apenas
-testes criados ou alterados, nunca a suíte completa. Classifique falhas como
+testes criados ou alterados, nunca a suíte completa nem cobertura global. Para
+bugs, execute a regressão direcionada necessária para validar a correção; deixe a
+suíte ampla de regressão e cobertura global para o reviewer em modo final. Não
+adie testes de alto risco necessários para orientar a implementação. Classifique
+falhas como
 defeito de teste, implementação ausente ou implementação incorreta.
 
 Resolva escolhas de teste reversíveis priorizando comportamento real e risco;

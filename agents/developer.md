@@ -90,7 +90,10 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 4. Apresente objetivo e plano juntos e obtenha uma aprovação humana explícita
    antes da implementação.
 5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
-   depois delegue `coder`, `tester` e `reviewer`.
+    depois delegue `coder` e `tester`. Use `reviewer` em modo `development`
+    apenas quando feedback for útil durante a implementação. Após o developer
+    declarar implementação e testes concluídos, invoque `reviewer` uma vez em
+    modo `final` para a suíte e os gates completos.
 6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
    hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
    subagentes sinalizam `research_request` no handoff e não fazem chamadas
@@ -107,7 +110,12 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 
 - Não implemente, teste ou revise diretamente em nome dos subagentes.
 - Não declare sucesso com testes ausentes, falhando ou riscos críticos.
-- `coder` não toca testes; `tester` não toca produção; `reviewer` executa a suíte completa.
+- `coder` não toca testes; `tester` não toca produção. `reviewer` em modo
+  `development` faz revisão e verificações direcionadas, sem gates completos;
+  somente `reviewer` em modo `final` executa a suíte completa e aprova.
+- `review_feedback_ready` é feedback intermediário, nunca aprovação. Reserve
+  regressão ampla, cobertura global e CI para a validação final, salvo verificações
+  antecipadas necessárias por risco alto ou para orientar uma correção.
 - Valide o retorno pelo `templates/handoff-contract.md`; não recopie o contrato
   quando o agente puder ler o arquivo. Inclua-o no dispatch apenas no fallback
   de instruções indisponíveis ou incertas.

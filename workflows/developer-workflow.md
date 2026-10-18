@@ -27,10 +27,19 @@ available to the receiving harness.
    for simple work.
 5. `coder` implements. Use `coder-expert` only for high complexity or explicit
    escalation.
-6. `tester` adds or updates tests against the approved scenarios.
-7. `reviewer` runs the full applicable suite, reviews code/tests, and verifies
-   local and remote quality gates.
-8. After `review_approved`, document the solution and present manual validation
+6. `tester` adds or updates tests against the approved scenarios and runs only
+   tests created or changed in that step. Targeted regression tests needed to
+   guide a fix run during development; full regression suites and global coverage
+   checks are deferred until implementation is declared complete.
+7. If useful, `reviewer` may run in `development` mode during implementation:
+   review only affected requirements/files and run focused checks. It returns
+   `review_feedback_ready` when no immediate correction is needed; this is not
+   approval and does not run full suites, global coverage, or remote gates.
+8. Once the developer confirms implementation and test work are complete, invoke
+   `reviewer` once in `final` mode to run the full applicable suite, regression,
+   coverage, lint/typecheck/build, and local/remote quality gates. Only this mode
+   may return `review_approved`.
+9. After `review_approved`, document the solution and present manual validation
    instructions. Work is `completed` only after required manual validation is
    recorded; only the user accepts device/hardware behavior.
 
@@ -63,8 +72,9 @@ approval in either path.
 - `coder`/`coder-expert` change production only; they do not edit tests or run
   the full suite.
 - `tester` changes tests only and runs tests created or changed by that step.
-- `reviewer` is the only agent that runs the complete suite and issues a review
-  decision. It does not edit source or tests.
+- `reviewer` is the only agent that runs the complete suite and issues final
+  approval. In `development` mode it gives scoped feedback only; it does not edit
+  source or tests. `review_feedback_ready` is explicitly non-approving.
 - `analyst` is an optional primary agent that returns requirements; it does not
   start implementation.
 - Subagents report blocking questions to `developer`; only `developer` asks the
@@ -92,13 +102,20 @@ the coder edits tests; the tester edits production; a full suite is run by coder
 or tester; a bug lacks regression coverage at approval; or a review is approved
 with a blocker, failed/missing test, stale gate, or inconclusive required check.
 
-`review_approved` requires all of the following:
+`review_approved` is allowed only in `final` mode and requires all of the following:
 
 - `blockers: []` and no unresolved critical risk;
 - every applicable `REQ-*`/`AC-*` linked to implementation and test evidence;
 - complete applicable local tests, lint/format/build/coverage checks;
 - remote CI conclusively green when configured and available;
 - all gate evidence tied to the exact reviewed state (`head` plus timestamp).
+
+Development-mode feedback may report focused check results and pending final
+gates. Defer full regression runs, global coverage, broad analysis, and remote CI
+polling until implementation and test changes are complete, unless concrete high
+risk or a needed diagnostic makes an earlier check necessary. Any source/test
+change after final validation makes affected evidence stale and requires relevant
+final gates to rerun.
 
 If source state changes after a check, that check is `stale` and must be rerun.
 For a dirty worktree, identify the reviewed state with the base HEAD plus a

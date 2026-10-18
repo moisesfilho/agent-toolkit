@@ -46,7 +46,7 @@ EXPECTED_STATUS = {
     "coder": ("implementation_ready", "implementation_corrected", "blocked"),
     "coder-expert": ("implementation_ready", "implementation_corrected", "blocked"),
     "tester": ("test_specification_ready", "test_ready", "test_refined", "tester_disputed"),
-    "reviewer": ("review_approved", "test_refinement_needed", "needs_more_tests",
+    "reviewer": ("review_feedback_ready", "review_approved", "test_refinement_needed", "needs_more_tests",
                  "needs_correction", "review_incomplete"),
     "research": ("research_complete", "research_inconclusive"),
 }
@@ -127,6 +127,8 @@ def check_agent(role: str, content: str) -> list[str]:
             "blockers: []",
             "review_incomplete",
             "nunca aprovação",
+            "review_approved` só é permitido em modo final",
+            "review_feedback_ready` só é permitido em modo development",
         )
         lower = content.lower()
         for rule in required_rules:
