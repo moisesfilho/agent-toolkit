@@ -43,6 +43,40 @@ available to the receiving harness.
    instructions. Work is `completed` only after required manual validation is
    recorded; only the user accepts device/hardware behavior.
 
+## Dispatch and scope control
+
+Before each delegation, send the smallest context that lets the receiving role
+act safely: approved objective and relevant `REQ-*`/`AC-*`, one task and its exit
+criterion, role/mode, allowed files or scope, references to the canonical plan
+and ledger, and only new/changed evidence or blockers. Reference canonical
+instructions instead of copying them when readable; use the explicit-content
+fallback in `docs/agent-instruction-delivery.md` when readability is uncertain.
+Do not require a snapshot for planning or read-only discovery. For implementation,
+testing, or review of a changing worktree, identify the relevant source state as
+base `HEAD` plus a stable diff/snapshot identifier; after commit, record the SHA.
+
+After each return, validate the handoff, update the existing canonical ledger
+once, and route only verified new information. Do not create a parallel ledger
+or repeat unchanged requirements, logs, or workflow text. Missing evidence stays
+`none`/`[]` when unavailable and is a blocker only when it prevents the next
+step.
+
+When a check discovers work beyond the approved task, classify it in the ledger
+as one of: **blocking for an acceptance criterion/gate**, **minimal technical
+dependency**, or **adjacent/deferable**. Continue only blockers and necessary
+dependencies within approved scope. Defer unrelated improvements. If a dependency
+changes objective, behavior, compatibility, or accepted risk, pause and obtain
+human reapproval; do not use Jev to authorize scope.
+
+Group compatible findings into one bounded correction dispatch only when they
+share the same responsible role and scope. Keep different owners or modules
+separate; serialize writers and reviewers in a shared worktree. Grouping never
+resets `cycle`, removes a test, or bypasses review. For a reviewer interrupted
+by step limit/timeout, preserve `review_incomplete`; resume from verified pending
+checks only if the source snapshot is unchanged. If it changed, invalidate and
+rerun affected checks. An absent/truncated summary is missing evidence, not an
+implicit pass.
+
 ## Research on stalled work
 
 Use `research` when a technical decision lacks evidence, or a cycle repeats
@@ -210,6 +244,10 @@ Final delivery records diff/state, commands and exit results, local/remote gate
 state, manual validation requested/completed/pending, residual risks, and any
 user override. Manual device validation must identify the firmware/build state
 and the specific behavior tested; generic smoke checks do not prove a feature.
+Tie committed CI evidence to the reviewed content and exact commit SHA. A
+successful check for a different commit or changed worktree does not validate
+the current state. Hardware evidence records build/firmware identity and the
+observed feature effect; serial command acceptance alone is not proof of behavior.
 
 ## Jev
 

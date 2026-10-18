@@ -92,6 +92,25 @@ class HandoffContractTests(unittest.TestCase):
         finally:
             template.write_text(original, encoding="utf-8")
 
+    def test_workflow_has_incremental_dispatch_and_scope_controls(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        for phrase in (
+            "Dispatch and scope control",
+            "update the existing canonical ledger",
+            "blocking for an acceptance criterion/gate",
+            "reviewer interrupted",
+            "exact commit SHA",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, workflow)
+
+    def test_reviewer_interruption_remains_fail_closed(self):
+        reviewer = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
+        self.assertIn("review_incomplete", reviewer)
+        self.assertIn("Não presuma que o resumo será emitido", reviewer)
+        self.assertIn("mudanças tornam", reviewer)
+        self.assertIn("stale", reviewer)
+
 
 if __name__ == "__main__":
     unittest.main()

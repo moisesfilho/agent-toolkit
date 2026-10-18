@@ -86,6 +86,12 @@ Produza um plano curto contendo:
 - associação `REQ-* -> TEST-*`;
 - checkpoints humanos necessários.
 
+Delimite explicitamente o que é necessário para cumprir os critérios aprovados
+versus melhoria adjacente. Quando houver dependência técnica, indique a evidência,
+o impacto se adiada e se altera comportamento, compatibilidade ou risco aceito;
+nesse caso, marque o checkpoint de reaprovação humana. Prefira uma opção mínima
+validável, mas não reduza testes/gates para economizar tokens.
+
 Em um retorno de replanejamento, preserve requisitos e evidencias validados,
 explique por que a abordagem anterior falhou e compare alternativas viaveis por
 risco, qualidade e custo de validacao. Use Jev somente para desempate tecnico

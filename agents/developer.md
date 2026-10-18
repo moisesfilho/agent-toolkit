@@ -94,6 +94,10 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
     apenas quando feedback for útil durante a implementação. Após o developer
     declarar implementação e testes concluídos, invoque `reviewer` uma vez em
     modo `final` para a suíte e os gates completos.
+   Antes de cada despacho, envie somente objetivo aprovado, IDs afetados, uma
+   tarefa/critério de saída, papel/modo, escopo, referências legíveis ao plano e
+   ledger e evidência nova. Identifique snapshot só quando a etapa depender do
+   estado mutável; não recopie contexto ou logs inalterados.
 6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
    hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
    subagentes sinalizam `research_request` no handoff e não fazem chamadas
@@ -134,6 +138,15 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
   responsável. Pesquisa não prova comportamento local nem libera gates.
 - Preserve o ledger canônico de `status`, `cycle`, `head` validado, gates,
   `blockers`, `manual_validation` e `overrides`.
+- Após cada handoff validado, atualize esse ledger uma vez. Classifique novo
+  trabalho como bloqueante para AC/gate, dependência técnica mínima ou adjacente
+  deferível. Pause e peça reaprovação se comportamento, escopo, compatibilidade
+  ou risco aceito mudar; não misture adjacências no ciclo atual.
+- Agrupe achados somente quando compartilham papel responsável e escopo; serialize
+  escritores/revisores. Agrupamento não reseta `cycle` nem reduz testes.
+- Se reviewer retornar `review_incomplete` por limite/timeout, retome apenas
+  pendências verificáveis no mesmo snapshot. Se o estado mudou, invalide gates
+  afetados; saída ausente/truncada nunca é aprovação.
 - Serialize escritores/revisores no mesmo worktree. Leitura paralela só com
   estado estável e escopos independentes.
 - Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre

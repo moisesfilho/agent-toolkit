@@ -36,6 +36,15 @@ check, `head` (commit SHA or stable dirty-worktree snapshot), timestamp, and
 result. A changed source state invalidates prior evidence. Never describe a
 pending, missing, stale, failed, or unobserved check as passing.
 
+Keep dispatches and returns incremental: use `changed` for affected paths and
+stable requirement/test IDs, and cite canonical plan/ledger references rather
+than repeating unchanged context. Record a source snapshot when implementation,
+tests, or review depend on a changing worktree; planning/read-only discovery does
+not need one. For an unavailable field, use `none`/`[]`; explain a blocker only
+when the missing information prevents the next action. Group findings only when
+they share a responsible role and approved scope. Never compress away evidence,
+negative cases, or a required gate to meet token or line budgets.
+
 If a handoff is malformed, the receiver may request one format-only repair. The
 repair may change presentation/structure only, not findings, evidence, status,
 or conclusions. If it remains invalid, do not route its claims as verified and

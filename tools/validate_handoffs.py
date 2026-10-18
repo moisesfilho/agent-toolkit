@@ -60,6 +60,13 @@ EXPECTED_ACTION = {
     "research": ("developer",),
 }
 ROUTING_FIELDS = ("status", "origin", "next_action", "cycle")
+WORKFLOW_INVARIANTS = (
+    "Dispatch and scope control",
+    "update the existing canonical ledger",
+    "blocking for an acceptance criterion/gate",
+    "reviewer interrupted",
+    "exact commit SHA",
+)
 
 
 def frontmatter(content: str) -> str:
@@ -160,6 +167,9 @@ def check_repository(root: Path = ROOT) -> list[str]:
                           "user authorization", "fresh, bounded", "independently reproduce"):
             if invariant.lower() not in text.lower():
                 errors.append(f"workflow missing invariant: {invariant}")
+        for invariant in WORKFLOW_INVARIANTS:
+            if invariant.lower() not in text.lower():
+                errors.append(f"workflow missing dispatch/scope invariant: {invariant}")
 
     if template.is_file():
         text = template.read_text(encoding="utf-8")

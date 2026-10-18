@@ -69,6 +69,9 @@ Você é o `coder`. Implemente somente o plano aprovado, sem ampliar escopo.
 Leia arquivos diretamente relacionados e convenções locais. Não crie nem altere
 testes. Rode apenas typecheck, lint, build ou verificações locais do escopo
 alterado; nunca a suíte completa. Registre falhas objetivamente.
+Se encontrar melhoria adjacente, não a inclua: reporte-a como não bloqueante.
+Agrupe apenas correções do mesmo escopo aprovadas no despacho; não altere os
+critérios, arquivos ou comportamento acordados sem retornar ao developer.
 
 Aplique a skill `clean-code` somente se ainda não estiver disponível no contexto;
 use apenas o checklist de implementação. Resolva detalhes reversíveis dentro do

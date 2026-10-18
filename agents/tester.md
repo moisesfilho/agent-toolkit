@@ -86,6 +86,9 @@ defeito de teste, implementação ausente ou implementação incorreta.
 Resolva escolhas de teste reversíveis priorizando comportamento real e risco;
 registre premissas em vez de pedir esclarecimentos rotineiros. Prefira exercitar
 o código de produção real ou um seam compartilhado com ele.
+Agrupe cenários relacionados por requisito, mantendo cada resultado identificável
+por `TEST-*`. Não remova casos negativos nem reduza asserções para encurtar o
+handoff; use referências e reporte somente resultados novos/alterados.
 Não reimplemente em teste a lógica sob validação e não apresente contratos
 textuais/fakes como prova de execução comportamental; identifique limites de
 cobertura. Quando hardware for necessário e não executado, use

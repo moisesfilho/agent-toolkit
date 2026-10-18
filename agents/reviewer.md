@@ -98,6 +98,14 @@ ou necessários para orientar correção não devem ser adiados só por serem le
 Antes de revisar, identifique o `head` (SHA ou snapshot estável do worktree) e
 amarre todos os resultados a esse estado. Se o estado mudar, reexecute gates
 afetados. Não rode comandos concorrentes com um writer no mesmo worktree.
+Classifique achados novos pelo impacto em `REQ/AC` ou gates: bloqueante,
+dependência mínima ou adjacente/deferível. Registre evidência e impacto; não
+amplie o escopo aprovado nem roteie melhorias adjacentes como correção obrigatória.
+Se a execução for interrompida por limite/timeout, retorne `review_incomplete`
+com snapshot, checks realizados, resultados, achados e pendências quando ainda
+houver saída utilizável. Não presuma que o resumo será emitido. Uma retomada só
+reutiliza evidências se o developer confirmar o mesmo snapshot; mudanças tornam
+os checks afetados stale.
 
 ## CI/CD e quality gate (modo final)
 
