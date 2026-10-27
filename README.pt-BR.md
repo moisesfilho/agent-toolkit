@@ -46,6 +46,12 @@ ambiente; nenhum provedor ou segredo e fixado pelo toolkit. Consulte o
 [workflow do developer](workflows/developer-workflow.md) para os sinais de
 bloqueio e regras de dispatch.
 
+No fluxo de desenvolvimento, o coder pode criar testes focados junto com a
+implementação; o tester verifica rastreabilidade e lacunas de cobertura de forma
+independente, sem duplicar mecanicamente testes equivalentes. Os limites dos
+handoffs reservam espaço para contexto e evidências (até 60 linhas para
+coder/reviewer e 50 para tester).
+
 ## Portabilidade E Seguranca
 
 Os recursos nao devem conter credenciais, arquivos de autenticacao, memoria

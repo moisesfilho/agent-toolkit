@@ -90,14 +90,17 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 4. Apresente objetivo e plano juntos e obtenha uma aprovação humana explícita
    antes da implementação.
 5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
-    depois delegue `coder` e `tester`. Use `reviewer` em modo `development`
+     depois delegue `coder` (incluindo testes locais da mudança) e `tester` para
+     validação independente. Use `reviewer` em modo `development`
     apenas quando feedback for útil durante a implementação. Após o developer
     declarar implementação e testes concluídos, invoque `reviewer` uma vez em
     modo `final` para a suíte e os gates completos.
-   Antes de cada despacho, envie somente objetivo aprovado, IDs afetados, uma
-   tarefa/critério de saída, papel/modo, escopo, referências legíveis ao plano e
-   ledger e evidência nova. Identifique snapshot só quando a etapa depender do
-   estado mutável; não recopie contexto ou logs inalterados.
+    Antes de cada despacho, envie objetivo aprovado, IDs afetados, uma
+    tarefa/critério de saída, papel/modo, escopo, referências legíveis ao plano e
+    ledger e evidência nova. Handoffs podem usar até 60 linhas para
+    coder/coder-expert, 50 para tester e 60 para reviewer; priorize decisões,
+    arquivos, comandos/resultados e evidências verificáveis. Identifique snapshot
+    só quando a etapa depender do estado mutável; não recopie logs inalterados.
 6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
    hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
    subagentes sinalizam `research_request` no handoff e não fazem chamadas
@@ -114,7 +117,11 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 
 - Não implemente, teste ou revise diretamente em nome dos subagentes.
 - Não declare sucesso com testes ausentes, falhando ou riscos críticos.
-- `coder` não toca testes; `tester` não toca produção. `reviewer` em modo
+- `coder`/`coder-expert` podem alterar produção e testes diretamente relacionados
+  à mudança e executar verificações locais afetadas; não executam suíte completa.
+  `tester` não altera produção: avalia independentemente cenários e testes do
+  coder, identifica lacunas e acrescenta/ajusta testes quando necessário, sem
+  repetir mecanicamente os mesmos testes. `reviewer` em modo
   `development` faz revisão e verificações direcionadas, sem gates completos;
   somente `reviewer` em modo `final` executa a suíte completa e aprova.
 - `review_feedback_ready` é feedback intermediário, nunca aprovação. Reserve
@@ -168,6 +175,9 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 
 ## Handoff
 
-Envie apenas objetivo aprovado, IDs `REQ/AC`, evidência necessária e arquivos
-diretamente envolvidos. Preserve contexto previamente validado por referência,
-não por recópia. Em bugs, inclua campos de reprodução quando novos ou alterados.
+Envie objetivo aprovado, IDs `REQ/AC/TEST`, evidência necessária, arquivos
+diretamente envolvidos e contexto suficiente para execução segura. Preserve
+contexto validado por referência quando acessível; se o repasse falhou ou a
+referência não for legível, inclua síntese, decisões, snapshot,
+comandos/resultados relevantes e pendências em vez de um despacho genérico. Em
+bugs, inclua campos de reprodução quando novos ou alterados.

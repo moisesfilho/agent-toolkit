@@ -44,6 +44,12 @@ the runtime; the agent does not require a particular provider or embed API keys.
 See the [developer workflow](workflows/developer-workflow.md) for stall signals
 and dispatch rules.
 
+In the development workflow, coders may add focused tests alongside their
+implementation; the tester independently checks traceability and coverage gaps
+instead of mechanically duplicating equivalent tests. Handoff limits reserve
+space for evidence and task context (up to 60 lines for coders/reviewer and 50
+for tester).
+
 ## Portability And Security
 
 Resources must not contain credentials, authentication files, private memory,

@@ -6,7 +6,8 @@ requirements and task-specific context without repeating shared fields. Keep
 handoffs incremental: cite stable requirement/test IDs and report only new or
 changed information. Every key below is required; use `none` for an unavailable
 scalar and `[]` for an empty list. Omitted keys, invalid statuses, and output
-over the role's line limit are invalid handoffs.
+over the role's line limit are invalid handoffs. Limits are ceilings, not targets;
+include enough context to survive failed or inaccessible references.
 
 Keep routing fields machine-checkable: `status`, `origin`, `next_action`, and
 `cycle` each appear exactly once as a single-line scalar. `next_action` contains
@@ -61,10 +62,10 @@ and report the limitation; never infer approval or discard reproducible issues.
 | --- | --- | --- | --- | ---: |
 | `analyst` | `requirements_ready`, `needs_clarification` | `handoff_to_developer`, `request_clarification` | `request_type`, `objective`, `facts`, `assumptions`, `scope`, `out_of_scope`, `requirements`, `acceptance_criteria`, `edge_cases`, `validation` | 25 |
 | `planner` | `objective_ready`, `plan_ready`, `needs_clarification` | `developer` | `objective_confirmed`, `objective`, `scope`, `acceptance_criteria`, `risk_profile`, `requirements`, `files`, `planned_tests`, `checkpoints` | 40 |
-| `coder` | `implementation_ready`, `implementation_corrected`, `blocked` | `tester`, `developer` | `changed` paths and affected `REQ-*`; local checks only | 25 |
-| `coder-expert` | `implementation_ready`, `implementation_corrected`, `blocked` | `tester`, `developer` | `changed` paths and affected `REQ-*`; local checks only | 25 |
-| `tester` | `test_specification_ready`, `test_ready`, `test_refined`, `tester_disputed` | `reviewer`, `coder`, `developer` | `changed` test paths, `TEST-*` mapping, executed test results; `manual_validation` when hardware is relevant | 25 |
-| `reviewer` | `review_feedback_ready`, `review_approved`, `test_refinement_needed`, `needs_more_tests`, `needs_correction`, `review_incomplete` | `tester`, `coder`, `developer`, `none` | Development mode: scoped findings/checks, final gates pending; final mode: full-suite results, coverage where applicable, conclusive `quality_gate`; approval only in final mode with empty blockers | 40 |
+| `coder` | `implementation_ready`, `implementation_corrected`, `blocked` | `tester`, `developer` | `changed` production/test paths and affected `REQ-*`; focused tests/checks, results and snapshot; pending independent validation | 60 |
+| `coder-expert` | `implementation_ready`, `implementation_corrected`, `blocked` | `tester`, `developer` | `changed` production/test paths and affected `REQ-*`; focused tests/checks, results and snapshot; pending independent validation | 60 |
+| `tester` | `test_specification_ready`, `test_ready`, `test_refined`, `tester_disputed` | `reviewer`, `coder`, `developer` | `changed` test paths, `TEST-*` mapping, independent coverage assessment and executed test results; `manual_validation` when hardware is relevant | 50 |
+| `reviewer` | `review_feedback_ready`, `review_approved`, `test_refinement_needed`, `needs_more_tests`, `needs_correction`, `review_incomplete` | `tester`, `coder`, `developer`, `none` | Development mode: scoped findings/checks, final gates pending; final mode: full-suite results, coverage where applicable, conclusive `quality_gate`; approval only in final mode with empty blockers | 60 |
 | `research` | `research_complete`, `research_inconclusive` | `developer` | `research_question`, `findings`, `sources`, `recommendation`; external evidence is not local validation | 25 |
 
 `retrospectiv` uses its dedicated report format; this agent handoff contract

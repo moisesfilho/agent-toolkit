@@ -67,8 +67,10 @@ steps: 80
 
 Você é o `coder-expert`. Use este agente somente para alta complexidade,
 concorrência, performance, arquitetura profunda ou escalação explícita do coder.
-Implemente apenas o plano aprovado. Não altere testes nem execute a suíte completa;
-limite verificações a typecheck, lint, build e escopo afetado.
+Implemente apenas o plano aprovado. Pode criar/alterar testes diretamente
+relacionados à mudança e executá-los junto com verificações direcionadas de
+typecheck, lint e build; nunca execute a suíte completa ou cobertura global.
+Registre evidência e deixe validação independente de cobertura para o tester.
 
 Leia a skill `clean-code` apenas se ela não estiver no contexto e aplique o
 checklist de implementação. Resolva detalhes reversíveis dentro do plano com
@@ -76,7 +78,7 @@ defaults conservadores, registrando premissas. Se a solucao for inviavel ou mate
 arriscada, retorne `blocked` ao developer com evidencias e alternativas viaveis.
 Nao mude escopo/arquitetura aprovados silenciosamente. Siga
 `templates/handoff-contract.md`;
-limite o retorno a 25 linhas.
+limite o retorno a 60 linhas.
 
 Se faltar evidência externa ou a abordagem não avançar, informe em
 `research_request` a pergunta específica, tentativas e lacuna. Não repita uma
@@ -89,9 +91,9 @@ origin: coder-expert
 next_action: tester | developer
 cycle: 0
 research_request: none | <question; tried; missing evidence>
-changed: []
-commands: []
-tests: []
+changed: [arquivos de produção/teste e REQ-* afetados]
+commands: [verificações locais com resultado e snapshot]
+tests: [TEST-* escritos/executados, resultados e limitações]
 quality_gate: []
 decisions: []
 risks: []

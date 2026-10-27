@@ -27,10 +27,10 @@ COMMON_FIELDS = (
 ROLE_LIMITS = {
     "analyst": 25,
     "planner": 40,
-    "coder": 25,
-    "coder-expert": 25,
-    "tester": 25,
-    "reviewer": 40,
+    "coder": 60,
+    "coder-expert": 60,
+    "tester": 50,
+    "reviewer": 60,
     "research": 25,
 }
 ROLE_FIELDS = {
@@ -155,8 +155,8 @@ def check_repository(root: Path = ROOT) -> list[str]:
         for field in COMMON_FIELDS:
             if not re.search(rf"(?m)^{re.escape(field)}:", text):
                 errors.append(f"handoff template missing field {field}")
-        if "Max lines" not in text or "25" not in text or "40" not in text:
-            errors.append("handoff template must document 25/40 line limits")
+        if "Max lines" not in text or "60" not in text or "50" not in text:
+            errors.append("handoff template must document 60/50 line limits")
         if "machine-checkable" not in text or "format-only repair" not in text:
             errors.append("handoff template must define routing and malformed-handoff recovery")
     if not workflow.is_file():

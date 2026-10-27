@@ -118,9 +118,59 @@ Comandos:
 
 Não replique a lógica desses scripts no prompt e não edite `opencode.json` manualmente quando o utilitário puder executar a operação.
 
+### Fallbacks configurados por plugin
+
+Os fallbacks podem ser gerenciados por plugins e não aparecem necessariamente
+em `agent.<nome>.model`, nem são exibidos por `model-setter plan`. Ao listar ou
+alterar fallbacks:
+
+1. Inspecione a configuração efetiva do OpenCode e procure a chave **plural**
+   `plugins`. Identifique entradas de plugin no formato objeto, incluindo o
+   identificador/pacote e `options`; não procure apenas uma chave `plugin` ou
+   um campo `fallback` por agente.
+2. Leia a opção de fallback definida pelo plugin e a documentação/código do
+   próprio plugin para confirmar o esquema. Exemplo de formato usado pelo
+   plugin `opencode-model-fallback`:
+
+   ```jsonc
+   {
+     "plugins": [
+       {
+         "package": "caminho-ou-pacote-do-plugin",
+         "options": {
+           "fallback_models": {
+             "reviewer": ["provider/model"]
+           }
+         }
+       }
+     ]
+   }
+   ```
+
+   Preserve os IDs qualificados e a ordem das listas: a ordem pode definir a
+   sequência de tentativa. Não trate este exemplo como configuração universal;
+   confirme o nome da opção e o comportamento na implementação instalada.
+3. Para listar, reporte separadamente o modelo primário (de `plan`/configuração
+   do agente) e cada fallback do mapa do plugin. Se não encontrar a configuração
+   efetiva ou não confirmar o esquema, informe a limitação; não conclua que não
+   há fallbacks apenas porque `plan` não os mostra.
+4. O utilitário `model-setter apply` altera atribuições locais de agentes, não
+   opções de plugins. Para modificar fallbacks, apresente antes os agentes,
+   modelos e ordem propostos e obtenha confirmação explícita. Depois da
+   confirmação, edite a configuração efetiva preservando todas as demais
+   entradas/opções; crie backup, valide o JSON, e releia a configuração para
+   confirmar o resultado. Não altere o código do plugin nem suas opções fora
+   do escopo autorizado.
+5. Após a mudança, considere recarga/reinício conforme o comportamento do
+   OpenCode/plugin e valide a execução do agente em uma sessão nova. Não declare
+   um fallback funcional só porque está listado na configuração: teste o fluxo
+   de fallback de modo controlado, sem repetir sondagens que possam consumir
+   quota ou gerar cobrança.
+
 ## Fluxo obrigatório
 
-1. Leia a configuração global e os arquivos em `~/.config/opencode/agents/`.
+1. Leia a configuração global, incluindo `plugins` e suas `options`, e os
+   arquivos em `~/.config/opencode/agents/`.
    Em toda tarefa que liste, avalie, recomende ou altere modelos, use pesquisa online atual, mesmo
    que haja conhecimento ou memória prévia. Consulte fontes oficiais do provedor
    sobre existência, capacidades, disponibilidade, descontinuação e preços; use

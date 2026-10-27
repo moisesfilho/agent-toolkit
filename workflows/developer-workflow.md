@@ -27,10 +27,16 @@ available to the receiving harness.
    for simple work.
 5. `coder` implements. Use `coder-expert` only for high complexity or explicit
    escalation.
-6. `tester` adds or updates tests against the approved scenarios and runs only
-   tests created or changed in that step. Targeted regression tests needed to
-   guide a fix run during development; full regression suites and global coverage
-   checks are deferred until implementation is declared complete.
+6. `coder` adds/updates focused unit, component, or regression tests directly
+   related to the implementation when appropriate and runs those tests plus
+   limited checks. `tester` independently reviews traceability, assertions, edge
+   cases, and the coder's test evidence; it adds or adjusts tests only for
+   meaningful coverage gaps and runs tests created/changed in that step plus
+   necessary targeted regressions. Avoid mechanically recreating/rerunning
+   equivalent checks. High-risk scenarios defined before implementation remain
+   tester-owned validation obligations. Full regression suites and global
+   coverage checks are deferred until implementation and focused test work are
+   declared complete.
 7. If useful, `reviewer` may run in `development` mode during implementation:
    review only affected requirements/files and run focused checks. It returns
    `review_feedback_ready` when no immediate correction is needed; this is not
@@ -103,9 +109,12 @@ approval in either path.
 - `developer` is the only orchestrator and user interlocutor. It owns the
   canonical state ledger and validates every handoff before routing it.
 - `planner` is read-only and defines architecture, risk, files, and test intent.
-- `coder`/`coder-expert` change production only; they do not edit tests or run
-  the full suite.
-- `tester` changes tests only and runs tests created or changed by that step.
+- `coder`/`coder-expert` may change production and directly related tests, and run
+  focused checks; they never run the full suite or global coverage.
+- `tester` changes tests only, independently evaluates coder-authored coverage,
+  adds/adjusts tests for material gaps, and runs tests created/changed in that
+  step plus necessary targeted regressions. It should not duplicate equivalent
+  tests solely to repeat coder's work.
 - `reviewer` is the only agent that runs the complete suite and issues final
   approval. In `development` mode it gives scoped feedback only; it does not edit
   source or tests. `review_feedback_ready` is explicitly non-approving.
@@ -132,8 +141,8 @@ Exceptional states: `bug_diagnosis`, `bug_reproduction`,
 `review_incomplete`, `critical_checkpoint`, and `cancelled`.
 
 Transitions are prohibited when implementation precedes human plan approval;
-the coder edits tests; the tester edits production; a full suite is run by coder
-or tester; a bug lacks regression coverage at approval; or a review is approved
+the tester edits production; a full suite is run by coder or tester; a bug lacks
+regression coverage at approval; or a review is approved
 with a blocker, failed/missing test, stale gate, or inconclusive required check.
 
 `review_approved` is allowed only in `final` mode and requires all of the following:
@@ -275,10 +284,15 @@ if the receiving agent cannot read it. A path reference is only a navigation
 aid. Use the portable fallback in `docs/agent-instruction-delivery.md`; do not
 rely on symlinks to bypass permissions or assume they work in every harness.
 
-Use `REQ-*`, `AC-*`, and `TEST-*` rather than repeating known context. Preserve
+Use `REQ-*`, `AC-*`, and `TEST-*` to compact stable traceability, not to omit
+context a receiving agent cannot access. Preserve
 `REQ/AC -> implementation -> TEST -> result/evidence`; include negative,
 boundary, and expected-failure cases for high-risk changes. Keep handoffs within
-their role limit; put detailed logs in tool output and cite the command/result.
+their role limit (60 lines for coder/coder-expert/reviewer, 50 for tester; other
+roles retain their declared limits); include relevant decisions, paths, test
+mapping, commands/results, snapshot, blockers, and pending work. Put verbose raw
+logs in tool output and cite the specific command/result; do not truncate
+decision-critical evidence to satisfy a small handoff budget.
 
 ## Human gates and traceability
 

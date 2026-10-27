@@ -28,10 +28,16 @@ class HandoffContractTests(unittest.TestCase):
 
     def test_handoff_over_role_limit_is_rejected(self):
         content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
-        extra_lines = "".join(f"extra_{index}: value\n" for index in range(15))
+        extra_lines = "".join(f"extra_{index}: value\n" for index in range(50))
         content = content.replace("origin: coder\n", f"origin: coder\n{extra_lines}", 1)
         errors = check_agent("coder", content)
-        self.assertTrue(any("exceeds 25 lines" in error for error in errors))
+        self.assertTrue(any("exceeds 60 lines" in error for error in errors))
+
+    def test_handoff_within_expanded_coder_limit_is_accepted(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        extra_lines = "".join(f"evidence_{index}: value\n" for index in range(30))
+        content = content.replace("origin: coder\n", f"origin: coder\n{extra_lines}", 1)
+        self.assertFalse(any("exceeds" in error for error in check_agent("coder", content)))
 
     def test_routing_field_must_be_a_single_allowed_value(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
@@ -103,6 +109,13 @@ class HandoffContractTests(unittest.TestCase):
         ):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, workflow)
+
+    def test_workflow_allows_focused_coder_tests_and_independent_tester_validation(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("directly related tests", workflow)
+        self.assertIn("independently reviews traceability", workflow)
+        self.assertIn("tester edits production", workflow)
+        self.assertNotIn("the coder edits tests", workflow)
 
     def test_reviewer_interruption_remains_fail_closed(self):
         reviewer = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")

@@ -160,7 +160,7 @@ manual_validation: none | pending | completed: <evidence>
 overrides: []
 ```
 
-Limite o retorno a 40 linhas e inclua todos os campos comuns.
+Limite o retorno a 60 linhas e inclua todos os campos comuns.
 `review_approved` só é permitido em modo final e exige `blockers: []`, testes aplicáveis aprovados,
 gates conclusivos no `head` atual e nenhum risco crítico aberto.
 `review_feedback_ready` só é permitido em modo development e nunca fecha a
