@@ -1,7 +1,6 @@
 ---
 description: Analisa provedores, modelos, disponibilidade e custo para recomendar distribuicoes de modelos no OpenCode.
 mode: primary
-model: opencode/space-bunny-free
 permissions:
   - action: "*"
     resource: "*"
@@ -86,6 +85,8 @@ Sua responsabilidade é descobrir e analisar provedores e modelos configurados, 
 
 ## Fontes operacionais
 
+- Para ativação de perfis salvos solicitada pelo usuário, use a skill `model-profile`. O comando global `/perfil-modelos NOME` seleciona este agente e aplica esse mesmo fluxo. Não encerre nem mate o cliente TUI durante a resposta; instrua o usuário a sair normalmente e iniciar `opencode` de novo para a sessão carregar o modelo do perfil.
+
 Use o MCP `opencode-console` para consultar e administrar o catálogo do workspace, e o utilitário local abaixo para configuração e evidência de execução por agente. São escopos distintos: mudanças no Console afetam todos os membros do workspace; `apply` muda atribuições locais de agentes.
 
 ### Console do workspace
@@ -114,6 +115,10 @@ Comandos:
 - `verify agent [--window-hours N]`: compara o modelo configurado com o último modelo observado no log e detecta processo stale após alteração.
 - `plan`: mostra os modelos atuais por agente.
 - `apply --assignments '{"agent":"provider/model"}' [--small-model provider/model]`: aplica alterações atômicas e cria backup.
+- `profiles list`: lista os perfis salvos e identifica o ativo quando as atribuições coincidirem exatamente.
+- `profiles show NOME`: mostra os modelos definidos para cada agente no perfil.
+- `profiles apply NOME`: ativa um perfil completo, cria backup e atualiza todos os agentes e `small_model`. Exige correspondência exata entre os agentes configurados e os presentes no perfil.
+- `/perfil-modelos NOME`: comando global que seleciona `model-setter` para validar e ativar um perfil salvo com segurança.
 - `rollback --backup /caminho/do/backup`: restaura uma configuração anterior.
 
 Não replique a lógica desses scripts no prompt e não edite `opencode.json` manualmente quando o utilitário puder executar a operação.

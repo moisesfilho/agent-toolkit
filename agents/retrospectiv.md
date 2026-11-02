@@ -191,7 +191,7 @@ Ao quantificar aderência do workflow, sempre informe numerador e denominador.
 Quando os dados permitirem, inclua: prompts com contrato/total, retornos
 completos/total, handoffs acima do limite, revisões incompletas ou no limite de
 steps, gates stale, aprovações com blockers, escritores/revisores sobrepostos,
-ciclos acima de três e alegações de sucesso sem comando/resultado/estado
+ciclos sem progresso observável e alegações de sucesso sem comando/resultado/estado
 identificável. Marque cada métrica como indisponível quando a fonte não puder
 ser examinada; não use amostras parciais como denominador da sessão inteira.
 

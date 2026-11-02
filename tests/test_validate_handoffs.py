@@ -55,11 +55,13 @@ class HandoffContractTests(unittest.TestCase):
         errors = check_agent("coder", content)
         self.assertTrue(any("origin must appear exactly once" in error for error in errors))
 
-    def test_cycle_must_be_a_single_integer_in_range(self):
+    def test_cycle_must_be_a_single_non_negative_integer(self):
         content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
-        content = content.replace("cycle: 0", "cycle: 8", 1)
+        content = content.replace("cycle: 0", "cycle: 123456", 1)
+        self.assertFalse(any("cycle must be" in error for error in check_agent("coder", content)))
+        content = content.replace("cycle: 123456", "cycle: -1", 1)
         errors = check_agent("coder", content)
-        self.assertTrue(any("cycle must be a single integer" in error for error in errors))
+        self.assertTrue(any("cycle must be a single non-negative integer" in error for error in errors))
 
     def test_reviewer_steps_cannot_drop_below_70(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
@@ -88,15 +90,21 @@ class HandoffContractTests(unittest.TestCase):
         self.assertIn("review_feedback_ready` só é permitido em modo development", content)
         self.assertIn("review_approved` só é permitido em modo final", content)
 
-    def test_cycle_ceiling_is_seven(self):
+    def test_cycle_has_no_numeric_ceiling(self):
         template = ROOT / "templates/handoff-contract.md"
         original = template.read_text(encoding="utf-8")
-        template.write_text(original.replace("cycle: <0..7>", "cycle: <0..3>", 1), encoding="utf-8")
+        template.write_text(original.replace("cycle: <non-negative integer>", "cycle: <0..7>", 1), encoding="utf-8")
         try:
             errors = check_repository(ROOT)
-            self.assertIn("handoff template cycle range must be 0..7", errors)
+            self.assertIn("handoff template cycle must be an unbounded non-negative integer", errors)
         finally:
             template.write_text(original, encoding="utf-8")
+
+    def test_workflow_defines_observable_progress_and_stagnation(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("observable progress", workflow)
+        self.assertIn("A cycle is stalled", workflow)
+        self.assertIn("There is no numeric ceiling on correction cycles", workflow)
 
     def test_workflow_has_incremental_dispatch_and_scope_controls(self):
         workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")

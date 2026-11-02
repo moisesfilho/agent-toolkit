@@ -37,17 +37,23 @@ available to the receiving harness.
    tester-owned validation obligations. Full regression suites and global
    coverage checks are deferred until implementation and focused test work are
    declared complete.
-7. If useful, `reviewer` may run in `development` mode during implementation:
-   review only affected requirements/files and run focused checks. It returns
-   `review_feedback_ready` when no immediate correction is needed; this is not
-   approval and does not run full suites, global coverage, or remote gates.
-8. Once the developer confirms implementation and test work are complete, invoke
-   `reviewer` once in `final` mode to run the full applicable suite, regression,
-   coverage, lint/typecheck/build, and local/remote quality gates. Only this mode
-   may return `review_approved`.
-9. After `review_approved`, document the solution and present manual validation
+7. For device/hardware changes, after implementation and focused independent
+   tests, invoke `reviewer` in `development` mode for scoped feedback only; this
+   mode must not run full suites, global coverage, broad analysis, or remote
+   gates. Then run the approved device-validation phase **before** final review
+   when the device is available and the test is safe/authorized. Confirm firmware
+   identity, follow project procedure, and validate actual acceptance behavior.
+   Do not use a full-suite review as a substitute for device validation.
+   If validation is unavailable, unsafe, explicitly deferred, or inconclusive,
+   record the exact limitation and keep `manual_validation` pending. Before any
+   final broad review in that exception path, the developer must obtain explicit
+   user authorization. With authorization, reviewer may run applicable local
+   final gates, but this is code-gate review only, never physical acceptance or
+   task completion. Only final mode may return `review_approved` for code gates.
+8. After review, document the result and present any remaining manual validation
    instructions. Work is `completed` only after required manual validation is
-   recorded; only the user accepts device/hardware behavior.
+   recorded and accepted by the user; agents report evidence but do not accept
+   device/hardware behavior on the user's behalf.
 
 ## Dispatch and scope control
 
@@ -95,7 +101,7 @@ responsible role (planner for a material approach change). OpenCode V2 defaults
 to one subagent nesting level, so the developer owns dispatch. Do not research
 the same question again without new evidence. Research informs decisions; it does
 not validate local behavior, change scope, count as implementation, or waive plan
-approval, tests, review, user decisions, or the cycle ceiling. If research is
+approval, tests, review, or user decisions. If research is
 unavailable or inconclusive, record the limitation and use the existing blocked,
 replan, or human-checkpoint route.
 
@@ -116,8 +122,14 @@ approval in either path.
   step plus necessary targeted regressions. It should not duplicate equivalent
   tests solely to repeat coder's work.
 - `reviewer` is the only agent that runs the complete suite and issues final
-  approval. In `development` mode it gives scoped feedback only; it does not edit
-  source or tests. `review_feedback_ready` is explicitly non-approving.
+  code-gate approval. In `development` mode it gives scoped feedback only; it
+  does not edit source or tests. `review_feedback_ready` is explicitly
+  non-approving. For device work, final review follows focused and device
+  validation whenever safe and available; it must not front-load the full suite
+  before the implementation has been exercised on the target. If target
+  validation is blocked/deferred, the developer must obtain explicit user
+  authorization before dispatching final review; the reviewer then reports
+  `manual_validation: pending` and cannot imply physical acceptance.
 - `analyst` is an optional primary agent that returns requirements; it does not
   start implementation.
 - Subagents report blocking questions to `developer`; only `developer` asks the
@@ -155,10 +167,16 @@ with a blocker, failed/missing test, stale gate, or inconclusive required check.
 
 Development-mode feedback may report focused check results and pending final
 gates. Defer full regression runs, global coverage, broad analysis, and remote CI
-polling until implementation and test changes are complete, unless concrete high
-risk or a needed diagnostic makes an earlier check necessary. Any source/test
-change after final validation makes affected evidence stale and requires relevant
-final gates to rerun.
+polling until implementation and focused independent tests are complete. For
+hardware acceptance, the normal order is focused implementation checks ->
+scoped reviewer feedback -> target-device validation -> final broad review. Do
+not front-load a final/full review before device validation. If device validation
+is unavailable, unsafe, explicitly deferred, or inconclusive, document why and
+pause before final broad review; obtain explicit user authorization for the
+exception. If authorized, local code gates may run, but the physical gate remains
+pending and the task is not complete. Any source/test change after final
+validation makes affected evidence stale and requires relevant final gates to
+rerun.
 
 If source state changes after a check, that check is `stale` and must be rerun.
 For a dirty worktree, identify the reviewed state with the base HEAD plus a
@@ -214,13 +232,23 @@ still active. Parallel implementation is allowed only for explicitly disjoint
 files/modules, with one integrator (`developer`) reconciling the result before
 tests/review.
 
-Count each correction or replan loop in `cycle`, from 0 to 7. A return for a
+Count each correction or replan loop in `cycle` as an unbounded, non-negative
+integer for traceability, not as a stopping threshold. A return for a
 production/test correction, `test_refinement_needed`, `needs_more_tests`,
 `needs_correction`, or a new implementation approach after infeasibility/risk
-consumes one cycle. A format-only handoff repair does not. After seven cycles
-without convergence, enter `critical_checkpoint` and ask the user how to proceed.
-Seven is a hard ceiling, not a target: stop earlier for repeated failures, no new
-evidence or hypothesis, critical risk, or a blocked human decision.
+increments it; a format-only handoff repair does not. After every validated
+return, compare the current state with the prior ledger and record the concrete
+delta: acceptance criteria/gates satisfied, failures corrected, blockers removed,
+new evidence or a revised hypothesis that changes the next action, or a failed
+approach replaced with a viable one. Continue while there is observable progress
+and a safe, in-scope next step. A cycle is stalled when it repeats a failed
+approach or finding without new evidence, a changed hypothesis, a material state
+change, or a reduction in blockers. Do not repeat a stalled route: use bounded
+research or replan if it can provide a new path. If no useful safe step remains,
+progress depends on a human decision, or critical risk is unresolved, enter
+`critical_checkpoint` and ask the user how to proceed, summarizing attempts,
+evidence, blockers, and options. Progress never waives approval, testing, review,
+or other human gates.
 
 Routing:
 
@@ -253,6 +281,9 @@ Final delivery records diff/state, commands and exit results, local/remote gate
 state, manual validation requested/completed/pending, residual risks, and any
 user override. Manual device validation must identify the firmware/build state
 and the specific behavior tested; generic smoke checks do not prove a feature.
+For device-bound changes, record whether device validation preceded final review;
+if it did not, record the blocker/deferment and explicit user authorization for
+the exception, and retain `manual_validation: pending`.
 Tie committed CI evidence to the reviewed content and exact commit SHA. A
 successful check for a different commit or changed worktree does not validate
 the current state. Hardware evidence records build/firmware identity and the
@@ -301,7 +332,9 @@ decision-critical evidence to satisfy a small handoff budget.
 2. Human acceptance of required manual/device validation; agents report evidence
    and limitations but do not claim user acceptance.
 3. Business, scope, compatibility, irreversible actions, unresolved conceptual
-   disagreement, and up to seven non-convergent correction cycles require the user.
+   disagreement, stagnation without a safe useful next step, and human-owned
+   decisions require the user. There is no numeric ceiling on correction cycles;
+   convergence is determined by recorded, observable progress, not attempt count.
 
 Maintain `REQ -> implementation -> TEST -> REVIEW`. For bugs use
 `BUG_REPORT -> reproduction evidence -> fix -> TEST_REGRESSION -> REVIEW`.

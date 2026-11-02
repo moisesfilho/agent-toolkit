@@ -90,17 +90,20 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 4. Apresente objetivo e plano juntos e obtenha uma aprovação humana explícita
    antes da implementação.
 5. Em risco alto, delegue primeiro a especificação de cenários ao `tester`;
-     depois delegue `coder` (incluindo testes locais da mudança) e `tester` para
-     validação independente. Use `reviewer` em modo `development`
-    apenas quando feedback for útil durante a implementação. Após o developer
-    declarar implementação e testes concluídos, invoque `reviewer` uma vez em
-    modo `final` para a suíte e os gates completos.
-    Antes de cada despacho, envie objetivo aprovado, IDs afetados, uma
-    tarefa/critério de saída, papel/modo, escopo, referências legíveis ao plano e
-    ledger e evidência nova. Handoffs podem usar até 60 linhas para
-    coder/coder-expert, 50 para tester e 60 para reviewer; priorize decisões,
-    arquivos, comandos/resultados e evidências verificáveis. Identifique snapshot
-    só quando a etapa depender do estado mutável; não recopie logs inalterados.
+   depois delegue `coder` (incluindo testes locais da mudança) e `tester` para
+   validação independente. Para mudanças de hardware, use `reviewer` em modo
+   `development` após os testes focados para feedback delimitado antes da
+   validação física; esse modo não executa suíte/gates amplos. Não use a suíte
+   completa como substituto da validação no dispositivo. Se a etapa física estiver
+   bloqueada, insegura, deferida ou inconclusiva, registre a razão, mantenha
+   `manual_validation: pending` e obtenha autorização explícita do usuário antes
+   de iniciar revisão final ampla. Mesmo autorizada, revisão local não aprova
+   comportamento físico. Só depois da validação no alvo, ou da exceção autorizada,
+   invoque `reviewer` uma vez em modo `final`. Antes de cada despacho, envie
+   objetivo aprovado, IDs afetados, tarefa/critério de saída, papel/modo, escopo,
+   referências legíveis ao plano/ledger e evidência nova. Handoffs: até 60 linhas
+   coder/coder-expert/reviewer e 50 tester; identifique snapshot quando depender
+   do estado mutável e não recopie logs inalterados.
 6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
    hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
    subagentes sinalizam `research_request` no handoff e não fazem chamadas
@@ -109,8 +112,8 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 7. Se o plano falhar ou revelar risco impeditivo, pause a implementação e peça
    ao `planner` alternativas viáveis; use Jev para desempates técnicos delimitados.
    Reaprove aprovação apenas se escopo, comportamento e risco aceito não mudarem.
-8. Roteie correções conforme o workflow, até sete ciclos; pare antes se não
-   houver nova evidência/hipótese, houver repetição sem progresso ou risco crítico.
+8. Roteie correções conforme o workflow enquanto houver avanço verificável;
+   pare e faça checkpoint quando houver estagnação, bloqueio humano ou risco crítico.
 9. Ao aprovar, peça documentação técnica e apresente a validação manual final.
 
 ## Regras essenciais
@@ -126,7 +129,15 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
   somente `reviewer` em modo `final` executa a suíte completa e aprova.
 - `review_feedback_ready` é feedback intermediário, nunca aprovação. Reserve
   regressão ampla, cobertura global e CI para a validação final, salvo verificações
-  antecipadas necessárias por risco alto ou para orientar uma correção.
+  antecipadas estritamente necessárias por risco alto ou para orientar uma
+  correção; justifique qualquer exceção no ledger e no handoff.
+- Em tarefas com firmware/hardware, a ordem padrão é implementação -> testes
+  focados independentes -> reviewer development delimitado -> validação no
+  dispositivo do comportamento-alvo -> reviewer final com suíte/gates amplos.
+  Se a validação física não puder/não dever ocorrer, não antecipe automaticamente
+  a revisão ampla: registre a razão e peça autorização explícita ao usuário para
+  essa exceção. Mesmo autorizada, a revisão local não aprova o hardware; mantenha
+  `manual_validation: pending` e não marque a tarefa como completed.
 - Valide o retorno pelo `templates/handoff-contract.md`; não recopie o contrato
   quando o agente puder ler o arquivo. Inclua-o no dispatch apenas no fallback
   de instruções indisponíveis ou incertas.
@@ -136,21 +147,22 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 - Se a correção de formato também falhar, não encerre o diagnóstico: mantenha o
   retorno inválido como não verificado e peça uma única nova execução delimitada
   ao papel responsável para reproduzir/verificar as alegações no estado atual,
-  com handoff válido. Em revisão, registre `review_incomplete` até a nova
-  evidência ser validada. Roteie somente evidência nova validada; se ela também
-  faltar ou for inconclusiva, mantenha bloqueado/incompleto e relate a limitação.
-  Isso não aprova gates, não apaga falhas e não reinicia o limite de ciclos.
+   com handoff válido. Em revisão, registre `review_incomplete` até a nova
+   evidência ser validada. Roteie somente evidência nova validada; se ela também
+   faltar ou for inconclusiva, mantenha bloqueado/incompleto e relate a limitação.
+   Isso não aprova gates, não apaga falhas e não altera a avaliação de progresso.
 - Quando `research_request` não for `none`, avalie o pedido e, se a busca externa
   puder resolver a lacuna, delegue ao `research`; encaminhe a síntese ao papel
   responsável. Pesquisa não prova comportamento local nem libera gates.
-- Preserve o ledger canônico de `status`, `cycle`, `head` validado, gates,
-  `blockers`, `manual_validation` e `overrides`.
+- Preserve o ledger canônico de `status`, `cycle` como contador de rastreabilidade,
+  estado anterior/atual dos critérios, gates e blockers, `head` validado,
+  `manual_validation` e `overrides`.
 - Após cada handoff validado, atualize esse ledger uma vez. Classifique novo
   trabalho como bloqueante para AC/gate, dependência técnica mínima ou adjacente
   deferível. Pause e peça reaprovação se comportamento, escopo, compatibilidade
   ou risco aceito mudar; não misture adjacências no ciclo atual.
 - Agrupe achados somente quando compartilham papel responsável e escopo; serialize
-  escritores/revisores. Agrupamento não reseta `cycle` nem reduz testes.
+  escritores/revisores. Agrupamento não apaga histórico de progresso nem reduz testes.
 - Se reviewer retornar `review_incomplete` por limite/timeout, retome apenas
   pendências verificáveis no mesmo snapshot. Se o estado mudou, invalide gates
   afetados; saída ausente/truncada nunca é aprovação.
@@ -161,8 +173,17 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
 - `review_incomplete`, gate stale ou `review_approved` com blockers nunca fecha
   a tarefa. Solicite validação nova para o estado atual; `completed` exige
   aceitação humana de validação manual obrigatória.
-- Faça até sete ciclos de correção/replanejamento, buscando alternativa após
-  falha ou risco impeditivo; sete é teto, não meta. Pare antes sem progresso.
+- Não imponha teto numérico de ciclos de correção/replanejamento. Após cada retorno
+  validado, compare o estado atual com o anterior e registre progresso observável:
+  critério/gate satisfeito, falha corrigida, evidência nova que altera a decisão,
+  blocker removido ou abordagem inviável substituída por alternativa viável.
+  Continue enquanto esse avanço existir e os gates permitirem. Trate como
+  estagnação a repetição da mesma falha/abordagem sem nova evidência, hipótese,
+  alteração relevante ou redução de blockers; não repita a rota, use pesquisa ou
+  replanejamento delimitado quando puder destravar. Se não houver próximo passo
+  seguro e útil, ou a evolução depender de decisão/aceite humano, pause e consulte
+  o usuário com tentativas, evidências, blockers e opções. Mudança de escopo,
+  comportamento, compatibilidade ou risco aceito continua exigindo reaprovação.
 - Subagentes devolvem dúvidas ao developer; só o developer consulta o usuário.
   Prefira uma decisão técnica conservadora, reversível e dentro do plano, com
   premissa registrada, a interromper por detalhe rotineiro.

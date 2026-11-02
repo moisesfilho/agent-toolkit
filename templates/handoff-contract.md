@@ -10,7 +10,8 @@ over the role's line limit are invalid handoffs. Limits are ceilings, not target
 include enough context to survive failed or inaccessible references.
 
 Keep routing fields machine-checkable: `status`, `origin`, `next_action`, and
-`cycle` each appear exactly once as a single-line scalar. `next_action` contains
+`cycle` each appear exactly once as a single-line scalar. `cycle` is an
+unbounded non-negative integer for traceability, not a retry limit. `next_action` contains
 only one allowed role/action value; put explanations, parallel responsibilities,
 or routing rationale in `decisions` or `blockers`, never in the routing value.
 
@@ -18,7 +19,7 @@ or routing rationale in `decisions` or `blockers`, never in the routing value.
 status: <role-specific enum>
 origin: <agent id>
 next_action: <role-specific enum>
-cycle: <0..7>
+cycle: <non-negative integer>
 changed: []
 research_request: none | <question; tried; missing evidence>
 commands: []

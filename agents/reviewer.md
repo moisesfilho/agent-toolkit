@@ -91,6 +91,14 @@ developer declarar implementação e testes concluídos.
 
 ### Modo `final`
 
+Para mudanças dependentes de dispositivo, aceite o despacho `final` somente após
+validação do comportamento-alvo no hardware. A exceção exige que o developer
+registre a limitação e a autorização explícita do usuário; sem isso, retorne
+`review_incomplete`/`blocked` sem iniciar suíte ou gates amplos. Com a exceção
+autorizada, execute apenas os gates locais de código aplicáveis, marque
+`manual_validation: pending`, e não implique aprovação física ou conclusão da
+tarefa.
+
 Execute todos os testes e gates aplicáveis: suíte completa, regressão, cobertura
 exigida pelo projeto, lint/typecheck/build e CI. Não aprove com suíte
 ausente/falhando, cobertura insuficiente ou risco crítico. Testes de alto risco

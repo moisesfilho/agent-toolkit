@@ -66,6 +66,8 @@ WORKFLOW_INVARIANTS = (
     "blocking for an acceptance criterion/gate",
     "reviewer interrupted",
     "exact commit SHA",
+    "observable progress",
+    "There is no numeric ceiling on correction cycles",
 )
 
 
@@ -116,8 +118,8 @@ def check_agent(role: str, content: str) -> list[str]:
 
     if values["origin"] and values["origin"] != [role]:
         errors.append(f"{role}: origin must be the single scalar {role}")
-    if values["cycle"] and not re.fullmatch(r"[0-7]", values["cycle"][0]):
-        errors.append(f"{role}: cycle must be a single integer from 0 to 7")
+    if values["cycle"] and not re.fullmatch(r"\d+", values["cycle"][0]):
+        errors.append(f"{role}: cycle must be a single non-negative integer")
     if values["next_action"]:
         actions = tuple(item.strip() for item in values["next_action"][0].split("|"))
         if actions != EXPECTED_ACTION[role]:
@@ -173,12 +175,10 @@ def check_repository(root: Path = ROOT) -> list[str]:
 
     if template.is_file():
         text = template.read_text(encoding="utf-8")
-        if not re.search(r"(?m)^cycle:\s*<0\.\.7>", text):
-            errors.append("handoff template cycle range must be 0..7")
+        if not re.search(r"(?m)^cycle:\s*<non-negative integer>", text):
+            errors.append("handoff template cycle must be an unbounded non-negative integer")
     if workflow.is_file():
         text = workflow.read_text(encoding="utf-8")
-        if "from 0 to 7" not in text:
-            errors.append("workflow cycle ceiling must be 7")
         if "only `developer` asks the" not in text:
             errors.append("workflow must route user questions through developer")
 
