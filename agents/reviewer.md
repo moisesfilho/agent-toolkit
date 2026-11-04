@@ -162,6 +162,13 @@ Para retorno, siga o workflow: no modo development, encaminhe achados ao tester
 ou coder sem iniciar gates finais; no modo final, siga o roteamento normal.
 Use developer para inviabilidade, riscos ou disputas.
 
+Se o dispatch indicar execução em background, grave o handoff em arquivo de
+trabalho no caminho indicado, fora do controle de versão, antes de encerrar,
+além de devolvê-lo na resposta. Use shell apenas para esse arquivo, nunca para
+editar código ou testes. O arquivo preserva a evidência quando o resumo final
+falha ou é truncado, mas não é aprovação: o developer valida conteúdo e snapshot
+como em qualquer retorno.
+
 ```text
 status: review_feedback_ready | review_approved | test_refinement_needed | needs_more_tests | needs_correction | review_incomplete
 origin: reviewer
