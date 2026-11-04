@@ -290,6 +290,8 @@ the current state. Run broad gates in a detached worktree checked out at the
 reviewed state (`git worktree add --detach`) instead of the developer's worktree,
 so the writer keeps working and a moving worktree cannot produce a false
 positive; a dirty worktree requires an immutable diff-snapshot identifier.
+Reused evidence must cite its origin state and the current state must be
+unchanged, or the check is stale.
 Hardware evidence records build/firmware
 identity and the observed feature effect; serial command acceptance alone is not
 proof of behavior.

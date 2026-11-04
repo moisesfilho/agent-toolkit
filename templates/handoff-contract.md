@@ -45,8 +45,10 @@ says which verifiable steps are left.
 For every executed command, record the command (or a safe concise equivalent),
 exit/result, and the reviewed source state. `quality_gate` entries identify the
 check, `head` (commit SHA or stable dirty-worktree snapshot), timestamp, and
-result. A changed source state invalidates prior evidence. Never describe a
-pending, missing, stale, failed, or unobserved check as passing.
+result. A changed source state invalidates prior evidence. Reusing a result from
+an earlier run requires citing the origin state and confirming the current state
+is unchanged; evidence from a different snapshot is stale, not a gate. Never
+describe a pending, missing, stale, failed, or unobserved check as passing.
 
 Keep dispatches and returns incremental: use `changed` for affected paths and
 stable requirement/test IDs, and cite canonical plan/ledger references rather

@@ -105,7 +105,11 @@ ausente/falhando, cobertura insuficiente ou risco crítico. Testes de alto risco
 ou necessários para orientar correção não devem ser adiados só por serem lentos.
 Antes de revisar, identifique o `head` (SHA ou snapshot estável do worktree) e
 amarre todos os resultados a esse estado. Se o estado mudar, reexecute gates
-afetados. Execute os gates amplos em um worktree destacado no estado revisado
+afetados. Cobertura e gates pertencem ao mesmo run do `head` revisado:
+reaproveitar resultado de execução anterior exige citar o SHA de origem e
+confirmar que o estado atual não mudou; sem essa confirmação, reexecute.
+Evidência de outro snapshot é gate stale, nunca aprovação. Execute os gates
+amplos em um worktree destacado no estado revisado
 (`git worktree add --detach <diretório> <sha>`), em vez do worktree do
 developer: o writer segue livre e a revisão não produz falso positivo quando ele
 trabalha durante os gates. Worktree sujo não tem SHA; materialize um snapshot
