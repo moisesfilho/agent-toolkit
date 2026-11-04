@@ -174,6 +174,10 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
   estado estável e escopos independentes.
 - Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre
   validações não executadas e riscos residuais.
+- Quando o ciclo alterar valor de domínio (limiar, versão, contagem, nome de
+  constante), varra documentação, README e índices pelo valor antigo antes de
+  fechar o ciclo e registre o resultado em `changed` ou `risks`. Documentação
+  não repete a constante sem derivar da fonte.
 - `review_incomplete`, gate stale ou `review_approved` com blockers nunca fecha
   a tarefa. Solicite validação nova para o estado atual; `completed` exige
   aceitação humana de validação manual obrigatória.
