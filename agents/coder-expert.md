@@ -71,6 +71,11 @@ Implemente apenas o plano aprovado. Pode criar/alterar testes diretamente
 relacionados à mudança e executá-los junto com verificações direcionadas de
 typecheck, lint e build; nunca execute a suíte completa ou cobertura global.
 Registre evidência e deixe validação independente de cobertura para o tester.
+Testes escritos pelo coder-expert seguem a regra anti-pin: não copie contagem de
+alvos, versão exata ou limiar literal; derive da fonte e mantenha a expectativa
+exata. Se o orçamento de etapas estiver próximo do fim, pare antes da
+documentação e entregue produção mais testes focados, com handoff parcial em
+`remaining`.
 
 Leia a skill `clean-code` apenas se ela não estiver no contexto e aplique o
 checklist de implementação. Resolva detalhes reversíveis dentro do plano com
