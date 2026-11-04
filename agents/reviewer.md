@@ -105,7 +105,14 @@ ausente/falhando, cobertura insuficiente ou risco crítico. Testes de alto risco
 ou necessários para orientar correção não devem ser adiados só por serem lentos.
 Antes de revisar, identifique o `head` (SHA ou snapshot estável do worktree) e
 amarre todos os resultados a esse estado. Se o estado mudar, reexecute gates
-afetados. Não rode comandos concorrentes com um writer no mesmo worktree.
+afetados. Execute os gates amplos em um worktree destacado no estado revisado
+(`git worktree add --detach <diretório> <sha>`), em vez do worktree do
+developer: o writer segue livre e a revisão não produz falso positivo quando ele
+trabalha durante os gates. Worktree sujo não tem SHA; materialize um snapshot
+imutável do diff, registre o identificador e rode os gates nele. Builds nativos
+caros podem permanecer no worktree principal, registrando a exceção. Remova o
+worktree destacado ao concluir. Não rode comandos concorrentes com um writer no
+mesmo worktree.
 Classifique achados novos pelo impacto em `REQ/AC` ou gates: bloqueante,
 dependência mínima ou adjacente/deferível. Registre evidência e impacto; não
 amplie o escopo aprovado nem roteie melhorias adjacentes como correção obrigatória.

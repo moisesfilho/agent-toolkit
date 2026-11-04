@@ -286,8 +286,13 @@ if it did not, record the blocker/deferment and explicit user authorization for
 the exception, and retain `manual_validation: pending`.
 Tie committed CI evidence to the reviewed content and exact commit SHA. A
 successful check for a different commit or changed worktree does not validate
-the current state. Hardware evidence records build/firmware identity and the
-observed feature effect; serial command acceptance alone is not proof of behavior.
+the current state. Run broad gates in a detached worktree checked out at the
+reviewed state (`git worktree add --detach`) instead of the developer's worktree,
+so the writer keeps working and a moving worktree cannot produce a false
+positive; a dirty worktree requires an immutable diff-snapshot identifier.
+Hardware evidence records build/firmware
+identity and the observed feature effect; serial command acceptance alone is not
+proof of behavior.
 
 ## Jev
 
