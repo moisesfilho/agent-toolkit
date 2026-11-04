@@ -12,6 +12,7 @@ reutilizavel e arquivos de configuracao portaveis.
 | `skills/` | Capacidades e procedimentos focados. |
 | `workflows/` | Fluxos de planejamento, despacho incremental com contexto suficiente, autoria de testes focados pelo coder e validação independente pelo tester, classificação de escopo, retomada de revisão por snapshot, progresso/estagnação observáveis sem limite numérico de ciclos, alternativas/replanejamento, feedback de revisão durante desenvolvimento e gates completos na revisão final, recuperacao limitada de handoff malformado, implementacao e release. |
 | `templates/` | Modelos reutilizáveis; `handoff-contract.md` define campos/limites ampliados por papel, `cycle` não limitado como contador de rastreabilidade, evidência incremental vinculada ao estado e recuperacao de handoff, incluindo feedback não aprovador intermediário e sinal/retorno de pesquisa. |
+| `plans/` | Planos de melhoria do proprio toolkit e dos agentes, com status, linha de base medida, criterios de sucesso e riscos; `plans/README.md` define o ciclo de vida e as regras de aprovacao por fase. |
 | `docs/` | Conceitos, compatibilidade e guias. |
 | `README.md`, `README.pt-BR.md` | Apresentação do toolkit e instruções de descoberta no OpenCode V2. |
 | `docs/agent-instruction-delivery.md` | Dispatch portatil de instrucoes, fallback de conteudo e limites de symlinks. |
