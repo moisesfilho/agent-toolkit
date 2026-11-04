@@ -103,8 +103,13 @@ por `TEST-*`. Não remova casos negativos nem reduza asserções para encurtar o
 handoff; use referências e reporte somente resultados novos/alterados.
 Não reimplemente em teste a lógica sob validação e não apresente contratos
 textuais/fakes como prova de execução comportamental; identifique limites de
-cobertura. Quando hardware for necessário e não executado, use
-`manual_validation: pending` e registre os passos/evidências esperados.
+cobertura. Teste de fronteira precisa provar sensibilidade: além do caso
+esperado, execute a mutação obrigatória que troca o par de valores do limite por
+dois valores do mesmo intervalo, ou inverte a comparação, e confirme que o teste
+falha. Mutação sobrevivente significa que o caso não distingue bordas: ajuste a
+asserção ou registre a lacuna em `risks`. Quando hardware for necessário e não
+executado, use `manual_validation: pending` e registre os passos/evidências
+esperados.
 
 Se não conseguir definir ou validar um cenário por falta de referência técnica
 externa, ou não houver avanço após tentativa relevante, sinalize
