@@ -37,7 +37,7 @@
   ainda produz falso positivo quando o developer trabalha.
 - **P4 - Criterio de aceite no nivel do modelo.** "Percentual estavel" sem
   resolucao de amostragem nem exigencia de atingir os extremos deixou passar dois
-  defeitos que so apareceram no hardware, com receptor de suite e CI verdes.
+  defeitos que so apareceram no hardware, com suite e CI verdes.
 - **P5 - Evidencia reaproveitada.** Cobertura citada de um commit anterior ao
   head revisado, sem marcar a origem.
 - **P6 - Retorno de execucao em background.** A conclusao chegou ambigua e um
@@ -71,12 +71,37 @@ B1 (apos "Nunca remova cenarios ou enfraqueca assercoes"):
 > propriedade que importa, mantendo a expectativa exata. Contrato textual nao
 > repete constante sem derivar dela.
 
+B2 (apos "Implemente também testes unitários/de componente e regressões"):
+
+> Testes escritos pelo coder seguem a regra anti-pin: nao copie contagem de
+> alvos, versao exata ou limiar literal; derive da fonte e mantenha a
+> expectativa exata. Se o orcamento de etapas estiver proximo do fim, pare antes
+> da documentacao e entregue producao mais testes focados, com handoff parcial
+> em `remaining`.
+
 B3:
 
 > Dimensione o despacho pelo orcamento do papel. Quando o escopo somar producao,
 > suite de testes, documentacao e build, divida em dois despachos e instrua:
 > ao aproximar do limite, pare e entregue producao mais testes focados, com
 > handoff parcial.
+
+B4 (campo novo no bloco do contrato):
+
+```text
+remaining: [<proximo passo verificavel>]
+```
+
+- Chave **opcional**: ausente quando o despacho concluiu; presente apenas em
+  retorno interrompido por limite, timeout ou dependencia externa.
+- Lista de strings; nao e roteamento (`next_action` continua escalar unico) nem
+  substitui `blockers`.
+- `tools/validate_handoffs.py` precisa aceitar a chave como permitida e validar
+  o tipo (lista de strings nao vazias); handoffs existentes sem a chave seguem
+  validos, e chave desconhecida continua rejeitada.
+- `tests/test_validate_handoffs.py` ganha um caso positivo (lista valida) e ao
+  menos dois negativos (string escalar; item vazio). O caso "handoff sem
+  `remaining`" deve continuar passando.
 
 B6:
 
@@ -95,6 +120,39 @@ B6:
 Cada fase e aprovada e aplicada separadamente, com o repositorio em estado
 validado ao final.
 
+### F1 - detalhamento executavel (aprovacao pendente)
+
+Objetivo: eliminar a classe de blocker "valor estatico obsoleto" e o encerramento
+por limite de etapas, sem tocar em regras de aprovacao, permissoes ou gates.
+
+| Item | Arquivo | Acao |
+| --- | --- | --- |
+| B1 | `agents/tester.md` | inserir a redacao B1 apos "Nunca remova cenarios ou enfraqueca assercoes" |
+| B2 | `agents/coder.md` | inserir a redacao B2 apos a frase que autoriza testes focados do coder |
+| B3 | `agents/developer.md` | inserir a redacao B3 no passo de despacho (item 5), junto das regras de handoff |
+| B4 | `templates/handoff-contract.md`, `tools/validate_handoffs.py`, `tests/test_validate_handoffs.py` | campo `remaining:` conforme o schema da secao 3, com validador e testes no mesmo commit |
+
+Sequenciamento (um commit por linha):
+
+1. B1 + B2 - mesma classe de defeito, um arquivo de papel cada.
+2. B3 - regra de orcamento e handoff parcial.
+3. B4 - contrato mais validador mais testes; e o unico item que pode quebrar CI.
+
+Definicao de pronto da F1:
+
+```bash
+python3 tools/validate_handoffs.py          # exit 0
+python3 -m unittest discover -s tests -v    # todos os testes OK
+git diff --check                            # limpo
+```
+
+Alem disso: `steps` dos agentes inalterado; nenhum campo obrigatorio removido;
+nenhuma mudanca em `review_mode`, regras de aprovacao ou validacao fisica;
+checagem de links do CI com rc=0.
+
+Criterio de reversao: se em duas entregas o total de despachos crescer mais de
+20% sem reduzir blockers nem retornos por limite, reverter B3 e manter B1/B2.
+
 ## 5. Criterios de sucesso
 
 Medidos em duas entregas reais apos a fase aplicada:
@@ -110,11 +168,15 @@ Medidos em duas entregas reais apos a fase aplicada:
 
 ## 6. Como validar
 
-1. Aplicar F1 e rodar uma entrega de escopo parecido com a de origem
-   (mudanca de comportamento com teste, documentacao e build).
-2. Registrar as metricas da tabela da secao 5 para essa entrega.
-3. Promover F2 apenas se as metricas de F1 melhorarem sem aumentar o numero de
-   despachos totais; caso contrario, revisar a hipotese antes de seguir.
+1. Aplicar F1 e rodar **duas** entregas de escopo parecido com a de origem:
+   mudanca de comportamento com teste, documentacao e build, uma delas com
+   validacao no dispositivo.
+2. Registrar, por entrega, as metricas da secao 5 e o total de despachos.
+3. Comparar com a linha de base da secao 1 e decidir:
+   - metricas na faixa alvo e total de despachos estavel ou menor: promover F2;
+   - metricas na faixa alvo com mais despachos: manter F1 e investigar B3 antes
+     de abrir F2;
+   - metricas fora do alvo: aplicar o criterio de reversao da F1.
 
 ## 7. Riscos e mitigacoes
 
