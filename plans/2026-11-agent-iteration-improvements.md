@@ -269,6 +269,6 @@ git diff --check                            # limpo
 - `steps` dos agentes inalterado (developer 60, planner 30, coder 70,
   tester 50, reviewer 70); nenhum campo obrigatorio removido; nenhuma mudanca em
   `review_mode`, regras de aprovacao, permissoes ou validacao fisica.
-- Achado adjacente nao aplicado: `agents/coder-expert.md` nao recebeu B2 porque o
-  plano lista apenas `agents/coder.md`. A regra anti-pin e o handoff parcial em
-  `remaining` deveriam valer tambem para o coder-expert em um proximo ciclo.
+- Achado adjacente aplicado em 2026-11-04: `agents/coder-expert.md` recebeu a
+  mesma regra de B2 (anti-pin e handoff parcial em `remaining`), em commit
+  proprio (`a4b92d5`), porque o plano listava apenas `agents/coder.md`.
