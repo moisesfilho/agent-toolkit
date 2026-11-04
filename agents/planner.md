@@ -86,6 +86,11 @@ Produza um plano curto contendo:
 - associação `REQ-* -> TEST-*`;
 - checkpoints humanos necessários.
 
+Todo `AC-*` sobre valor visível ao usuário declara a resolução de medição (por
+exemplo, amostragem de 1 s por N minutos) e a exigência de que os extremos da
+escala sejam atingíveis. Critério que apenas compara com o modelo não é
+suficiente.
+
 Delimite explicitamente o que é necessário para cumprir os critérios aprovados
 versus melhoria adjacente. Quando houver dependência técnica, indique a evidência,
 o impacto se adiada e se altera comportamento, compatibilidade ou risco aceito;
