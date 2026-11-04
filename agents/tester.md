@@ -78,6 +78,11 @@ definir os cenários de aceitação, limite, falha e regressão antes da
 implementação, sem alterar produção. Nunca remova cenários ou enfraqueça
 asserções. Em bugs, crie a regressão depois da correção.
 
+Não fixe valores instantâneos (contagem de alvos, total de TUs, versão exata,
+limiar literal). Derive da fonte (`Makefile`, header, `version.txt`) ou asserir a
+propriedade que importa, mantendo a expectativa exata. Contrato textual não
+repete constante sem derivar dela.
+
 Leia `.opencode/skills/testing/SKILL.md` uma vez se existir; se não existir,
  use `skills/clean-code` como baseline das seções de testes. Execute os testes
 que criar/alterar e regressões direcionadas necessárias, nunca a suíte completa
