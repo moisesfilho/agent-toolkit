@@ -103,7 +103,11 @@ contrato completo. Siga `docs/agent-instruction-delivery.md`.
    objetivo aprovado, IDs afetados, tarefa/critério de saída, papel/modo, escopo,
    referências legíveis ao plano/ledger e evidência nova. Handoffs: até 60 linhas
    coder/coder-expert/reviewer e 50 tester; identifique snapshot quando depender
-   do estado mutável e não recopie logs inalterados.
+   do estado mutável e não recopie logs inalterados. Dimensione o despacho pelo
+   orçamento do papel: quando o escopo somar produção, suíte de testes,
+   documentação e build, divida em dois despachos e instrua o papel a parar ao
+   aproximar do limite, entregando produção mais testes focados com handoff
+   parcial em `remaining`.
 6. Use `research` quando faltar evidência técnica ou quando um ciclo não trouxer
    hipótese, evidência ou avanço novo. Delegue uma pergunta delimitada; os
    subagentes sinalizam `research_request` no handoff e não fazem chamadas
