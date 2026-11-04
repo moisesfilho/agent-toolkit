@@ -24,6 +24,10 @@ COMMON_FIELDS = (
     "manual_validation",
     "overrides",
 )
+# Optional fields: allowed in a handoff but never required. `remaining` carries
+# the verifiable pending steps of a dispatch interrupted by a step limit,
+# timeout, or external dependency.
+OPTIONAL_FIELDS = ("remaining",)
 ROLE_LIMITS = {
     "analyst": 25,
     "planner": 40,
@@ -85,6 +89,28 @@ def field_block(content: str) -> list[str]:
     return matches[-1].group(1).splitlines()
 
 
+def check_optional_fields(block: list[str]) -> list[str]:
+    """Validate optional fields that are present in the handoff block.
+
+    `remaining` is only valid as a bracketed list of one or more non-empty
+    pending steps, separated by `;`. Omitting it is always valid; an empty list
+    is not, because the field exists precisely to name what is still pending.
+    """
+    lines = [line for line in block if re.match(r"^remaining:", line)]
+    if not lines:
+        return []
+    if len(lines) > 1:
+        return ["remaining must appear at most once"]
+    raw = re.sub(r"^remaining:\s*", "", lines[0]).strip()
+    match = re.fullmatch(r"\[(.*)\]", raw)
+    if not match:
+        return ["remaining must be a bracketed list of pending steps"]
+    steps = [step.strip() for step in match.group(1).split(";")]
+    if not steps or any(not step for step in steps):
+        return ["remaining must list at least one non-empty pending step"]
+    return []
+
+
 def check_agent(role: str, content: str) -> list[str]:
     errors: list[str] = []
     try:
@@ -104,6 +130,7 @@ def check_agent(role: str, content: str) -> list[str]:
     missing = sorted(required - declared)
     if missing:
         errors.append(f"{role}: handoff block missing fields: {', '.join(missing)}")
+    errors.extend(f"{role}: {error}" for error in check_optional_fields(block))
     if len(block) > ROLE_LIMITS[role]:
         errors.append(f"{role}: example handoff exceeds {ROLE_LIMITS[role]} lines")
 
@@ -157,6 +184,10 @@ def check_repository(root: Path = ROOT) -> list[str]:
         for field in COMMON_FIELDS:
             if not re.search(rf"(?m)^{re.escape(field)}:", text):
                 errors.append(f"handoff template missing field {field}")
+        if not re.search(r"(?m)^remaining:", text):
+            errors.append("handoff template missing optional field remaining")
+        elif "is optional" not in text.lower():
+            errors.append("handoff template must mark remaining as optional")
         if "Max lines" not in text or "60" not in text or "50" not in text:
             errors.append("handoff template must document 60/50 line limits")
         if "machine-checkable" not in text or "format-only repair" not in text:

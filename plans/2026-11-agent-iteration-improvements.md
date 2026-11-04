@@ -1,6 +1,6 @@
 # Plano: melhorias na iteracao dos agentes
 
-- Status: **proposto** (nada implementado neste repositorio)
+- Status: **em andamento** - B4 (campo opcional `remaining`) aplicado; B1-B3 pendentes
 - Data de abertura: 2026-11-04
 - Origem: retrospectiva de uma sessao de desenvolvimento no projeto cyberdeck5
   (firmware ESP32-P4), com 4 entregas e 27 despachos de subagente
@@ -96,9 +96,9 @@ remaining: [<proximo passo verificavel>]
   retorno interrompido por limite, timeout ou dependencia externa.
 - Lista de strings; nao e roteamento (`next_action` continua escalar unico) nem
   substitui `blockers`.
-- `tools/validate_handoffs.py` precisa aceitar a chave como permitida e validar
-  o tipo (lista de strings nao vazias); handoffs existentes sem a chave seguem
-  validos, e chave desconhecida continua rejeitada.
+- `tools/validate_handoffs.py` precisa aceitar a chave e validar o tipo (lista
+  de strings nao vazias); handoffs existentes sem a chave seguem validos. O
+  validador nao policia chaves desconhecidas hoje, e este campo nao muda isso.
 - `tests/test_validate_handoffs.py` ganha um caso positivo (lista valida) e ao
   menos dois negativos (string escalar; item vazio). O caso "handoff sem
   `remaining`" deve continuar passando.
@@ -131,6 +131,9 @@ por limite de etapas, sem tocar em regras de aprovacao, permissoes ou gates.
 | B2 | `agents/coder.md` | inserir a redacao B2 apos a frase que autoriza testes focados do coder |
 | B3 | `agents/developer.md` | inserir a redacao B3 no passo de despacho (item 5), junto das regras de handoff |
 | B4 | `templates/handoff-contract.md`, `tools/validate_handoffs.py`, `tests/test_validate_handoffs.py` | campo `remaining:` conforme o schema da secao 3, com validador e testes no mesmo commit |
+
+Progresso: **B4 aplicado** (`remaining` no template, validador e 5 testes
+novos); B1, B2 e B3 pendentes.
 
 Sequenciamento (um commit por linha):
 
@@ -190,9 +193,10 @@ Medidos em duas entregas reais apos a fase aplicada:
 
 ## 8. Decisoes pendentes
 
-- Aprovar a F1 (B1 a B4) como primeiro incremento.
-- Confirmar se o vocabulario de handoff pode ganhar campo novo (`remaining`) ou
-  se o estado parcial deve continuar em `blockers`.
+- Aprovar a F1 (B1 a B3): B4 ja foi aprovado e aplicado.
+- Resolvido: o campo `remaining` foi autorizado; e opcional e convive com
+  `blockers` (`blockers` = o que impede concluir; `remaining` = passos
+  verificaveis pendentes).
 - Definir se F2 e F3 entram como plano separado apos a medicao de F1.
 
 ## 9. Fora de escopo

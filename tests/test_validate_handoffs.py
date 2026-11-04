@@ -39,6 +39,44 @@ class HandoffContractTests(unittest.TestCase):
         content = content.replace("origin: coder\n", f"origin: coder\n{extra_lines}", 1)
         self.assertFalse(any("exceeds" in error for error in check_agent("coder", content)))
 
+    def test_optional_remaining_field_is_accepted(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        content = content.replace(
+            "overrides: []\n",
+            "overrides: []\nremaining: [run the focused suite; write the documentation]\n",
+            1,
+        )
+        errors = check_agent("coder", content)
+        self.assertFalse(any("remaining" in error for error in errors))
+
+    def test_remaining_must_be_a_bracketed_list(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        content = content.replace(
+            "overrides: []\n", "overrides: []\nremaining: write the docs\n", 1
+        )
+        errors = check_agent("coder", content)
+        self.assertTrue(any("bracketed list" in error for error in errors))
+
+    def test_remaining_must_list_a_non_empty_step(self):
+        base = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        for value in ("[]", "[run the suite; ]"):
+            with self.subTest(value=value):
+                content = base.replace(
+                    "overrides: []\n", f"overrides: []\nremaining: {value}\n", 1
+                )
+                errors = check_agent("coder", content)
+                self.assertTrue(any("at least one non-empty" in error for error in errors))
+
+    def test_handoff_without_remaining_stays_valid(self):
+        content = (ROOT / "agents/coder.md").read_text(encoding="utf-8")
+        errors = check_agent("coder", content)
+        self.assertFalse(any("remaining" in error for error in errors))
+
+    def test_template_documents_optional_remaining(self):
+        template = (ROOT / "templates/handoff-contract.md").read_text(encoding="utf-8")
+        self.assertIn("remaining:", template)
+        self.assertIn("is optional", template.lower())
+
     def test_routing_field_must_be_a_single_allowed_value(self):
         content = (ROOT / "agents/reviewer.md").read_text(encoding="utf-8")
         content = content.replace(

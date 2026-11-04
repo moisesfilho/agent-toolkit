@@ -4,8 +4,9 @@ This is the canonical handoff contract. Include it in a dispatch only when the
 receiving agent cannot reliably read this file; otherwise provide the role
 requirements and task-specific context without repeating shared fields. Keep
 handoffs incremental: cite stable requirement/test IDs and report only new or
-changed information. Every key below is required; use `none` for an unavailable
-scalar and `[]` for an empty list. Omitted keys, invalid statuses, and output
+changed information. Every key below is required except `remaining`, which is
+optional; use `none` for an unavailable scalar and `[]` for an empty list.
+Omitted keys, invalid statuses, and output
 over the role's line limit are invalid handoffs. Limits are ceilings, not targets;
 include enough context to survive failed or inaccessible references.
 
@@ -30,7 +31,16 @@ risks: []
 blockers: []
 manual_validation: none | pending | completed: <evidence>
 overrides: []
+remaining: [<pending step>; <step>]
 ```
+
+`remaining` is optional and appears only in a handoff interrupted by a step
+limit, timeout, or external dependency: a bracketed, semicolon-separated list of
+the verifiable pending steps, for example
+`remaining: [run the focused suite; write the documentation]`. Omit it when the
+dispatch finished; an empty list is invalid. It is never a routing value and does
+not replace `blockers`: `blockers` says what prevents completion, `remaining`
+says which verifiable steps are left.
 
 For every executed command, record the command (or a safe concise equivalent),
 exit/result, and the reviewed source state. `quality_gate` entries identify the
