@@ -1,6 +1,7 @@
 # Plano: melhorias na iteracao dos agentes
 
-- Status: **em andamento** - B4 (campo opcional `remaining`) aplicado; B1-B3 pendentes
+- Status: **concluido** - F1, F2 e F3 aplicadas, validadas e commitadas em
+  2026-11-04 (um commit por item; ver secao 10)
 - Data de abertura: 2026-11-04
 - Origem: retrospectiva de uma sessao de desenvolvimento no projeto cyberdeck5
   (firmware ESP32-P4), com 4 entregas e 27 despachos de subagente
@@ -118,9 +119,10 @@ B6:
 | F3 | B8, B9, B10 | robustez de retorno, testes e documentacao |
 
 Cada fase e aprovada e aplicada separadamente, com o repositorio em estado
-validado ao final.
+validado ao final. Excecao registrada na secao 8: em 2026-11-04 as tres fases
+foram aprovadas e aplicadas na mesma sessao.
 
-### F1 - detalhamento executavel (aprovacao pendente)
+### F1 - detalhamento executavel (aprovada e aplicada)
 
 Objetivo: eliminar a classe de blocker "valor estatico obsoleto" e o encerramento
 por limite de etapas, sem tocar em regras de aprovacao, permissoes ou gates.
@@ -132,8 +134,9 @@ por limite de etapas, sem tocar em regras de aprovacao, permissoes ou gates.
 | B3 | `agents/developer.md` | inserir a redacao B3 no passo de despacho (item 5), junto das regras de handoff |
 | B4 | `templates/handoff-contract.md`, `tools/validate_handoffs.py`, `tests/test_validate_handoffs.py` | campo `remaining:` conforme o schema da secao 3, com validador e testes no mesmo commit |
 
-Progresso: **B4 aplicado** (`remaining` no template, validador e 5 testes
-novos); B1, B2 e B3 pendentes.
+Progresso: **F1 aplicada** - B1 em `agents/tester.md`, B2 em
+`agents/coder.md`, B3 em `agents/developer.md`; B4 (`remaining` no template,
+validador e 5 testes) ja estava aplicado.
 
 Sequenciamento (um commit por linha):
 
@@ -155,6 +158,28 @@ checagem de links do CI com rc=0.
 
 Criterio de reversao: se em duas entregas o total de despachos crescer mais de
 20% sem reduzir blockers nem retornos por limite, reverter B3 e manter B1/B2.
+
+### F2 - detalhamento executavel (aprovada e aplicada)
+
+Objetivo: cortar o custo de serializacao e de retrabalho de medicao (P3, P4, P5)
+sem afrouxar gates.
+
+| Item | Arquivo | Acao aplicada |
+| --- | --- | --- |
+| B5 | `agents/reviewer.md`, `workflows/developer-workflow.md` | gates amplos em worktree destacado no estado revisado (`git worktree add --detach`); worktree sujo exige snapshot imutavel do diff; build nativo caro pode ficar no worktree principal com a excecao registrada |
+| B6 | `agents/planner.md` | todo `AC-*` sobre valor visivel declara resolucao de medicao e exige que os extremos da escala sejam atingiveis |
+| B7 | `agents/reviewer.md`, `templates/handoff-contract.md`, `workflows/developer-workflow.md` | cobertura e gates do mesmo run do `head` revisado; reuso cita o estado de origem e exige estado atual inalterado; evidencia de outro snapshot e stale |
+
+### F3 - detalhamento executavel (aprovada e aplicada)
+
+Objetivo: robustez de retorno, sensibilidade de teste e consistencia de
+documentacao (P6, P7, P8).
+
+| Item | Arquivo | Acao aplicada |
+| --- | --- | --- |
+| B8 | `agents/reviewer.md` | em execucao background, handoff duravel no arquivo de trabalho indicado no dispatch, alem da resposta; shell apenas para esse arquivo; o arquivo nao e aprovacao |
+| B9 | `agents/tester.md` | teste de fronteira prova sensibilidade com mutacao obrigatoria (dois valores do mesmo intervalo ou comparacao invertida); mutacao sobrevivente vira assercao ajustada ou lacuna em `risks` |
+| B10 | `agents/developer.md`, `workflows/developer-workflow.md` | mudanca de valor de dominio varre documentacao, README e indices pelo valor antigo antes de fechar o ciclo |
 
 ## 5. Criterios de sucesso
 
@@ -191,16 +216,59 @@ Medidos em duas entregas reais apos a fase aplicada:
 | B6 encarece o planejamento | aplicar apenas a valores visiveis ao usuario |
 | B4 quebra o validador de handoffs | mudar contrato, validador e testes no mesmo commit |
 
-## 8. Decisoes pendentes
+## 8. Decisoes
 
-- Aprovar a F1 (B1 a B3): B4 ja foi aprovado e aplicado.
+- Resolvido em 2026-11-04: F1 (B1 a B3) aprovada e aplicada; B4 ja estava
+  aplicado.
 - Resolvido: o campo `remaining` foi autorizado; e opcional e convive com
   `blockers` (`blockers` = o que impede concluir; `remaining` = passos
   verificaveis pendentes).
-- Definir se F2 e F3 entram como plano separado apos a medicao de F1.
+- Resolvido em 2026-11-04: F2 e F3 foram aplicadas neste mesmo plano, por pedido
+  explicito do usuario ("implemente todas as fases"), sem aguardar a janela de
+  medicao de F1. As metricas das secoes 5 e 6 seguem valendo para decidir a
+  reversao de B3 e os proximos ajustes.
+- Resolvido em 2026-11-04: alteracoes commitadas por item, sem push; os SHAs
+  estao na secao 10.
 
 ## 9. Fora de escopo
 
 - Alterar regras de aprovacao, de revisao final ou de validacao fisica.
 - Mudar permissoes, modelos ou limites de passos dos agentes.
 - Qualquer alteracao em projetos consumidores.
+
+## 10. Registro de aplicacao (2026-11-04)
+
+Itens e arquivos alterados: B1 e B9 em `agents/tester.md`; B2 em
+`agents/coder.md`; B3 e B10 em `agents/developer.md`; B5, B7 e B8 em
+`agents/reviewer.md`; B6 em `agents/planner.md`; B7 tambem em
+`templates/handoff-contract.md`; B5, B7 e B10 tambem em
+`workflows/developer-workflow.md`; B4 ja estava aplicado.
+
+Commits (2026-11-04, sem push):
+
+| Item | Commit |
+| --- | --- |
+| B1 + B2 | `c3135b5` Prohibit snapshot pins in tester and coder tests |
+| B3 | `6b63629` Size dispatches by the role step budget |
+| B5 | `74151a6` Run broad review gates in a detached worktree |
+| B6 | `5f1d3c1` Require measurement resolution for visible acceptance criteria |
+| B7 | `aa4ff22` Tie reused gate evidence to its origin state |
+| B8 | `a825061` Persist background review handoffs to a work file |
+| B9 | `b9fb724` Require a boundary mutation in tester scenarios |
+| B10 | `584d3da` Sweep documentation when a domain value changes |
+| B4 | `27a60f0` Add an optional remaining field to the handoff contract |
+
+Validacao executada (tambem a cada commit):
+
+```bash
+python3 tools/validate_handoffs.py          # PASS
+python3 -m unittest discover -s tests       # 27 testes OK
+git diff --check                            # limpo
+```
+
+- `steps` dos agentes inalterado (developer 60, planner 30, coder 70,
+  tester 50, reviewer 70); nenhum campo obrigatorio removido; nenhuma mudanca em
+  `review_mode`, regras de aprovacao, permissoes ou validacao fisica.
+- Achado adjacente nao aplicado: `agents/coder-expert.md` nao recebeu B2 porque o
+  plano lista apenas `agents/coder.md`. A regra anti-pin e o handoff parcial em
+  `remaining` deveriam valer tambem para o coder-expert em um proximo ciclo.
