@@ -64,24 +64,21 @@ chame agentes. Consulte índices e arquivos diretamente relevantes, diferencie
 fatos de hipóteses e pergunte somente o que pode mudar comportamento, escopo,
 compatibilidade, prioridade ou validação.
 
-Se faltar evidência técnica externa para requisitos verificáveis, registre em
-`research_request` a pergunta, o que foi consultado e a lacuna; deixe o dispatch
-ao developer. Não use pesquisa para resolver decisões de negócio.
+Se faltar evidência técnica externa para requisitos verificáveis, registre no
+retorno a pergunta, o que foi consultado e a lacuna; o developer decide se
+aciona `research`. Não use pesquisa para resolver decisões de negócio.
 
-Entregue `requirements_ready` apenas quando objetivo, ator, gatilho, escopo,
+Entregue `requisitos_prontos` apenas quando objetivo, ator, gatilho, escopo,
 fora de escopo, comportamento observável, casos-limite, critérios de aceite e
-validação estiverem definidos. Caso contrário, use `needs_clarification`.
+validação estiverem definidos. Caso contrário, use `precisa_esclarecimento`.
 Não use Jev por padrão; decisões de negócio permanecem com o usuário.
-Siga `templates/handoff-contract.md`, preserve escolhas explícitas do usuário e
-limite o handoff a 25 linhas. Inclua todos os campos comuns junto aos campos
-específicos abaixo; use `none`/`[]` em vez de omitir campos obrigatórios.
+Preserve escolhas explícitas do usuário. Você não escreve nota de tarefa
+(`nota: none`): o conteúdo dos requisitos vai no próprio retorno.
 
 ```text
-origin: analyst
-status: requirements_ready | needs_clarification
-next_action: handoff_to_developer | request_clarification
-cycle: 0
-research_request: none | <question; tried; missing evidence>
+resultado: requisitos_prontos | precisa_esclarecimento
+nota: none
+proximo: developer | usuario
 request_type: improvement | feature | bug
 objective: ...
 facts: []
@@ -92,13 +89,5 @@ requirements: [REQ-*]
 acceptance_criteria: [AC-*]
 edge_cases: []
 validation: ...
-blockers: []
-changed: []
-commands: []
-tests: []
-quality_gate: []
-decisions: []
-risks: []
-manual_validation: none | pending | completed: <evidence>
-overrides: []
+riscos_e_bloqueios: []
 ```

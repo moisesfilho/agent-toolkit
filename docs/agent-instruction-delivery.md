@@ -9,12 +9,13 @@ Before delegating, the developer must determine whether the agent and harness
 can read the referenced workflow and other required files. If a read is
 unavailable, restricted, or uncertain, the receiving agent must declare that
 limitation. The developer then includes the relevant canonical instructions
-directly in the dispatch, along with the complete shared contract from
-[`templates/handoff-contract.md`](../templates/handoff-contract.md). A file path
-may be included as a navigation aid, but is not a substitute for the content.
-When the agent can read the canonical files, send their references and only the
-role-specific fields, task context, and changed evidence; do not repeat the
-shared contract or workflow text.
+directly in the dispatch, along with the note and record models from
+[`templates/task-note.md`](../templates/task-note.md) and
+[`templates/task-record.md`](../templates/task-record.md). A file path may be
+included as a navigation aid, but is not a substitute for the content. When the
+agent can read the canonical files, send their references and only the task
+context, changed evidence, and note path; do not repeat the shared models or
+workflow text.
 
 Harnesses differ in how they expose files and permissions. Do not assume that a
 path, tool, or integration available in one harness is available in another.

@@ -99,8 +99,8 @@ Resolva escolhas de teste reversíveis priorizando comportamento real e risco;
 registre premissas em vez de pedir esclarecimentos rotineiros. Prefira exercitar
 o código de produção real ou um seam compartilhado com ele.
 Agrupe cenários relacionados por requisito, mantendo cada resultado identificável
-por `TEST-*`. Não remova casos negativos nem reduza asserções para encurtar o
-handoff; use referências e reporte somente resultados novos/alterados.
+por `TEST-*`. Não remova casos negativos nem reduza asserções para encurtar a
+nota; use referências e reporte somente resultados novos/alterados.
 Não reimplemente em teste a lógica sob validação e não apresente contratos
 textuais/fakes como prova de execução comportamental; identifique limites de
 cobertura. Teste de fronteira precisa provar sensibilidade: além do caso
@@ -108,33 +108,32 @@ esperado, execute a mutação obrigatória que troca o par de valores do limite 
 dois valores do mesmo intervalo, ou inverte a comparação, e confirme que o teste
 falha. Mutação sobrevivente significa que o caso não distingue bordas: ajuste a
 asserção ou registre a lacuna em `risks`. Quando hardware for necessário e não
-executado, use `manual_validation: pending` e registre os passos/evidências
+executado, registre na nota a validação manual pendente e os passos/evidências
 esperados.
 
 Se não conseguir definir ou validar um cenário por falta de referência técnica
-externa, ou não houver avanço após tentativa relevante, sinalize
-`research_request` (pergunta; tentativas; evidência faltante) ao developer. Não
-faça delegação aninhada nem reduza asserções para contornar a lacuna.
+externa, ou não houver avanço após tentativa relevante, registre no retorno a
+pergunta, o que tentou e a evidência que falta; o developer decide se aciona
+`research`. Não faça delegação aninhada nem reduza asserções para contornar a
+lacuna.
 
-Se o pedido vier do reviewer e a implementação estiver correta, retorne direto a
-ele. `tester_disputed` sempre retorna ao developer. Use Jev apenas para priorizar
-uma lacuna de cobertura entre opções claras e de baixo risco.
+Se o pedido vier do reviewer e a implementação estiver correta, sinalize no
+retorno que o próximo passo é o reviewer. `tester_disputed` sempre retorna ao
+developer. Use Jev apenas para priorizar uma lacuna de cobertura entre opções
+claras e de baixo risco.
+
+Ao concluir, escreva ou atualize somente a sua nota seguindo
+`templates/task-note.md`: cenários e testes criados/alterados, rastreabilidade
+`REQ/AC -> TEST`, resultados e limitações. A nota não é prova por si só; cite
+comando, resultado e estado do código.
+
+Depois retorne ao `developer`:
 
 ```text
-status: test_specification_ready | test_ready | test_refined | tester_disputed
-origin: tester
-next_action: reviewer | coder | developer
-cycle: 0
-research_request: none | <question; tried; missing evidence>
-changed: [testes e REQ/TEST afetados]
-commands: [somente testes criados/alterados]
-tests: [resultados objetivos]
-quality_gate: []
-decisions: []
-risks: []
-blockers: []
-manual_validation: none | pending | completed: <evidence>
-overrides: []
+resultado: concluido | bloqueado | inconclusivo
+nota: <caminho da nota>
+proximo: <papel ou decisao necessaria>
 ```
 
-Inclua todos os campos comuns e limite o retorno a 50 linhas.
+Não há limite de caracteres nesses campos. Quando hardware for necessário e não
+executado, registre a validação manual pendente e os passos esperados na nota.

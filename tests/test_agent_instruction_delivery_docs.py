@@ -17,10 +17,11 @@ class AgentInstructionDeliveryDocsTests(unittest.TestCase):
         self.assertTrue(re.search(r"single.{0,30}normative source", self.guide, re.S))
         self.assertIn("workflows/developer-workflow.md", self.guide)
 
-    def test_unreadable_instructions_require_explicit_content_and_shared_contract(self):
+    def test_unreadable_instructions_require_explicit_content_and_task_models(self):
         self.assertTrue(re.search(r"cannot read|read.{0,30}unavailable|restricted", self.guide))
         self.assertTrue(re.search(r"includes?.{0,100}directly in the dispatch", self.guide, re.S))
-        self.assertIn("templates/handoff-contract.md", self.guide)
+        self.assertIn("templates/task-note.md", self.guide)
+        self.assertIn("templates/task-record.md", self.guide)
         self.assertTrue(re.search(r"not a substitute for the content", self.guide))
 
     def test_symlink_does_not_bypass_access_permissions(self):

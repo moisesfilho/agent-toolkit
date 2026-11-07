@@ -21,8 +21,8 @@ nome em kebab-case com o mes de abertura quando ajudar a ordenar
   criterio de sucesso mensuravel e risco de regressao.
 - Criterios de sucesso devem ser mediveis em uma entrega real; "melhorar a
   qualidade" nao e criterio.
-- Alteracao de contrato de handoff exige atualizar
-  `tools/validate_handoffs.py` e `tests/test_validate_handoffs.py` no mesmo
-  trabalho.
+- Alteracao do modelo de memoria (nota por papel, registro consolidado) ou dos
+  papeis exige atualizar `tools/validate_resources.py` e
+  `tests/test_validate_resources.py` no mesmo trabalho.
 - Planos nao contem credenciais, caminhos privados de maquina nem dados de
   sessao.

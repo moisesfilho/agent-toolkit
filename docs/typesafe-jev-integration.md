@@ -62,7 +62,7 @@ Developer ou subagente
   -> agente classifica a pergunta (noul/choice/score)
   -> agente chama o MCP TypeSafe/Jev quando permitido
   -> Jev retorna decisao estruturada, probabilidade e confianca
-  -> continua a execucao, registra no handoff ou consulta o usuario
+  -> continua a execucao, registra na nota ou consulta o usuario
 ```
 
 A skill ensina o agente a modelar perguntas TypeSafe. O MCP fornece a
@@ -288,14 +288,14 @@ Regras implementadas:
 5. Com confianca insuficiente ou falha do MCP, usar default conservador e
    reversivel se nao mudar resultado/escopo/risco; caso contrario, escalar.
 6. Registrar pergunta, resposta, probabilidade/confianca, decisao e motivo do
-   escalonamento no handoff.
+   escalonamento na nota da tarefa.
 7. Usar somente nos gatilhos fechados de baixo risco: empate real entre
    alternativas delimitadas, `blocking_questions` reversiveis ou classificacao
    de severidade, risco e cobertura.
 
 As responsabilidades por agente sao delimitadas na politica global e
-reforcadas nos arquivos dos agentes `planner`, `coder`, `coder-expert`,
-`tester` e `reviewer`. O `minimal` continua sem uso de ferramentas.
+reforcadas nos arquivos dos agentes `planner`, `coder`, `tester` e `reviewer`.
+O `minimal` continua sem uso de ferramentas.
 
 ## Exemplo de uso
 
@@ -330,8 +330,8 @@ Se insuficiente, prefira default seguro e reversivel quando couber; use `questio
 somente quando a resposta humana puder mudar resultado, escopo ou risco aceito.
 
 Outros usos nao sao obrigatorios. Quando um dos gatilhos acima ocorrer, prefira
-uma unica chamada com perguntas independentes e registre apenas uma linha no
-handoff no formato `jev: pergunta -> resposta/confianca -> decisao`.
+uma unica chamada com perguntas independentes e registre apenas uma linha na
+nota no formato `jev: pergunta -> resposta/confianca -> decisao`.
 
 Priorizacao de correcoes por severidade (`score`):
 

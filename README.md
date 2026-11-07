@@ -46,9 +46,10 @@ and dispatch rules.
 
 In the development workflow, coders may add focused tests alongside their
 implementation; the tester independently checks traceability and coverage gaps
-instead of mechanically duplicating equivalent tests. Handoff limits reserve
-space for evidence and task context (up to 60 lines for coders/reviewer and 50
-for tester).
+instead of mechanically duplicating equivalent tests. Each role keeps its own
+task note, and the developer consolidates a single task record at closure; there
+is no shared handoff contract. See
+[persistent agent context](docs/contexto-persistente.md).
 
 ## Portability And Security
 

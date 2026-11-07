@@ -48,9 +48,10 @@ bloqueio e regras de dispatch.
 
 No fluxo de desenvolvimento, o coder pode criar testes focados junto com a
 implementação; o tester verifica rastreabilidade e lacunas de cobertura de forma
-independente, sem duplicar mecanicamente testes equivalentes. Os limites dos
-handoffs reservam espaço para contexto e evidências (até 60 linhas para
-coder/reviewer e 50 para tester).
+independente, sem duplicar mecanicamente testes equivalentes. Cada papel mantém
+sua própria nota da tarefa, e o developer consolida um único registro no
+encerramento; não existe contrato de handoff compartilhado. Consulte
+[contexto persistente entre agentes](docs/contexto-persistente.md).
 
 ## Portabilidade E Seguranca
 

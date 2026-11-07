@@ -3,10 +3,10 @@
 ## Objective
 
 Lean, requirements-led development with implementation, tests, review, and
-human checkpoints. This is the canonical source for states and routing;
-`templates/handoff-contract.md` owns handoff fields and limits. Dispatch only
-references readable instructions and includes task-specific context. Use the
-explicit-content fallback when readability is unavailable or uncertain.
+human checkpoints. This is the canonical source for states and routing.
+`templates/task-note.md` owns the per-role working note and
+`templates/task-record.md` owns the consolidated result; dispatches carry only
+task-specific context and deltas.
 
 Follow [`docs/agent-instruction-delivery.md`](../docs/agent-instruction-delivery.md)
 to verify file access and include canonical instruction content when it is not
@@ -17,147 +17,132 @@ available to the receiving harness.
 1. `developer` performs progressive discovery and classifies `risk_profile`.
    Resolve ordinary ambiguity from context; ask only when an answer can change
    expected behavior, scope, compatibility, accepted risk, or a human gate.
-2. `planner` resolves technical ambiguity and produces a plan. A valid `analyst`
-   handoff may supply requirements without reopening settled questions.
+2. `planner` resolves technical ambiguity and produces a plan. Valid `analyst`
+   requirements may be used without reopening settled questions.
 3. Present objective and plan together for one explicit user approval before
    implementation. Do not ask separate objective confirmation when the request
    already establishes it.
 4. For high-risk work, `tester` defines acceptance, boundary, failure, and
    regression scenarios before implementation. This does not make TDD mandatory
    for simple work.
-5. `coder` implements. Use `coder-expert` only for high complexity or explicit
-   escalation.
+5. `coder` implements. Use a stronger model for high complexity instead of a
+   separate expert role.
 6. `coder` adds/updates focused unit, component, or regression tests directly
-   related to the implementation when appropriate and runs those tests plus
-   limited checks. `tester` independently reviews traceability, assertions, edge
-   cases, and the coder's test evidence; it adds or adjusts tests only for
-   meaningful coverage gaps and runs tests created/changed in that step plus
-   necessary targeted regressions. Avoid mechanically recreating/rerunning
-   equivalent checks. High-risk scenarios defined before implementation remain
-   tester-owned validation obligations. Full regression suites and global
-   coverage checks are deferred until implementation and focused test work are
-   declared complete.
+   related to the implementation and runs those tests plus limited checks.
+   `tester` independently reviews traceability, assertions, edge cases, and the
+   coder's evidence; it adds or adjusts tests only for meaningful coverage gaps.
+   Full regression suites and global coverage checks are deferred until
+   implementation and focused test work are declared complete.
 7. For device/hardware changes, after implementation and focused independent
    tests, invoke `reviewer` in `development` mode for scoped feedback only; this
    mode must not run full suites, global coverage, broad analysis, or remote
    gates. Then run the approved device-validation phase **before** final review
-   when the device is available and the test is safe/authorized. Confirm firmware
-   identity, follow project procedure, and validate actual acceptance behavior.
-   Do not use a full-suite review as a substitute for device validation.
-   If validation is unavailable, unsafe, explicitly deferred, or inconclusive,
-   record the exact limitation and keep `manual_validation` pending. Before any
-   final broad review in that exception path, the developer must obtain explicit
-   user authorization. With authorization, reviewer may run applicable local
-   final gates, but this is code-gate review only, never physical acceptance or
-   task completion. Only final mode may return `review_approved` for code gates.
+   when the device is available and the test is safe/authorized.
 8. After review, document the result and present any remaining manual validation
    instructions. Work is `completed` only after required manual validation is
    recorded and accepted by the user; agents report evidence but do not accept
    device/hardware behavior on the user's behalf.
 
-## Dispatch and scope control
+## Task notes and memory
+
+Every role keeps its own working note; there is no shared file written by many
+roles.
+
+- Path convention: `<project>/docs/agent-state/<task>/<role>.md`, following
+  `templates/task-note.md`. A project with its own documentation convention keeps
+  it, and the path is confirmed in the dispatch.
+- One author per note: a role writes only its own note and never edits another
+  role's note. The developer never rewrites role notes.
+- A note is a summary of the dispatch objective, work done, evidence, decisions,
+  pending items, and references. It is not a log: do not paste tool output, full
+  diffs, or the approved plan. There is no line limit; keep what a safe resume
+  needs and reference the rest.
+- Not every transition requires a note update. A role updates its note when it
+  finishes material work, not when a message arrives.
+- A note is not proof. A claim such as "tests passed" must point to the command,
+  result, and code state that produced it. The reviewer verifies the source
+  independently; no approval is based only on a summary.
+- At closure, the `developer` reads the notes and writes a single task record at
+  `<project>/docs/agent-state/<task>.md` following `templates/task-record.md`.
+  Only the developer consolidates; the record is the commit-ready reference and
+  the notes stay in the project as the detailed trail.
+- Committing the record requires user authorization for the task and must never
+  target `main`, `master`, or a production branch.
+- `analyst` and `research` are read-only and return their content directly with
+  `nota: none`.
+
+## Dispatch and sessions
 
 Before each delegation, send the smallest context that lets the receiving role
 act safely: approved objective and relevant `REQ-*`/`AC-*`, one task and its exit
-criterion, role/mode, allowed files or scope, references to the canonical plan
-and ledger, and only new/changed evidence or blockers. Reference canonical
-instructions instead of copying them when readable; use the explicit-content
-fallback in `docs/agent-instruction-delivery.md` when readability is uncertain.
-Do not require a snapshot for planning or read-only discovery. For implementation,
-testing, or review of a changing worktree, identify the relevant source state as
-base `HEAD` plus a stable diff/snapshot identifier; after commit, record the SHA.
+criterion, role/mode, allowed files or scope, note path, references to the
+canonical plan, and only new/changed evidence or blockers. Reference canonical
+instructions instead of copying them when readable.
 
-After each return, validate the handoff, update the existing canonical ledger
-once, and route only verified new information. Do not create a parallel ledger
-or repeat unchanged requirements, logs, or workflow text. Missing evidence stays
-`none`/`[]` when unavailable and is a blocker only when it prevents the next
-step.
+Sessions carry continuity:
 
-When a check discovers work beyond the approved task, classify it in the ledger
-as one of: **blocking for an acceptance criterion/gate**, **minimal technical
-dependency**, or **adjacent/deferable**. Continue only blockers and necessary
-dependencies within approved scope. Defer unrelated improvements. If a dependency
-changes objective, behavior, compatibility, or accepted risk, pause and obtain
-human reapproval; do not use Jev to authorize scope.
+- The first dispatch of a role in a task starts a new session. The second and
+  later dispatches reuse that role's `sessionID` and send only the task, exit
+  criterion, and delta.
+- The `role -> sessionID` map is ephemeral and belongs to the developer. It never
+  enters a note or the task record; a session ID is machine-local.
+- Reset a role session when the task changes, the plan is reapproved, the state
+  becomes stale, or a rejected hypothesis would bias the next attempt. Record the
+  reset in that role's note.
+- Reusing a session resets the role's step allowance, so an interrupted dispatch
+  can continue instead of rebuilding context.
+
+After each return, read the note, verify that evidence points to a source and
+code state, and route only verified new information. A missing or ambiguous
+return is missing evidence, not approval: request one bounded re-run from the
+responsible role. Do not create a parallel state file.
+
+When a check discovers work beyond the approved task, classify it as **blocking
+for an acceptance criterion/gate**, **minimal technical dependency**, or
+**adjacent/deferable**. Continue only blockers and necessary dependencies within
+approved scope. If a dependency changes objective, behavior, compatibility, or
+accepted risk, pause and obtain human reapproval; do not use Jev to authorize
+scope.
 
 Group compatible findings into one bounded correction dispatch only when they
 share the same responsible role and scope. Keep different owners or modules
 separate; serialize writers and reviewers in a shared worktree. Grouping never
-resets `cycle`, removes a test, or bypasses review. For a reviewer interrupted
-by step limit/timeout, preserve `review_incomplete`; resume from verified pending
-checks only if the source snapshot is unchanged. If it changed, invalidate and
-rerun affected checks. An absent/truncated summary is missing evidence, not an
-implicit pass.
-
-## Research on stalled work
-
-Use `research` when a technical decision lacks evidence, or a cycle repeats
-without a new hypothesis, evidence, or measurable progress. Subagents signal this
-in `research_request` as `question; tried; missing evidence`; they do not repeat
-the same failing path or dispatch nested research. The developer first checks
-whether the needed fact is already available in project code/docs, then delegates
-one bounded question to `research` and routes its concise findings to the
-responsible role (planner for a material approach change). OpenCode V2 defaults
-to one subagent nesting level, so the developer owns dispatch. Do not research
-the same question again without new evidence. Research informs decisions; it does
-not validate local behavior, change scope, count as implementation, or waive plan
-approval, tests, review, or user decisions. If research is
-unavailable or inconclusive, record the limitation and use the existing blocked,
-replan, or human-checkpoint route.
-
-For bugs, reproduce before planning where possible. High-risk bugs require
-`tester` scenarios before the fix; low/medium-risk bugs may be fixed first and
-receive a regression test afterward. Regression coverage is required before
-approval in either path.
+removes a test or bypasses review.
 
 ## Roles and separation
 
-- `developer` is the only orchestrator and user interlocutor. It owns the
-  canonical state ledger and validates every handoff before routing it.
-- `planner` is read-only and defines architecture, risk, files, and test intent.
-- `coder`/`coder-expert` may change production and directly related tests, and run
-  focused checks; they never run the full suite or global coverage.
+- `developer` is the only orchestrator, user interlocutor, and consolidator.
+  It reads role notes and never rewrites them.
+- `planner` is read-only for code and tests; it may write only its own note.
+- `coder` may change production and directly related tests and run focused
+  checks; it never runs the full suite or global coverage. Complexity is handled
+  by model choice, not by another role.
 - `tester` changes tests only, independently evaluates coder-authored coverage,
   adds/adjusts tests for material gaps, and runs tests created/changed in that
-  step plus necessary targeted regressions. It should not duplicate equivalent
-  tests solely to repeat coder's work.
+  step plus necessary targeted regressions.
 - `reviewer` is the only agent that runs the complete suite and issues final
-  code-gate approval. In `development` mode it gives scoped feedback only; it
+  code-gate approval. In `development` mode it gives scoped feedback only and
   does not edit source or tests. `review_feedback_ready` is explicitly
   non-approving. For device work, final review follows focused and device
-  validation whenever safe and available; it must not front-load the full suite
-  before the implementation has been exercised on the target. If target
-  validation is blocked/deferred, the developer must obtain explicit user
-  authorization before dispatching final review; the reviewer then reports
-  `manual_validation: pending` and cannot imply physical acceptance.
-- `analyst` is an optional primary agent that returns requirements; it does not
-  start implementation.
+  validation whenever safe and available.
+- `analyst` is an optional primary agent that returns requirements.
 - Subagents report blocking questions to `developer`; only `developer` asks the
   user. Within approved scope, choose a conservative, reversible technical
-  default and record the assumption instead of interrupting for routine details.
+  default and record the assumption.
 
-User instructions may explicitly override a workflow default only when the
-action is within the user's authority. Record `overrides` with the instruction,
-the affected rule, the chosen behavior, and `source: user`. An override cannot
-be represented as a gate passing: report the skipped/pending validation and
-leave completion or release acceptance to the user.
+## State and routing
 
-## State and routing invariants
+Main states: `discovery`, `planning`, `implementation`, `validation`, `review`,
+`manual_validation`, and `completed`. Exceptional states: `blocked`,
+`review_incomplete`, and `cancelled`.
 
-Main states: `discovery`, `clarification`, `planning`, `awaiting_approval`,
-`test_specification`, `implementation`, `test_creation`, `review`, `correction`,
-`manual_validation`, and `completed`.
+Transitions are prohibited when implementation precedes human plan approval; the
+tester edits production; a full suite is run by coder or tester; a bug lacks
+regression coverage at approval; or a review is approved with a blocker, failed
+or missing test, stale gate, or inconclusive required check.
 
-Exceptional states: `bug_diagnosis`, `bug_reproduction`,
-`assisted_reproduction`, `test_refinement`, `tester_disputed`, `blocked`,
-`review_incomplete`, `critical_checkpoint`, and `cancelled`.
-
-Transitions are prohibited when implementation precedes human plan approval;
-the tester edits production; a full suite is run by coder or tester; a bug lacks
-regression coverage at approval; or a review is approved
-with a blocker, failed/missing test, stale gate, or inconclusive required check.
-
-`review_approved` is allowed only in `final` mode and requires all of the following:
+`review_approved` is allowed only in `final` mode and requires all of the
+following:
 
 - `blockers: []` and no unresolved critical risk;
 - every applicable `REQ-*`/`AC-*` linked to implementation and test evidence;
@@ -167,38 +152,20 @@ with a blocker, failed/missing test, stale gate, or inconclusive required check.
 
 Development-mode feedback may report focused check results and pending final
 gates. Defer full regression runs, global coverage, broad analysis, and remote CI
-polling until implementation and focused independent tests are complete. For
-hardware acceptance, the normal order is focused implementation checks ->
-scoped reviewer feedback -> target-device validation -> final broad review. Do
-not front-load a final/full review before device validation. If device validation
-is unavailable, unsafe, explicitly deferred, or inconclusive, document why and
-pause before final broad review; obtain explicit user authorization for the
-exception. If authorized, local code gates may run, but the physical gate remains
-pending and the task is not complete. Any source/test change after final
-validation makes affected evidence stale and requires relevant final gates to
-rerun.
+polling until implementation and focused independent tests are complete.
 
 If source state changes after a check, that check is `stale` and must be rerun.
 For a dirty worktree, identify the reviewed state with the base HEAD plus a
 stable diff hash or an equivalent harness-supported snapshot identifier. Never
 claim a commit SHA for uncommitted changes.
 
-`review_incomplete` is not approval. Missing output, malformed handoff, a step
-limit, timeout, unavailable check, pending CI, or unreadable evidence must remain
-incomplete or blocked. The developer may request one format-only correction for
-a malformed handoff; do not route its claims as verified until corrected.
-
-If that correction is still malformed, stop format-repair loops. Keep the
-original handoff untrusted, record the role's result as `review_incomplete` when
-it was a review, and dispatch one fresh, bounded return to the responsible role
-to independently reproduce or verify the actionable claims against the current
-source state. This is evidence collection, not approval: route only claims in a
-validated return, preserve any still-unverified claims as limitations, and keep
-the task incomplete if the fresh return is malformed or inconclusive. A fresh
-verification does not erase failed gates or bypass the normal correction,
-review, cycle, or human-approval rules. For non-review handoffs, use the same
-pattern with the originating role; do not ask unrelated roles to infer its
-evidence.
+`review_incomplete` is not approval. Missing output, an interrupted review, a
+step limit, timeout, unavailable check, pending CI, or unreadable evidence must
+remain incomplete or blocked. If a return is ambiguous, request one bounded
+re-run to reproduce or verify the actionable claims against the current source
+state; route only validated claims and keep the task incomplete when the re-run
+is also inconclusive. A fresh verification does not erase failed gates or bypass
+correction, review, or human-approval rules.
 
 ## Risk and bugs
 
@@ -207,10 +174,22 @@ security, data, concurrency, external integration, critical behavior, or
 material-impact bugs. Risk controls depth of planning and evidence, never waives
 necessary tests.
 
-For bug reproduction, preserve only useful evidence: `reproduction_status`,
+For bugs, reproduce before planning where possible. High-risk bugs require
+tester scenarios before the fix; low/medium-risk bugs may be fixed first and
+receive a regression test afterward. Regression coverage is required before
+approval in either path. Preserve only useful evidence: reproduction status,
 steps, expected/observed, commands/results, sanitized logs, environment, and
-limitations. Assisted reproduction requires an observation strategy before
-asking the user to act.
+limitations.
+
+## Research on stalled work
+
+Use `research` when a technical decision lacks evidence, or a cycle repeats
+without a new hypothesis, evidence, or measurable progress. Subagents signal the
+question, what was tried, and the missing evidence; they do not repeat the
+failing path or dispatch nested research. The developer first checks local code
+and docs, then delegates one bounded question and routes the findings to the
+responsible role. Research informs decisions; it does not validate local
+behavior, change scope, or waive gates.
 
 ## Alternatives and correction cycles
 
@@ -219,25 +198,16 @@ materially riskier than planned, stop that path and return to `developer` with
 evidence, constraints, and viable alternatives. The developer routes back to the
 planner for a bounded replan; do not silently change scope or keep repeating a
 failing approach. Compare alternatives on feasibility, risk, quality, cost, and
-validation effort. Use Jev for a genuine low-risk semantic tie when its answer
-can change the choice; one call may batch independent judgments over the same
-minimal state. Ask the user when alternatives change scope, behavior,
-compatibility, accepted risk, or require a human checkpoint. Reapproval is
-required if the approved objective, acceptance criteria, or material risk changes.
+validation effort.
 
 Permit parallel read-only discovery/planning only when inputs are stable and
 scopes are independent. Serialize all edits and reviews against a shared
 worktree; do not start a dependent reviewer or writer while another writer is
-still active. Parallel implementation is allowed only for explicitly disjoint
-files/modules, with one integrator (`developer`) reconciling the result before
-tests/review.
+active. Parallel implementation is allowed only for explicitly disjoint
+files/modules, with one integrator reconciling the result before tests/review.
 
-Count each correction or replan loop in `cycle` as an unbounded, non-negative
-integer for traceability, not as a stopping threshold. A return for a
-production/test correction, `test_refinement_needed`, `needs_more_tests`,
-`needs_correction`, or a new implementation approach after infeasibility/risk
-increments it; a format-only handoff repair does not. After every validated
-return, compare the current state with the prior ledger and record the concrete
+Do not impose a numeric ceiling on correction cycles. After every validated
+return, compare the current state with the prior state and record the concrete
 delta: acceptance criteria/gates satisfied, failures corrected, blockers removed,
 new evidence or a revised hypothesis that changes the next action, or a failed
 approach replaced with a viable one. Continue while there is observable progress
@@ -245,23 +215,17 @@ and a safe, in-scope next step. A cycle is stalled when it repeats a failed
 approach or finding without new evidence, a changed hypothesis, a material state
 change, or a reduction in blockers. Do not repeat a stalled route: use bounded
 research or replan if it can provide a new path. If no useful safe step remains,
-progress depends on a human decision, or critical risk is unresolved, enter
-`critical_checkpoint` and ask the user how to proceed, summarizing attempts,
-evidence, blockers, and options. Progress never waives approval, testing, review,
-or other human gates.
+progress depends on a human decision, or critical risk is unresolved, enter a
+checkpoint and ask the user how to proceed, summarizing attempts, evidence,
+blockers, and options. Progress never waives approval, testing, review, or other
+human gates.
 
-Routing:
-
-- `reviewer -> tester -> reviewer` for test defects or missing coverage when
-  production behavior is correct;
-- `reviewer -> coder -> tester -> reviewer` for production defects/regression
-  coverage;
-- `coder/reviewer -> developer -> planner` when the approach is infeasible or
-  materially risky; continue only under the existing approval gate;
-- `tester_disputed` and architectural/scope disputes return to `developer`;
-- any non-`none` `research_request` returns to `developer` for bounded dispatch;
-- failed gates return to the responsible role; no approval while they remain
-  failed or stale.
+Routing: `reviewer -> tester -> reviewer` for test defects or missing coverage
+when production behavior is correct; `reviewer -> coder -> tester -> reviewer`
+for production defects; `coder/reviewer -> developer -> planner` when the
+approach is infeasible or materially risky; `tester_disputed` and disputes return
+to `developer`; any research need returns to `developer` for bounded dispatch;
+failed gates return to the responsible role.
 
 ## Quality gate and delivery
 
@@ -273,9 +237,7 @@ scope, cost, and justification.
 The reviewer may inspect Git and run checks. Commit or push requires explicit
 user authorization in the current task, even on a work branch. Never commit,
 push, or force-push to production branches. Before authorized version control
-operations, inspect branch, status, diff, and stage only intended files. Track
-remote checks to a conclusive result when integration permits. Pending, failed,
-not-triggered, or unverifiable CI prevents `review_approved`.
+operations, inspect branch, status, diff, and stage only intended files.
 
 Final delivery records diff/state, commands and exit results, local/remote gate
 state, manual validation requested/completed/pending, residual risks, and any
@@ -283,7 +245,8 @@ user override. Manual device validation must identify the firmware/build state
 and the specific behavior tested; generic smoke checks do not prove a feature.
 For device-bound changes, record whether device validation preceded final review;
 if it did not, record the blocker/deferment and explicit user authorization for
-the exception, and retain `manual_validation: pending`.
+the exception.
+
 Tie committed CI evidence to the reviewed content and exact commit SHA. A
 successful check for a different commit or changed worktree does not validate
 the current state. Run broad gates in a detached worktree checked out at the
@@ -291,11 +254,8 @@ reviewed state (`git worktree add --detach`) instead of the developer's worktree
 so the writer keeps working and a moving worktree cannot produce a false
 positive; a dirty worktree requires an immutable diff-snapshot identifier.
 Reused evidence must cite its origin state and the current state must be
-unchanged, or the check is stale. When a domain value changes (threshold,
-version, count, constant name), sweep documentation, READMEs, and indexes for
-the old value before closing the cycle. Hardware evidence records build/firmware
-identity and the observed feature effect; serial command acceptance alone is not
-proof of behavior.
+unchanged, or the check is stale. When a domain value changes, sweep
+documentation, READMEs, and indexes for the old value before closing the cycle.
 
 ## Jev
 
@@ -305,35 +265,12 @@ technical tie, a viable fallback selection, a non-scope blocking question, or
 severity/risk/coverage classification. Skip it for facts determined by code,
 docs, commands or tests, trivial choices, and answers that would not change the
 action. Keep state minimal, batch independent questions, and record one compact
-line in `decisions`. Confidence thresholds and schema are in
+line in the role note. Confidence thresholds and schema are in
 `docs/typesafe-jev-policy.md`. Jev never confirms goals, scope, plan approval,
 business decisions, credentials, deployment, migration, deletion, or other
-human gates; use `question` and await the user where required.
+human gates.
 
-## Handoff contract
-
-The canonical shared fields, per-role requirements, enums, and size limits are
-in `templates/handoff-contract.md`. Every return includes all required keys; use
-`none` for unavailable scalar values and `[]` for empty collections. Validate
-against the template; include its content in a dispatch only when the receiving
-harness cannot reliably read it.
-
-When dispatching, include the relevant canonical workflow/instruction content
-if the receiving agent cannot read it. A path reference is only a navigation
-aid. Use the portable fallback in `docs/agent-instruction-delivery.md`; do not
-rely on symlinks to bypass permissions or assume they work in every harness.
-
-Use `REQ-*`, `AC-*`, and `TEST-*` to compact stable traceability, not to omit
-context a receiving agent cannot access. Preserve
-`REQ/AC -> implementation -> TEST -> result/evidence`; include negative,
-boundary, and expected-failure cases for high-risk changes. Keep handoffs within
-their role limit (60 lines for coder/coder-expert/reviewer, 50 for tester; other
-roles retain their declared limits); include relevant decisions, paths, test
-mapping, commands/results, snapshot, blockers, and pending work. Put verbose raw
-logs in tool output and cite the specific command/result; do not truncate
-decision-critical evidence to satisfy a small handoff budget.
-
-## Human gates and traceability
+## Human gates
 
 1. One explicit user approval of objective and plan before code changes; omit a
    separate objective-confirmation round when intent is already clear.
@@ -341,8 +278,7 @@ decision-critical evidence to satisfy a small handoff budget.
    and limitations but do not claim user acceptance.
 3. Business, scope, compatibility, irreversible actions, unresolved conceptual
    disagreement, stagnation without a safe useful next step, and human-owned
-   decisions require the user. There is no numeric ceiling on correction cycles;
-   convergence is determined by recorded, observable progress, not attempt count.
+   decisions require the user.
 
 Maintain `REQ -> implementation -> TEST -> REVIEW`. For bugs use
 `BUG_REPORT -> reproduction evidence -> fix -> TEST_REGRESSION -> REVIEW`.

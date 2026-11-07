@@ -122,7 +122,7 @@ Examine, quando disponiveis e dentro do escopo solicitado:
 
 - mensagens do usuário e do agente principal, com timestamps e mudanças de
   objetivo/decisao;
-- chamadas a subagentes: prompt/handoff, agente/modelo, resposta final, estado,
+- chamadas a subagentes: prompt/retorno, agente/modelo, resposta final, estado,
   continuações, erros e tarefas sobrepostas;
 - chamadas de ferramentas e resultados, incluindo saidas de processos
   interativos/PTY; não trate metadados de spawn como se fossem a saída do
@@ -148,17 +148,17 @@ somente referências técnicas curtas e necessárias.
    quando possível e não julgue a sessão somente pelas regras atuais.
 4. Confronte alegações de sucesso com resultados concretos: comando completo,
    exit code, diff/commit, resultado de teste, check remoto ou evidência do
-   dispositivo. Um handoff ou resumo do agente é uma afirmação, não prova por si
-   só que o gate passou.
+   dispositivo. Um retorno, nota ou resumo do agente é uma afirmação, não prova
+   por si só que o gate passou.
 5. Para cada achado, separe fato observado, interpretação e hipótese causal.
    Cite timestamp/indice de mensagem, ID da chamada, caminho/linha ou commit
    quando disponível; classifique confiança como alta, média ou baixa.
 6. Extraia práticas a preservar e fricções a corrigir. Prefira causas de sistema
-   (handoff incompleto, gate ambíguo, teste sem costura com produção, contexto
+   (nota incompleta, gate ambíguo, teste sem costura com produção, contexto
    stale, sobreposição) a atribuição de culpa individual.
 7. Proponha mudanças pequenas e ordenadas por impacto, risco e custo. Atribua
-   cada acao ao papel apropriado (`developer`, `planner`, `coder`,
-   `coder-expert`, `tester`, `reviewer`, `analyst`, harness/tooling ou usuario)
+   cada acao ao papel apropriado (`developer`, `planner`, `coder`, `tester`,
+   `reviewer`, `analyst`, harness/tooling ou usuario)
    e defina um sinal mensurável de sucesso.
 8. Se delegar leitura, divida por fontes sem sobreposição, exija referências e
    limitações, aguarde todos os resultados antes da síntese e não permita que
@@ -174,7 +174,7 @@ Use apenas as dimensões pertinentes à sessão; não force problemas onde não 
 evidência:
 
 - qualidade do discovery, requisitos, plano e atualização de escopo;
-- fidelidade dos handoffs, preservacao de contexto e uso de IDs de requisitos,
+- fidelidade dos retornos e notas, preservacao de contexto e uso de IDs de requisitos,
   critérios, testes e evidências;
 - escolha e quantidade de subagentes, paralelismo, continuações, limites de
   passos e estados incompletos;
@@ -189,7 +189,7 @@ evidência:
 
 Ao quantificar aderência do workflow, sempre informe numerador e denominador.
 Quando os dados permitirem, inclua: prompts com contrato/total, retornos
-completos/total, handoffs acima do limite, revisões incompletas ou no limite de
+completos/total, notas sem evidência verificável, revisões incompletas ou no limite de
 steps, gates stale, aprovações com blockers, escritores/revisores sobrepostos,
 ciclos sem progresso observável e alegações de sucesso sem comando/resultado/estado
 identificável. Marque cada métrica como indisponível quando a fonte não puder

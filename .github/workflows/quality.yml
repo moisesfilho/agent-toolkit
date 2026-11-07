@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check harnesses/typesafe-jev-mcp/index.mjs
-          python3 tools/validate_handoffs.py
+          python3 tools/validate_resources.py
           python3 -m unittest discover -s tests -v
 
       - name: Write job summary

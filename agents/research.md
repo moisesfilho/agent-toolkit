@@ -33,28 +33,17 @@ observations, and inference; note source quality and conflicting/stale evidence.
 Do not dump search results or long quotations. State what should be tested in
 the actual project; external precedent is not proof of local correctness.
 
-Use `research_request` to preserve the exact question and already-tried
-approaches. If the question is underspecified, return a bounded assumption or
-identify the one missing fact. Follow `templates/handoff-contract.md`; keep the
-handoff within 25 lines.
+Preserve the exact question and already-tried approaches. If the question is
+underspecified, return a bounded assumption or identify the one missing fact.
+You do not write a task note (`nota: none`); the findings belong in the return.
 
 ```text
-status: research_complete | research_inconclusive
-origin: research
-next_action: developer
-cycle: 0
+resultado: pesquisa_concluida | pesquisa_inconclusiva
+nota: none
+proximo: developer
 research_question: ...
 findings: []
 sources: [title | URL | date | claim]
 recommendation: ...
-changed: []
-research_request: none
-commands: []
-tests: []
-quality_gate: []
-decisions: []
-risks: []
-blockers: []
-manual_validation: none | pending | completed: <evidence>
-overrides: []
+riscos_e_limitacoes: []
 ```

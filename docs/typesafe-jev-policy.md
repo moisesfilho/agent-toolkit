@@ -20,7 +20,7 @@ O MCP `typesafe-jev_jev_decide` e uma ferramenta de apoio a decisoes estruturada
   - `noul`: probabilidade de resposta positiva `>= 0.90` (o `noul` nao expoe `confidence` separado).
   - `choice` e `score`: `confidence >= 0.90`.
   - Em qualquer tipo, exige-se decisao reversivel, de baixo risco e dentro do escopo aprovado.
-- Registre no handoff a pergunta, resposta, probabilidade/confianca, decisao adotada e eventual motivo de escalonamento.
+- Registre na nota da tarefa a pergunta, resposta, probabilidade/confianca, decisao adotada e eventual motivo de escalonamento.
 - Se o MCP falhar ou a confianca for insuficiente, escolha um default
   conservador, reversivel e dentro do plano quando isso nao alterar resultado,
   escopo ou risco aceito; registre a premissa. Caso contrario, encaminhe ao
@@ -34,7 +34,7 @@ Nao use o Jev para confirmar objetivo, escopo, requisitos, criterios de aceite o
 
 - `developer`: pode orquestrar decisoes tecnicas locais e resolver `blocking_questions` de baixo risco.
 - `planner`: pode escolher defaults tecnicos conservadores, mas nao pode fechar objetivo, escopo, requisitos ou aprovacao do plano.
-- `coder` e `coder-expert`: podem escolher alternativas reversiveis ja contidas no plano. Nao podem ampliar escopo nem substituir testes ou revisao.
+- `coder`: pode escolher alternativas reversiveis ja contidas no plano. Nao pode ampliar escopo nem substituir testes ou revisao.
 - `tester`: pode priorizar casos de borda, risco de regressao e lacunas de cobertura. Nao pode remover cenarios nem enfraquecer assercoes.
 - `reviewer`: pode classificar severidade, risco residual e prioridade de correcoes. Nao pode aprovar com testes falhando ou substituir um gate humano.
 - `minimal`: nao usa ferramentas, mesmo que a permissao global do MCP exista.
@@ -54,12 +54,12 @@ documentacao, comandos ou testes e houver uma decisao reversivel e de baixo risc
 Agentes devem resolver blocking questions nao materiais sem consultar o usuario:
 use contexto, Jev quando aplicavel ou um default reversivel conservador. So
 escale se a decisao puder alterar comportamento, escopo, compatibilidade, risco
-aceito ou gate humano. Agrupe perguntas independentes na mesma chamada. Registre no handoff uma linha
+aceito ou gate humano. Agrupe perguntas independentes na mesma chamada. Registre na nota uma linha
 compacta no formato `jev: pergunta -> resposta/confianca -> decisao`. Nao releia
 a skill de TypeSafe se ela ja estiver no contexto da sessao.
 
 Quando nao houver alternativa aprovada viavel, retorne ao planner para propor
 outra abordagem. Se a alternativa alterar escopo, comportamento, compatibilidade
 ou risco material, pare e obtenha esclarecimento/aprovacao humana; Jev nao
-substitui esse checkpoint. O fluxo deve tentar alternativas dentro do limite
-de ciclos do workflow e nao repetir uma abordagem que falhou sem nova evidencia.
+substitui esse checkpoint. O fluxo deve tentar alternativas enquanto houver
+progresso observavel e nao repetir uma abordagem que falhou sem nova evidencia.

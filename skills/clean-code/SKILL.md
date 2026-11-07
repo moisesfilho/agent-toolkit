@@ -132,5 +132,5 @@ solely because another valid style would also be possible.
 Apply these principles using the language, framework, architecture, formatter,
 linter, and test conventions already present in the target project. Existing
 project rules and explicit requirements take precedence over generic examples
-in this skill. When conventions conflict, record the trade-off in the handoff
+in this skill. When conventions conflict, record the trade-off in the task note
 instead of silently rewriting unrelated code.
