@@ -115,9 +115,9 @@ Comandos:
 - `verify agent [--window-hours N]`: compara o modelo configurado com o último modelo observado no log e detecta processo stale após alteração.
 - `plan`: mostra os modelos atuais por agente.
 - `apply --assignments '{"agent":"provider/model"}' [--small-model provider/model]`: aplica alterações atômicas e cria backup.
-- `profiles list`: lista os perfis salvos e identifica o ativo quando as atribuições coincidirem exatamente.
-- `profiles show NOME`: mostra os modelos definidos para cada agente no perfil.
-- `profiles apply NOME`: ativa um perfil completo, cria backup e atualiza todos os agentes e `small_model`. Exige correspondência exata entre os agentes configurados e os presentes no perfil.
+- `profiles list`: lista os perfis salvos e identifica o ativo quando os modelos dos agentes do toolkit e o `small_model` coincidirem; agentes fora do toolkit não entram nessa comparação.
+- `profiles show NOME`: mostra os modelos definidos para cada agente do toolkit no perfil.
+- `profiles apply NOME`: ativa um perfil completo, cria backup e atualiza somente os agentes do toolkit (`analyst`, `coder`, `developer`, `minimal`, `model-setter`, `planner`, `research`, `retrospectiv`, `reviewer`, `tester`) mais o `small_model`. Cada perfil precisa cobrir exatamente esses dez agentes; agentes faltantes ou fora do escopo bloqueiam a aplicação.
 - `/perfil-modelos NOME`: comando global que seleciona `model-setter` para validar e ativar um perfil salvo com segurança.
 - `rollback --backup /caminho/do/backup`: restaura uma configuração anterior.
 
