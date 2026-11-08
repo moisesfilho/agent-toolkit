@@ -67,6 +67,38 @@ RECORD_TEMPLATE_PHRASES = (
     "## Residual risks",
 )
 HOME_PATH = re.compile(r"(?<![\w$])/home/[A-Za-z0-9._-]+/")
+PERMISSION_BLOCK = re.compile(r"(?m)^permissions:(?: +#.*)?[ \t]*$")
+PERMISSION_INLINE = re.compile(r"(?m)^permissions:[ \t]*[^\s#]")
+PERMISSION_KEY = re.compile(r"(?m)^permissions:(?P<rest>[^\n]*)$")
+PERMISSION_HEADER_REST = re.compile(r"(?: +#.*)?[ \t]*\Z")
+PERMISSION_ENTRY = re.compile(
+    r"(?m)^  - action: (?P<action>[^\s#][^#\n]*)\n"
+    r"    resource: (?P<resource>[^\s#][^#\n]*)\n"
+    r"    effect: (?P<effect>allow|deny|ask)\n"
+)
+PERMISSION_LAYOUT_ERROR = (
+    "permissions block uses an unsupported YAML layout; "
+    "use one `- action`/`resource`/`effect` triple per entry"
+)
+RESEARCH_ALLOWED_ACTIONS = ("read", "glob", "websearch", "webfetch")
+RESEARCH_FORBIDDEN_ACTIONS = (
+    "shell",
+    "execute",
+    "edit",
+    "write",
+    "patch",
+    "external_directory",
+)
+RESEARCH_FORBIDDEN_SEARCH_ACTIONS = ("grep",)
+RESEARCH_FORBIDDEN_EFFECTS = ("allow", "ask")
+RESEARCH_SENSITIVE_READ_DENIALS = (
+    ".env",
+    ".pem",
+    ".key",
+    "id_rsa",
+    "id_ed25519",
+    "auth.json",
+)
 
 
 def frontmatter(content: str) -> str:
@@ -81,6 +113,139 @@ def return_block(content: str) -> list[str] | None:
     if not matches:
         return None
     return matches[-1].group(1).splitlines()
+
+
+def permission_block(header: str) -> list[str] | None:
+    """Return the lines of the ``permissions:`` block, if declared as a block list.
+
+    YAML comments are ignored wherever they appear and never change the
+    indentation of the sequence, so a full-line comment in any column stays
+    inside the block. Only a real top-level key closes it. The key spelling is
+    canonical: either ``permissions:`` alone or at least one space before a
+    trailing comment.
+    """
+    match = PERMISSION_BLOCK.search(header)
+    if not match:
+        return None
+    lines: list[str] = []
+    for line in header[match.end() :].splitlines()[1:]:
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            lines.append(line)
+            continue
+        if stripped and not line.startswith((" ", "\t")):
+            break
+        lines.append(line)
+    return lines
+
+
+def parse_permissions(header: str) -> tuple[list[tuple[str, str, str]], list[str]]:
+    """Parse ``action``/``resource``/``effect`` triples without accepting loose YAML.
+
+    Only the canonical block form the repository uses is understood. Any other
+    valid YAML spelling (flow style, reordered keys, comments on a value, block
+    scalars, extra keys) is reported instead of being silently skipped, so an
+    unrecognized layout can never hide an allow rule. A malformed ``permissions:``
+    key spelling, such as a comment with no separating space or with a tab,
+    fails closed because the file cannot be analyzed reliably.
+    """
+    keys = list(PERMISSION_KEY.finditer(header))
+    if len(keys) > 1:
+        return [], [PERMISSION_LAYOUT_ERROR]
+    if keys and not PERMISSION_HEADER_REST.match(keys[0].group("rest")):
+        return [], [PERMISSION_LAYOUT_ERROR]
+    if len(PERMISSION_INLINE.findall(header)) + len(PERMISSION_BLOCK.findall(header)) > 1:
+        return [], [PERMISSION_LAYOUT_ERROR]
+    if PERMISSION_INLINE.search(header):
+        return [], [PERMISSION_LAYOUT_ERROR]
+    block = permission_block(header)
+    if block is None:
+        return [], []
+    text = "\n".join(block) + "\n"
+    entries: list[tuple[str, str, str]] = []
+    residue = text
+    for match in PERMISSION_ENTRY.finditer(text):
+        entries.append(
+            (
+                match.group("action").strip().strip('"'),
+                match.group("resource").strip().strip('"'),
+                match.group("effect"),
+            )
+        )
+        residue = residue.replace(match.group(0), "", 1)
+    leftover = "\n".join(
+        line
+        for line in residue.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    )
+    if leftover:
+        return entries, [PERMISSION_LAYOUT_ERROR]
+    return entries, []
+
+
+def permissions(header: str) -> list[tuple[str, str, str]]:
+    """Read canonical ``action``/``resource``/``effect`` triples from the frontmatter."""
+    return parse_permissions(header)[0]
+
+
+def check_research_permissions(header: str) -> list[str]:
+    """``research`` keeps local ``read``/``glob`` and web grants, never search or mutation.
+
+    ``allow`` and ``ask`` are both treated as grants: answering a prompt is not a
+    durable invariant, so prohibited actions and textual search must be absent or
+    explicitly denied. Sensitive read resources must end as ``deny``; a later
+    ``allow`` or ``ask`` would override the denial under last-wins evaluation.
+    """
+    entries, layout_errors = parse_permissions(header)
+    if layout_errors:
+        return [f"research: {error}" for error in layout_errors]
+    errors: list[str] = []
+    deny_all = [index for index, rule in enumerate(entries) if rule == ("*", "*", "deny")]
+    if not deny_all:
+        errors.append("research: permissions must start from deny-all")
+    grants = [index for index, (_, _, effect) in enumerate(entries) if effect == "allow"]
+    if deny_all and grants and min(grants) < max(deny_all):
+        errors.append("research: deny-all must precede every grant")
+    for required in RESEARCH_ALLOWED_ACTIONS:
+        if not any(
+            action == required and resource == "*" and effect == "allow"
+            for action, resource, effect in entries
+        ):
+            errors.append(f"research: must allow {required}")
+    forbidden = RESEARCH_FORBIDDEN_ACTIONS + RESEARCH_FORBIDDEN_SEARCH_ACTIONS
+    for action_name in forbidden:
+        effects = {
+            effect
+            for action, _, effect in entries
+            if action == action_name and effect in RESEARCH_FORBIDDEN_EFFECTS
+        }
+        for effect in sorted(effects):
+            errors.append(f"research: must not {effect} {action_name}")
+    denied_read = [
+        resource for action, resource, effect in entries if action == "read" and effect == "deny"
+    ]
+    for fragment in RESEARCH_SENSITIVE_READ_DENIALS:
+        if not any(fragment in resource for resource in denied_read):
+            errors.append(f"research: must deny read for {fragment}")
+    broad_read = [
+        index for index, rule in enumerate(entries) if rule == ("read", "*", "allow")
+    ]
+    boundary = max(broad_read) if broad_read else None
+    for index, (action, resource, effect) in enumerate(entries):
+        if action != "read":
+            continue
+        sensitive = any(fragment in resource for fragment in RESEARCH_SENSITIVE_READ_DENIALS)
+        if not sensitive:
+            continue
+        if effect != "deny":
+            if resource != "*.env.example":
+                errors.append(f"research: must not re-grant read for {resource}")
+            continue
+        if boundary is not None and index < boundary:
+            errors.append(
+                f"research: read denial for {resource} must follow the broad read grant"
+            )
+    return errors
 
 
 def check_text(label: str, text: str) -> list[str]:
@@ -128,6 +293,9 @@ def check_agent(role: str, content: str) -> list[str]:
 
     if role in NOTE_ROLES and "templates/task-note.md" not in content:
         errors.append(f"{role}: must reference templates/task-note.md")
+
+    if role == "research":
+        errors.extend(check_research_permissions(header))
 
     if role == "reviewer":
         required_rules = (
