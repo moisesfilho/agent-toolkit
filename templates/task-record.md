@@ -49,6 +49,8 @@ Rules:
 
 - One author (`developer`). Roles never write the record.
 - It summarizes; the role notes remain the detailed evidence trail.
+- It records the current state only: superseded or discarded items stay in the
+  notes and never carry into the record.
 - `Status: completed` requires that mandatory manual validation was accepted by
   the user when it applies.
 - The record and notes stay in the project as reference for future tasks.

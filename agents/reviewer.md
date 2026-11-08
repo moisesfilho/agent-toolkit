@@ -167,6 +167,13 @@ Ao concluir a revisão, escreva ou atualize somente a sua nota seguindo
 evidence`, gates executados com `head` e timestamp, e pendências. A nota é o
 registro durável inclusive em execução background; ela não é aprovação.
 
+Atualize a nota por append: cada adição começa com carimbo de data/hora
+(`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o
+caso. O cabeçalho `Updated` sozinho não carimba conteúdo novo. Só reescreva texto
+anterior se ele estiver ativamente enganoso e puder mudar a próxima ação de outro
+papel; quando uma pendência anterior for resolvida por evidência nova, marque-a
+como descartada para que não seja cobrada como bloqueio.
+
 Depois retorne ao `developer`:
 
 ```text

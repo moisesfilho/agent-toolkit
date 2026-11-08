@@ -59,13 +59,25 @@ roles.
   needs and reference the rest.
 - Not every transition requires a note update. A role updates its note when it
   finishes material work, not when a message arrives.
+- Update by appending, not by rewriting history. Every appended entry starts with
+  its own timestamp (`YYYY-MM-DD HH:MM ±HH:MM`) and states whether it supersedes
+  or discards an earlier conclusion. Updating the `Updated` header alone is not
+  enough to mark new content.
+- Rewrite an earlier statement only when it is actively misleading and could
+  change another role's next action, such as an approval, a test result, or a
+  security risk.
+- When reading a note, apply the most recent applicable entry and treat items it
+  supersedes or discards as closed. Age alone does not invalidate an entry: an
+  old fact stays valid until a later update closes it. Do not keep routing a
+  pending item that a timestamped update already resolved.
 - A note is not proof. A claim such as "tests passed" must point to the command,
   result, and code state that produced it. The reviewer verifies the source
   independently; no approval is based only on a summary.
 - At closure, the `developer` reads the notes and writes a single task record at
   `<project>/docs/agent-state/<task>.md` following `templates/task-record.md`.
   Only the developer consolidates; the record is the commit-ready reference and
-  the notes stay in the project as the detailed trail.
+  the notes stay in the project as the detailed trail. The record carries only
+  the current state: superseded and discarded items stay in the notes.
 - Committing the record requires user authorization for the task and must never
   target `main`, `master`, or a production branch.
 - `analyst` and `research` are read-only and return their content directly with
@@ -93,7 +105,9 @@ Sessions carry continuity:
   can continue instead of rebuilding context.
 
 After each return, read the note, verify that evidence points to a source and
-code state, and route only verified new information. A missing or ambiguous
+code state, and route only verified new information. Apply the most recent
+applicable entry; an item a timestamped update supersedes or discards is closed
+and must not be routed as pending. A missing or ambiguous
 return is missing evidence, not approval: request one bounded re-run from the
 responsible role. Do not create a parallel state file.
 

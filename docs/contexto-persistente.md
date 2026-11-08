@@ -22,6 +22,23 @@ Projetos que ja possuem convencao de documentacao mantem a propria; o caminho e
 confirmado no despacho. `analyst` e `research` sao somente leitura e retornam
 `nota: none`.
 
+## Deltas com carimbo de tempo
+
+- A nota cresce por append. Cada nova adicao comeca com data e hora e fuso
+  (`YYYY-MM-DD HH:MM ±HH:MM`), para que outro agente identifique o que e novo.
+  Alterar apenas o cabecalho `Updated` nao carimba o conteudo novo.
+- Quando um fato novo supera uma conclusao anterior, a entrada diz explicitamente
+  o que foi **substituido** ou **descartado** e qual e o estado vigente. Assim
+  uma pendencia ja resolvida ou uma hipotese abandonada deixa de ser tratada como
+  aberta.
+- Reescreva o texto anterior somente quando ele estiver ativamente enganoso e
+  puder mudar a proxima acao de outro papel: aprovacao, resultado de teste ou
+  risco de seguranca.
+- Ao ler, aplique a entrada mais recente aplicavel. Antiguidade nao invalida um
+  fato: ele permanece valido ate que um delta o substitua ou descarte.
+- O registro consolidado carrega apenas o estado vigente; itens substituidos ou
+  descartados permanecem no historico das notas.
+
 ## Sessoes
 
 - O primeiro despacho de um papel abre uma sessao nova; os seguintes reutilizam

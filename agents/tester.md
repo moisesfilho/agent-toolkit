@@ -127,6 +127,12 @@ Ao concluir, escreva ou atualize somente a sua nota seguindo
 `REQ/AC -> TEST`, resultados e limitações. A nota não é prova por si só; cite
 comando, resultado e estado do código.
 
+Atualize a nota por append: cada adição começa com carimbo de data/hora
+(`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o
+caso. O cabeçalho `Updated` sozinho não carimba conteúdo novo. Só reescreva texto
+anterior se ele estiver ativamente enganoso e puder mudar a próxima ação de outro
+papel.
+
 Depois retorne ao `developer`:
 
 ```text

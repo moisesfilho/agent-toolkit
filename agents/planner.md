@@ -118,6 +118,12 @@ Ao concluir, escreva ou atualize somente a sua nota seguindo
 riscos e premissas. A nota resume e referencia; não copia o plano inteiro nem
 logs. Há uma nota por papel, e cada papel escreve apenas a própria nota.
 
+Atualize a nota por append: cada adição começa com carimbo de data/hora
+(`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o
+caso. O cabeçalho `Updated` sozinho não carimba conteúdo novo. Só reescreva texto
+anterior se ele estiver ativamente enganoso e puder mudar a próxima ação de outro
+papel.
+
 Depois retorne ao `developer`:
 
 ```text

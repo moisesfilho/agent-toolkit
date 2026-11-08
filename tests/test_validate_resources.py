@@ -96,6 +96,38 @@ class ResourceValidationTests(unittest.TestCase):
         self.assertIn("Only the\n`developer` writes it", record)
         self.assertIn("future reference", record)
 
+    def test_task_note_requires_timestamped_appends(self):
+        note = (ROOT / "templates/task-note.md").read_text(encoding="utf-8")
+        self.assertIn("## Updates", note)
+        self.assertIn("Timestamp every appended update", note)
+        self.assertIn("YYYY-MM-DD HH:MM", note)
+        self.assertIn("superseded or\n  discarded", note)
+        self.assertIn("Age alone does not invalidate", note)
+
+    def test_task_record_excludes_superseded_items(self):
+        record = (ROOT / "templates/task-record.md").read_text(encoding="utf-8")
+        self.assertIn("current state only", record)
+
+    def test_note_roles_require_timestamped_appends(self):
+        for role in ("planner", "coder", "tester", "reviewer"):
+            with self.subTest(role=role):
+                content = agent(role).replace("carimbo de data/hora", "marcador")
+                errors = check_agent(role, content)
+                self.assertIn(
+                    f"{role}: note updates must be timestamped and mark supersession",
+                    errors,
+                )
+
+    def test_note_roles_require_supersession_marking(self):
+        for role in ("planner", "coder", "tester", "reviewer"):
+            with self.subTest(role=role):
+                content = agent(role).replace("substitui ou descarta", "atualiza")
+                errors = check_agent(role, content)
+                self.assertIn(
+                    f"{role}: note updates must be timestamped and mark supersession",
+                    errors,
+                )
+
     def test_workflow_keeps_its_invariants(self):
         workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
         self.assertEqual(check_workflow(workflow), [])

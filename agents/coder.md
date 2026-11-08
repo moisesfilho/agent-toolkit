@@ -100,6 +100,12 @@ escritos, estado do código e o que falta para a validação independente. A not
 resume e referencia; não copia diffs, logs ou o plano. Não declare aprovação
 final.
 
+Atualize a nota por append: cada adição começa com carimbo de data/hora
+(`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o
+caso. O cabeçalho `Updated` sozinho não carimba conteúdo novo. Só reescreva texto
+anterior se ele estiver ativamente enganoso e puder mudar a próxima ação de outro
+papel.
+
 Depois retorne ao `developer`:
 
 ```text

@@ -89,10 +89,14 @@ lidas; se isso estiver indisponível ou incerto, inclua o conteúdo relevante. S
   `docs/agent-state/<task>/<role>.md` (ou o caminho indicado pelo projeto),
   seguindo `templates/task-note.md`.
 - Você não reescreve notas de outros papéis; lê-las é suficiente para rotear.
+  Ao ler, aplique a entrada mais recente aplicável e trate como encerrado o item
+  que um delta com carimbo de tempo substituiu ou descartou; não cobre como
+  pendência o que já foi resolvido nem descarte um fato antigo só por ser antigo.
 - No encerramento, consolide as notas em um registro único
   `docs/agent-state/<task>.md`, seguindo `templates/task-record.md`. O registro é
   escrito apenas por você e pode ser commitado como referência futura, conforme
-  a autorização de commit da tarefa.
+  a autorização de commit da tarefa. Ele carrega apenas o estado vigente:
+  itens substituídos ou descartados permanecem só na trilha das notas.
 - Nota e resumo não são prova: confirme comandos, resultados e estado do código
   na fonte antes de aceitar um gate. O `reviewer` continua verificando
   independentemente.

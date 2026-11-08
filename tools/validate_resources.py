@@ -44,6 +44,9 @@ WORKFLOW_PHRASES = (
     "numeric ceiling on correction cycles",
     "user authorization",
     "detached worktree",
+    "appending, not by rewriting",
+    "timestamp",
+    "discards",
 )
 WORKFLOW_SECTIONS = (
     "## Standard flow",
@@ -59,12 +62,16 @@ NOTE_TEMPLATE_PHRASES = (
     "## Work done",
     "## Evidence",
     "## Pending and risks",
+    "## Updates",
+    "Timestamp every appended update",
+    "supersedes or discards",
 )
 RECORD_TEMPLATE_PHRASES = (
     "Only the\n`developer` writes it",
     "## Objective and criteria",
     "## Validation",
     "## Residual risks",
+    "current state only",
 )
 HOME_PATH = re.compile(r"(?<![\w$])/home/[A-Za-z0-9._-]+/")
 PERMISSION_BLOCK = re.compile(r"(?m)^permissions:(?: +#.*)?[ \t]*$")
@@ -291,8 +298,15 @@ def check_agent(role: str, content: str) -> list[str]:
         if missing:
             errors.append(f"{role}: return block missing fields: {', '.join(missing)}")
 
-    if role in NOTE_ROLES and "templates/task-note.md" not in content:
-        errors.append(f"{role}: must reference templates/task-note.md")
+    if role in NOTE_ROLES:
+        if "templates/task-note.md" not in content:
+            errors.append(f"{role}: must reference templates/task-note.md")
+        for rule in ("carimbo de data/hora", "substitui ou descarta"):
+            if rule not in content:
+                errors.append(
+                    f"{role}: note updates must be timestamped and mark supersession"
+                )
+                break
 
     if role == "research":
         errors.extend(check_research_permissions(header))
