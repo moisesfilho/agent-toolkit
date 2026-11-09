@@ -96,6 +96,18 @@ exemplo, amostragem de 1 s por N minutos) e a exigência de que os extremos da
 escala sejam atingíveis. Critério que apenas compara com o modelo não é
 suficiente.
 
+Todo `AC-*` que dependa de validação humana ou de dispositivo declara
+`evidence_kind`: `medido` (comando ou série), `relato` (observação do usuário)
+ou `deferido` (com decisão do usuário). Relato do usuário não satisfaz critério
+quantitativo.
+
+Em `risk_profile: high`, o plano inclui uma matriz curta
+`campo assinado ou limite -> NEG-* -> status ou erro esperado` cobrindo cada
+campo autenticado, cada limite de tamanho ou tempo e a duração total da
+operação. Campo assinado ou limite sem caso negativo é plano incompleto e não
+autoriza o primeiro despacho ao `coder`. Em risco `low` ou `medium` a matriz é
+opcional.
+
 Delimite explicitamente o que é necessário para cumprir os critérios aprovados
 versus melhoria adjacente. Quando houver dependência técnica, indique a evidência,
 o impacto se adiada e se altera comportamento, compatibilidade ou risco aceito;
@@ -117,6 +129,10 @@ Ao concluir, escreva ou atualize somente a sua nota seguindo
 `templates/task-note.md`: objetivo do despacho, plano (ou caminho dele), decisões,
 riscos e premissas. A nota resume e referencia; não copia o plano inteiro nem
 logs. Há uma nota por papel, e cada papel escreve apenas a própria nota.
+
+Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
+que está concluído e o que ficou pendente, e retorne os três campos mesmo
+interrompido.
 
 Atualize a nota por append: cada adição começa com carimbo de data/hora
 (`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o

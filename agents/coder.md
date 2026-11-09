@@ -100,6 +100,14 @@ escritos, estado do código e o que falta para a validação independente. A not
 resume e referencia; não copia diffs, logs ou o plano. Não declare aprovação
 final.
 
+Ao criar arquivo ou artefato novo, atualize no mesmo trabalho o inventário de
+formatação, lint, `clean` e cobertura do projeto que já existir, para o gate
+final não encontrar alvo fora do escopo.
+
+Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
+que está concluído e o que ficou pendente, e retorne os três campos mesmo
+interrompido.
+
 Atualize a nota por append: cada adição começa com carimbo de data/hora
 (`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o
 caso. O cabeçalho `Updated` sozinho não carimba conteúdo novo. Só reescreva texto

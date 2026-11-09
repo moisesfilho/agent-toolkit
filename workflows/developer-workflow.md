@@ -23,8 +23,11 @@ available to the receiving harness.
    implementation. Do not ask separate objective confirmation when the request
    already establishes it.
 4. For high-risk work, `tester` defines acceptance, boundary, failure, and
-   regression scenarios before implementation. This does not make TDD mandatory
-   for simple work.
+   regression scenarios before implementation, including the negative case for
+   every signed field and limit in the plan. The exit criterion is a complete
+   `campo/limite -> NEG-* -> expected result` matrix; while it is incomplete the
+   task stays in `planning` and `coder` does not start. This does not make TDD
+   mandatory for simple work.
 5. `coder` implements. Use a stronger model for high complexity instead of a
    separate expert role.
 6. `coder` adds/updates focused unit, component, or regression tests directly
@@ -103,6 +106,10 @@ Sessions carry continuity:
   reset in that role's note.
 - Reusing a session resets the role's step allowance, so an interrupted dispatch
   can continue instead of rebuilding context.
+- Instruct every long dispatch to append a checkpoint (code state, done, pending)
+  before exhausting its step allowance and to return the three fields even when
+  interrupted. An empty return, a placeholder such as `@`, or a return without a
+  note is missing evidence, never a conclusion.
 
 After each return, read the note, verify that evidence points to a source and
 code state, and route only verified new information. Apply the most recent
@@ -150,9 +157,10 @@ Main states: `discovery`, `planning`, `implementation`, `validation`, `review`,
 `manual_validation`, and `completed`. Exceptional states: `blocked`,
 `review_incomplete`, and `cancelled`.
 
-Transitions are prohibited when implementation precedes human plan approval; the
-tester edits production; a full suite is run by coder or tester; a bug lacks
-regression coverage at approval; or a review is approved with a blocker, failed
+Transitions are prohibited when implementation precedes human plan approval, a
+high-risk implementation starts before the negative-case matrix is complete, the
+tester edits production, a full suite is run by coder or tester, a bug lacks
+regression coverage at approval, or a review is approved with a blocker, failed
 or missing test, stale gate, or inconclusive required check.
 
 `review_approved` is allowed only in `final` mode and requires all of the
@@ -248,6 +256,12 @@ lint/typecheck, unit/integration/regression tests, build/package, coverage, and
 security/quality analysis. Prefer existing project tools; propose new tools with
 scope, cost, and justification.
 
+Before running broad gates, run a preflight: new files must be inside the
+formatting/lint/typecheck scope, `clean`, ignore and coverage targets must match
+the artifacts the build produces, required tools and dependencies must exist, and
+every command must capture its exit code. A check that is pending, still running,
+truncated, or without output is inconclusive, never PASS.
+
 The reviewer may inspect Git and run checks. Commit or push requires explicit
 user authorization in the current task, even on a work branch. Never commit,
 push, or force-push to production branches. Before authorized version control
@@ -255,8 +269,12 @@ operations, inspect branch, status, diff, and stage only intended files.
 
 Final delivery records diff/state, commands and exit results, local/remote gate
 state, manual validation requested/completed/pending, residual risks, and any
-user override. Manual device validation must identify the firmware/build state
-and the specific behavior tested; generic smoke checks do not prove a feature.
+user override. Each manual `AC-*` records its evidence kind: measured (command or
+series), reported by the user, or deferred (user decision). A reported or
+deferred item never counts as satisfied, and deferral is a user decision rather
+than an agent default. Manual device validation must identify the firmware/build
+state and the specific behavior tested; generic smoke checks do not prove a
+feature.
 For device-bound changes, record whether device validation preceded final review;
 if it did not, record the blocker/deferment and explicit user authorization for
 the exception.
@@ -293,6 +311,10 @@ human gates.
 3. Business, scope, compatibility, irreversible actions, unresolved conceptual
    disagreement, stagnation without a safe useful next step, and human-owned
    decisions require the user.
+4. Recovery actions in a physical or shared environment — sending keys to a
+   device shell, rebooting the device, killing a process, resetting a service —
+   require explicit authorization in the dispatch. Without it the role stops and
+   reports the need instead of acting.
 
 Maintain `REQ -> implementation -> TEST -> REVIEW`. For bugs use
 `BUG_REPORT -> reproduction evidence -> fix -> TEST_REGRESSION -> REVIEW`.

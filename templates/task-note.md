@@ -27,7 +27,9 @@ Concise summary of what was executed or decided. Reference files, `REQ-*`,
 
 ## Evidence
 
-Command, result, and state for each meaningful check. Mark what was not run.
+Command, result, and state for each meaningful check. Record each gate as
+`comando | exit | head | timestamp` and mark what was not run. A check that is
+pending, still running, or without output is not a result.
 
 ## Decisions and assumptions
 
@@ -71,4 +73,7 @@ Rules:
   an old fact stays valid until a later update supersedes or discards it.
 - The consolidated task record carries only the current state; superseded and
   discarded items stay in the note trail and never move to the record.
+- Before exhausting its step allowance, a role appends a checkpoint with the
+  code state, what is done, and what is pending, so an interrupted run still
+  leaves a verifiable state.
 - Keep the note until the task is closed; it is part of the project record.

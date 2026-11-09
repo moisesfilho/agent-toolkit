@@ -47,6 +47,10 @@ WORKFLOW_PHRASES = (
     "appending, not by rewriting",
     "timestamp",
     "discards",
+    "negative case",
+    "preflight",
+    "checkpoint",
+    "evidence kind",
 )
 WORKFLOW_SECTIONS = (
     "## Standard flow",
@@ -65,6 +69,8 @@ NOTE_TEMPLATE_PHRASES = (
     "## Updates",
     "Timestamp every appended update",
     "supersedes or discards",
+    "exit",
+    "checkpoint",
 )
 RECORD_TEMPLATE_PHRASES = (
     "Only the\n`developer` writes it",
@@ -72,6 +78,8 @@ RECORD_TEMPLATE_PHRASES = (
     "## Validation",
     "## Residual risks",
     "current state only",
+    "evidence kind",
+    "deferred",
 )
 HOME_PATH = re.compile(r"(?<![\w$])/home/[A-Za-z0-9._-]+/")
 PERMISSION_BLOCK = re.compile(r"(?m)^permissions:(?: +#.*)?[ \t]*$")
@@ -105,6 +113,27 @@ RESEARCH_SENSITIVE_READ_DENIALS = (
     "id_rsa",
     "id_ed25519",
     "auth.json",
+)
+ROLE_REQUIRED_RULES = {
+    "planner": (
+        "risk_profile: high",
+        "caso negativo",
+        "NEG-*",
+        "evidence_kind",
+    ),
+    "tester": (
+        "caso negativo",
+        "NEG-*",
+        "cenarios_prontos",
+    ),
+}
+REVIEWER_REQUIRED_RULES = (
+    "review_approved` só é permitido em modo final",
+    "review_feedback_ready` só é permitido em modo development",
+    "review_incomplete",
+    "blockers: []",
+    "preflight",
+    "evidence_kind",
 )
 
 
@@ -307,18 +336,18 @@ def check_agent(role: str, content: str) -> list[str]:
                     f"{role}: note updates must be timestamped and mark supersession"
                 )
                 break
+        if "checkpoint" not in content.lower():
+            errors.append(f"{role}: must instruct a checkpoint before exhausting steps")
+
+    for required in ROLE_REQUIRED_RULES.get(role, ()):
+        if required.lower() not in content.lower():
+            errors.append(f"{role}: missing required rule {required!r}")
 
     if role == "research":
         errors.extend(check_research_permissions(header))
 
     if role == "reviewer":
-        required_rules = (
-            "review_approved` só é permitido em modo final",
-            "review_feedback_ready` só é permitido em modo development",
-            "review_incomplete",
-            "blockers: []",
-        )
-        for rule in required_rules:
+        for rule in REVIEWER_REQUIRED_RULES:
             if rule.lower() not in content.lower():
                 errors.append(f"reviewer: missing fail-closed rule {rule!r}")
     return errors

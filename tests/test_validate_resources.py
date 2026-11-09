@@ -64,6 +64,72 @@ class ResourceValidationTests(unittest.TestCase):
         errors = check_agent("reviewer", content)
         self.assertTrue(any("fail-closed rule" in error for error in errors))
 
+    def test_planner_requires_a_negative_case_matrix(self):
+        content = re.sub(r"NEG-\*", "ERRO-*", agent("planner"))
+        errors = check_agent("planner", content)
+        self.assertIn("planner: missing required rule 'NEG-*'", errors)
+
+    def test_planner_requires_evidence_kind_for_manual_criteria(self):
+        content = agent("planner").replace("evidence_kind", "tipo de evidência")
+        errors = check_agent("planner", content)
+        self.assertIn("planner: missing required rule 'evidence_kind'", errors)
+
+    def test_tester_requires_negative_cases_before_implementation(self):
+        content = agent("tester").replace("cenarios_prontos", "estado")
+        errors = check_agent("tester", content)
+        self.assertIn("tester: missing required rule 'cenarios_prontos'", errors)
+
+    def test_note_roles_require_a_step_checkpoint(self):
+        for role in ("planner", "coder", "tester", "reviewer"):
+            with self.subTest(role=role):
+                content = re.sub(r"(?i)checkpoint", "marcador", agent(role))
+                errors = check_agent(role, content)
+                self.assertIn(
+                    f"{role}: must instruct a checkpoint before exhausting steps",
+                    errors,
+                )
+
+    def test_reviewer_requires_the_final_gate_preflight(self):
+        content = re.sub(r"(?i)preflight", "inspeção", agent("reviewer"))
+        errors = check_agent("reviewer", content)
+        self.assertIn("reviewer: missing fail-closed rule 'preflight'", errors)
+
+    def test_reviewer_requires_manual_evidence_kind(self):
+        content = agent("reviewer").replace("evidence_kind", "tipo de evidência")
+        errors = check_agent("reviewer", content)
+        self.assertIn("reviewer: missing fail-closed rule 'evidence_kind'", errors)
+
+    def test_task_note_requires_gate_exit_codes(self):
+        note = (ROOT / "templates/task-note.md").read_text(encoding="utf-8")
+        self.assertIn("comando | exit | head | timestamp", note)
+        self.assertIn("pending, still running", note)
+        self.assertIn("checkpoint", note.lower())
+
+    def test_task_record_requires_manual_evidence_kind(self):
+        record = (ROOT / "templates/task-record.md").read_text(encoding="utf-8")
+        self.assertIn("evidence kind", record)
+        self.assertIn("`deferred` (user decision)", record)
+
+    def test_workflow_requires_the_negative_case_gate(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        stripped = re.sub(r"(?i)negative case", "extra case", workflow)
+        errors = check_workflow(stripped)
+        self.assertTrue(any("negative case" in error for error in errors))
+
+    def test_workflow_requires_preflight_and_checkpoint(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        for phrase in ("preflight", "checkpoint"):
+            with self.subTest(phrase=phrase):
+                stripped = re.sub(rf"(?i){phrase}", "step", workflow)
+                errors = check_workflow(stripped)
+                self.assertTrue(any(phrase in error for error in errors))
+
+    def test_workflow_requires_manual_evidence_kind(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        stripped = workflow.replace("evidence kind", "evidence label")
+        errors = check_workflow(stripped)
+        self.assertTrue(any("evidence kind" in error for error in errors))
+
     def test_retired_handoff_contract_reference_is_rejected(self):
         errors = check_text("docs/example.md", "See templates/handoff-contract.md.")
         self.assertTrue(any("retired reference" in error for error in errors))

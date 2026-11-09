@@ -48,9 +48,13 @@ bloqueio e regras de dispatch.
 
 No fluxo de desenvolvimento, o coder pode criar testes focados junto com a
 implementação; o tester verifica rastreabilidade e lacunas de cobertura de forma
-independente, sem duplicar mecanicamente testes equivalentes. Cada papel mantém
-sua própria nota da tarefa, e o developer consolida um único registro no
-encerramento; não existe contrato de handoff compartilhado. Consulte
+independente, sem duplicar mecanicamente testes equivalentes. Em risco alto, o
+plano liga cada campo assinado e cada limite a um caso negativo antes do primeiro
+despacho ao coder; despachos longos deixam checkpoint na nota do papel; a revisão
+final roda um preflight dos gates antes das checagens amplas. Critério de aceite
+manual registra o tipo de evidência: medido, relato do usuário ou deferido. Cada
+papel mantém sua própria nota da tarefa, e o developer consolida um único
+registro no encerramento; não existe contrato de handoff compartilhado. Consulte
 [contexto persistente entre agentes](docs/contexto-persistente.md).
 
 ## Portabilidade E Seguranca

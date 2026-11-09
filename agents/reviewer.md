@@ -99,10 +99,24 @@ autorizada, execute apenas os gates locais de código aplicáveis, registre na n
 que a validação manual está pendente, e não implique aprovação física ou
 conclusão da tarefa.
 
+### Preflight do gate final
+
+Antes dos gates amplos, confirme no estado revisado: arquivos novos entram no
+escopo de formatação/lint/typecheck; alvos de `clean`, ignore e cobertura cobrem
+os artefatos que o build gera; dependências e ferramentas necessárias existem; e
+cada comando tem `exit code` capturado. Saída ausente, truncada, `pending` ou
+ainda "em execução" é `review_incomplete`, nunca PASS. Se o preflight revelar
+artefato fora do inventário ou alvo de `clean` desatualizado, devolva ao papel
+responsável antes de iniciar a suíte ampla.
+
 Execute todos os testes e gates aplicáveis: suíte completa, regressão, cobertura
 exigida pelo projeto, lint/typecheck/build e CI. Não aprove com suíte
 ausente/falhando, cobertura insuficiente ou risco crítico. Testes de alto risco
 ou necessários para orientar correção não devem ser adiados só por serem lentos.
+
+Para cada `AC-*` manual, registre o `evidence_kind` (`medido`, `relato` ou
+`deferido`) e a evidência específica. Relato do usuário não satisfaz critério
+quantitativo; deferimento exige decisão do usuário e nunca conta como satisfeito.
 Antes de revisar, identifique o `head` (SHA ou snapshot estável do worktree) e
 amarre todos os resultados a esse estado. Se o estado mudar, reexecute gates
 afetados. Cobertura e gates pertencem ao mesmo run do `head` revisado:
@@ -166,6 +180,10 @@ Ao concluir a revisão, escreva ou atualize somente a sua nota seguindo
 `templates/task-note.md`: achados com `path:line | severity | finding |
 evidence`, gates executados com `head` e timestamp, e pendências. A nota é o
 registro durável inclusive em execução background; ela não é aprovação.
+
+Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
+que está concluído e o que ficou pendente, e retorne os três campos mesmo
+interrompido.
 
 Atualize a nota por append: cada adição começa com carimbo de data/hora
 (`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o

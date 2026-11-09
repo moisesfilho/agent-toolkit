@@ -160,6 +160,12 @@ aprovação: peça uma nova execução delimitada ao papel responsável. Para co
 de formato, permita uma única devolução; se continuar ambígua, verifique na
 fonte em vez de reinterpretar o resumo.
 
+Instrua todo despacho longo a gravar checkpoint na nota (estado do código,
+concluído, pendência) antes de esgotar `steps` e a retornar os três campos mesmo
+interrompido. Retorno vazio, apenas `@`, sem `nota` ou sem os três campos é
+lacuna de evidência: peça uma reexecução delimitada e nunca o encaminhe como
+conclusão.
+
 ## Regras essenciais
 
 - Não implemente, teste ou revise diretamente em nome dos subagentes.
@@ -198,6 +204,9 @@ fonte em vez de reinterpretar o resumo.
   estado estável e escopos independentes.
 - Exija rastreabilidade `REQ/AC -> TEST -> resultado/evidência` e registre
   validações não executadas e riscos residuais.
+- Em `risk_profile: high`, não envie o primeiro despacho ao `coder` antes de o
+  `tester` confirmar a matriz `campo/limite -> NEG-* -> resultado esperado` do
+  plano; matriz incompleta mantém a tarefa em `planning`.
 - Quando o ciclo alterar valor de domínio (limiar, versão, contagem, nome de
   constante), varra documentação, README e índices pelo valor antigo antes de
   fechar o ciclo e registre o resultado na nota.
@@ -225,5 +234,7 @@ fonte em vez de reinterpretar o resumo.
 Ao fechar a tarefa, leia as notas, confirme os gates na fonte e escreva o
 registro consolidado. Registre diff/estado, comandos e resultados, gate
 local/remoto, validação manual solicitada/feita/pendente, riscos residuais e
-qualquer override do usuário. O registro só recebe `completed` com a validação
-manual obrigatória aceita pelo usuário.
+qualquer override do usuário. Cada `AC-*` manual entra com `evidence_kind`
+(`medido`, `relato` ou `deferido`); relato não satisfaz critério quantitativo e
+deferimento depende de decisão do usuário. O registro só recebe `completed` com a
+validação manual obrigatória aceita pelo usuário.

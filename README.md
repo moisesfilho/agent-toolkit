@@ -46,9 +46,13 @@ and dispatch rules.
 
 In the development workflow, coders may add focused tests alongside their
 implementation; the tester independently checks traceability and coverage gaps
-instead of mechanically duplicating equivalent tests. Each role keeps its own
-task note, and the developer consolidates a single task record at closure; there
-is no shared handoff contract. See
+instead of mechanically duplicating equivalent tests. High-risk plans must map
+every signed field and limit to a negative case before the first coder dispatch,
+each long dispatch leaves a checkpoint in the role note, and final review runs a
+gate preflight before broad checks. Manual acceptance criteria record their
+evidence kind: measured, reported by the user, or deferred. Each role keeps its
+own task note, and the developer consolidates a single task record at closure;
+there is no shared handoff contract. See
 [persistent agent context](docs/contexto-persistente.md).
 
 ## Portability And Security

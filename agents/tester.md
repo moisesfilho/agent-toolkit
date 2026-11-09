@@ -75,8 +75,11 @@ do coder; acrescente ou ajuste testes quando isso elevar cobertura relevante,
 sem repetir mecanicamente testes equivalentes já executados. Em
 `risk_profile: high`, também pode
 definir os cenários de aceitação, limite, falha e regressão antes da
-implementação, sem alterar produção. Nunca remova cenários ou enfraqueça
-asserções. Em bugs, crie a regressão depois da correção.
+implementação, sem alterar produção. Essa especificação prévia cobre, para cada
+campo assinado e cada limite da matriz `NEG-*`, o caso negativo correspondente;
+retorne `cenarios_prontos: sim` somente quando todos estiverem cobertos e
+`bloqueado` caso contrário, porque sem isso o `coder` não inicia. Nunca remova
+cenários ou enfraqueça asserções. Em bugs, crie a regressão depois da correção.
 
 Não fixe valores instantâneos (contagem de alvos, total de TUs, versão exata,
 limiar literal). Derive da fonte (`Makefile`, header, `version.txt`) ou asserir a
@@ -109,7 +112,10 @@ dois valores do mesmo intervalo, ou inverte a comparação, e confirme que o tes
 falha. Mutação sobrevivente significa que o caso não distingue bordas: ajuste a
 asserção ou registre a lacuna em `risks`. Quando hardware for necessário e não
 executado, registre na nota a validação manual pendente e os passos/evidências
-esperados.
+esperados. Ação de recuperação no ambiente físico — enviar teclas a um shell do
+dispositivo, reiniciar o dispositivo, matar processo ou resetar serviço — só
+ocorre quando explicitamente autorizada no despacho; sem essa autorização, pare
+e reporte a necessidade em vez de agir.
 
 Se não conseguir definir ou validar um cenário por falta de referência técnica
 externa, ou não houver avanço após tentativa relevante, registre no retorno a
@@ -126,6 +132,10 @@ Ao concluir, escreva ou atualize somente a sua nota seguindo
 `templates/task-note.md`: cenários e testes criados/alterados, rastreabilidade
 `REQ/AC -> TEST`, resultados e limitações. A nota não é prova por si só; cite
 comando, resultado e estado do código.
+
+Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
+que está concluído e o que ficou pendente, e retorne os três campos mesmo
+interrompido.
 
 Atualize a nota por append: cada adição começa com carimbo de data/hora
 (`YYYY-MM-DD HH:MM ±HH:MM`) e indica o que substitui ou descarta, quando for o

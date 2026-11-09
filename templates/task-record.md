@@ -30,7 +30,9 @@ Production, test, and documentation paths affected.
 ## Validation
 
 Checks executed, results, and the code state they belong to. State clearly what
-was not run.
+was not run. Each manual `AC-*` records its evidence kind: `measured` (command or
+series), `reported by the user`, or `deferred` (user decision). A reported or
+deferred item is never recorded as satisfied.
 
 ## Decisions
 

@@ -64,7 +64,25 @@ proximo: <papel ou decisao necessaria>
 
 O developer le a nota, confere a evidencia na fonte e roteia. Retorno ambiguo ou
 sem nota e lacuna de evidencia: peca uma execucao delimitada em vez de
-reinterpretar o resumo.
+reinterpretar o resumo. Retorno vazio ou apenas `@` nunca e conclusao.
+
+## Checkpoint e tipo de evidencia
+
+- Antes de esgotar `steps`, o papel registra na nota um checkpoint com o estado
+  do codigo, o que esta concluido e o que ficou pendente. Um despacho
+  interrompido continua a partir desse estado, sem reconstruir contexto.
+- Cada gate executado e registrado como `comando | exit | head | timestamp`.
+  Checagem pendente, em execucao ou sem saida nao e resultado.
+- Criterio de aceite manual declara o `evidence_kind`: `medido` (comando ou
+  serie), `relato` (observacao do usuario) ou `deferido` (decisao do usuario).
+  Relato nao satisfaz criterio quantitativo e item deferido nunca conta como
+  satisfeito.
+- Antes dos gates amplos, o reviewer roda um preflight: arquivos novos dentro do
+  escopo de formato/lint, alvos de `clean` e cobertura atualizados, dependencias
+  presentes e exit code capturado.
+- Acao de recuperacao no ambiente fisico (teclas em shell do dispositivo,
+  reboot, kill de processo, reset de servico) exige autorizacao explicita no
+  despacho; sem ela o papel para e reporta.
 
 ## O que foi removido
 
