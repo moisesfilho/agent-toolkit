@@ -130,6 +130,14 @@ Ao concluir, escreva ou atualize somente a sua nota seguindo
 riscos e premissas. A nota resume e referencia; não copia o plano inteiro nem
 logs. Há uma nota por papel, e cada papel escreve apenas a própria nota.
 
+Quando o MCP de notas estiver configurado, escreva a nota com
+`note_planner_append`, enviando apenas `task_slug` e o texto da entrada. O
+servidor gera carimbo, caminho e papel; não os inclua no texto e não escreva a
+nota por `edit`. Se a tool não estiver disponível, use o fallback manual de
+`templates/task-note.md` com carimbo aferido e não alegue append MCP. O registro
+consolidado do developer não passa por essa tool. O MCP é best-effort e não
+impede bypass por configuração ou shell.
+
 Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
 que está concluído e o que ficou pendente, e retorne os três campos mesmo
 interrompido.

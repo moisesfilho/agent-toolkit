@@ -1,0 +1,72 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    {
+      "action": "note_*",
+      "resource": "*",
+      "effect": "deny"
+    }
+  ],
+  "agents": {
+    "planner": {
+      "permissions": [
+        {
+          "action": "note_planner_append",
+          "resource": "*",
+          "effect": "allow"
+        }
+      ]
+    },
+    "coder": {
+      "permissions": [
+        {
+          "action": "note_coder_append",
+          "resource": "*",
+          "effect": "allow"
+        }
+      ]
+    },
+    "tester": {
+      "permissions": [
+        {
+          "action": "note_tester_append",
+          "resource": "*",
+          "effect": "allow"
+        }
+      ]
+    },
+    "reviewer": {
+      "permissions": [
+        {
+          "action": "note_reviewer_append",
+          "resource": "*",
+          "effect": "allow"
+        }
+      ]
+    }
+  },
+  "mcp": {
+    "servers": {
+      "note_planner": {
+        "type": "local",
+        "codemode": false,
+        "command": ["node", "harnesses/agent-note-writer-mcp/index.mjs", "--role", "planner"]
+      },
+      "note_coder": {
+        "type": "local",
+        "codemode": false,
+        "command": ["node", "harnesses/agent-note-writer-mcp/index.mjs", "--role", "coder"]
+      },
+      "note_tester": {
+        "type": "local",
+        "codemode": false,
+        "command": ["node", "harnesses/agent-note-writer-mcp/index.mjs", "--role", "tester"]
+      },
+      "note_reviewer": {
+        "type": "local",
+        "codemode": false,
+        "command": ["node", "harnesses/agent-note-writer-mcp/index.mjs", "--role", "reviewer"]
+      }
+    }
+  }
+}

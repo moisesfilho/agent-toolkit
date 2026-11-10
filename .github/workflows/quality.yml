@@ -2,7 +2,7 @@ name: Quality
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -55,6 +55,29 @@ jobs:
           python3 tools/validate_resources.py
           python3 -m unittest discover -s tests -v
 
+      - name: Set up Node.js for note writer harness
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: harnesses/agent-note-writer-mcp/package-lock.json
+
+      - name: Validate note writer harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in harnesses/agent-note-writer-mcp/index.mjs \
+            harnesses/agent-note-writer-mcp/validate-config.mjs \
+            harnesses/agent-note-writer-mcp/src/*.mjs; do
+            node --check "$file"
+          done
+          npm ci --prefix harnesses/agent-note-writer-mcp
+          npm test --prefix harnesses/agent-note-writer-mcp
+          node harnesses/agent-note-writer-mcp/validate-config.mjs \
+            harnesses/agent-note-writer-mcp/examples/opencode.json
+          node harnesses/agent-note-writer-mcp/validate-config.mjs \
+            harnesses/agent-note-writer-mcp/examples/opencode.env-path.json
+
       - name: Write job summary
         if: always()
         run: |
@@ -66,4 +89,5 @@ jobs:
             echo '| Repository structure | Completed |'
             echo '| Markdown links | Completed |'
             echo '| Agent handoff contract | Completed |'
+            echo '| Note writer harness | Completed |'
           } >> "$GITHUB_STEP_SUMMARY"

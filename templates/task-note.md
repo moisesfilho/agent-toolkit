@@ -9,6 +9,20 @@ its own documentation convention keeps it; the path is confirmed in the dispatch
 A note is not proof: evidence must point to the command, result, and code state
 that produced it.
 
+## Writing The Note
+
+When a role note MCP is configured, write with that role's tool
+`note_<role>_append`, sending only `task_slug` and one entry line. The server owns
+the timestamp, destination and role, so do not send them in the text, and do not
+write the note with `edit`. Use one call per entry. MCP entries use the server's
+`<timestamp> - <text>` line format; do not duplicate the timestamp as a heading.
+
+If the tool is unavailable, use the manual append fallback below `## Updates`
+with a measured timestamp and the supersession line. Never claim an MCP append
+that did not run. The example integration configures `planner`, `coder`,
+`tester` and `reviewer` only. The consolidated record at
+`docs/agent-state/<task>.md` is outside this tool and belongs to the developer.
+
 ```md
 # <role> - <task>
 

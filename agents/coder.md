@@ -100,6 +100,14 @@ escritos, estado do código e o que falta para a validação independente. A not
 resume e referencia; não copia diffs, logs ou o plano. Não declare aprovação
 final.
 
+Quando o MCP de notas estiver configurado, escreva a nota com
+`note_coder_append`, enviando apenas `task_slug` e o texto da entrada. O servidor
+gera carimbo, caminho e papel; não os inclua no texto e não escreva a nota por
+`edit`. Se a tool não estiver disponível, use o fallback manual de
+`templates/task-note.md` com carimbo aferido e não alegue append MCP. O registro
+consolidado do developer não passa por essa tool. O MCP é best-effort e não
+impede bypass por configuração ou shell.
+
 Ao criar arquivo ou artefato novo, atualize no mesmo trabalho o inventário de
 formatação, lint, `clean` e cobertura do projeto que já existir, para o gate
 final não encontrar alvo fora do escopo.

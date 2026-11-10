@@ -2,3 +2,4 @@ __pycache__/
 *.py[cod]
 .DS_Store
 harnesses/typesafe-jev-mcp/node_modules
+harnesses/agent-note-writer-mcp/node_modules

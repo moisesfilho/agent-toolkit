@@ -51,6 +51,10 @@ WORKFLOW_PHRASES = (
     "preflight",
     "checkpoint",
     "evidence kind",
+    "note_<role>_append",
+    "fallback",
+    "write the note with `edit`",
+    "do not put them in the text",
 )
 WORKFLOW_SECTIONS = (
     "## Standard flow",
@@ -71,6 +75,10 @@ NOTE_TEMPLATE_PHRASES = (
     "supersedes or discards",
     "exit",
     "checkpoint",
+    "note_<role>_append",
+    "fallback",
+    "write the note with `edit`",
+    "do not send them in the text",
 )
 RECORD_TEMPLATE_PHRASES = (
     "Only the\n`developer` writes it",
@@ -338,6 +346,13 @@ def check_agent(role: str, content: str) -> list[str]:
                 break
         if "checkpoint" not in content.lower():
             errors.append(f"{role}: must instruct a checkpoint before exhausting steps")
+        if f"note_{role}_append" not in content:
+            errors.append(f"{role}: must name the role note MCP tool note_{role}_append")
+        if "fallback" not in content.lower():
+            errors.append(f"{role}: must define a manual fallback when the note tool is unavailable")
+        for phrase in ("task_slug", "`edit`", "não os inclua no texto"):
+            if phrase not in content:
+                errors.append(f"{role}: note MCP rule must mention {phrase!r}")
 
     for required in ROLE_REQUIRED_RULES.get(role, ()):
         if required.lower() not in content.lower():

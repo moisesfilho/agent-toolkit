@@ -181,6 +181,14 @@ Ao concluir a revisão, escreva ou atualize somente a sua nota seguindo
 evidence`, gates executados com `head` e timestamp, e pendências. A nota é o
 registro durável inclusive em execução background; ela não é aprovação.
 
+Quando o MCP de notas estiver configurado, escreva a nota com
+`note_reviewer_append`, enviando apenas `task_slug` e o texto da entrada. O
+servidor gera carimbo, caminho e papel; não os inclua no texto e não escreva a
+nota por `edit`. Se a tool não estiver disponível, use o fallback manual de
+`templates/task-note.md` com carimbo aferido e não alegue append MCP. O registro
+consolidado do developer não passa por essa tool. O MCP é best-effort e não
+impede bypass por configuração ou shell.
+
 Antes de esgotar `steps`, grave um checkpoint na nota com o estado do código, o
 que está concluído e o que ficou pendente, e retorne os três campos mesmo
 interrompido.

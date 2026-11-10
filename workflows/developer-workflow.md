@@ -56,6 +56,17 @@ roles.
   it, and the path is confirmed in the dispatch.
 - One author per note: a role writes only its own note and never edits another
   role's note. The developer never rewrites role notes.
+- When a note MCP is configured, a role writes its own note with that role's
+  tool `note_<role>_append`, sending only `task_slug` and the entry text. The
+  server supplies the timestamp, path and role: do not put them in the text, and
+  do not write the note with `edit`. The consolidated record at
+  `docs/agent-state/<task>.md` is outside this tool and remains the developer's.
+  If the tool is unavailable, use the manual append fallback defined here and in
+  the template with a measured timestamp; never claim an MCP append that did not
+  run. The example integration configures `planner`, `coder`, `tester` and
+  `reviewer` only; the developer's consolidated record is written manually. The
+  note MCP is best effort and does not prevent an agent with configuration or
+  shell access from bypassing it.
 - A note is a summary of the dispatch objective, work done, evidence, decisions,
   pending items, and references. It is not a log: do not paste tool output, full
   diffs, or the approved plan. There is no line limit; keep what a safe resume

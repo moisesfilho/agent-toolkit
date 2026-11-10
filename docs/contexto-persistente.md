@@ -13,6 +13,13 @@ resultado no encerramento.
   artefato commitavel e reutilizavel como referencia futura.
 - **Um autor por nota**: nao existe arquivo compartilhado de escrita
   concorrente. Trabalho paralelo so e permitido com escopos e notas distintos.
+- **MCP de nota (opcional)**: quando configurado, o papel escreve a propria nota
+  com `note_<role>_append`, enviando apenas `task_slug` e o texto da entrada; o
+  servidor gera carimbo, caminho e papel. Nao use `edit` para a nota e nao
+  inclua carimbo/caminho/papel no texto. Se a tool nao estiver disponivel, use o
+  fallback manual com carimbo aferido. O registro consolidado do developer nao
+  passa por essa tool; a ACL e best-effort e nao bloqueia bypass por config ou
+  shell.
 - **Sem limite de linhas**: a nota resume o que e util para retomar a tarefa e
   referencia o resto (plano, diff, logs). Nao copie logs, diffs ou o plano.
 - **Nota nao e prova**: "testes passaram" exige comando, resultado e estado do

@@ -1,5 +1,7 @@
 import re
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,6 +16,7 @@ from validate_resources import (  # noqa: E402
     RESEARCH_SENSITIVE_READ_DENIALS,
     check_agent,
     check_repository,
+    check_templates,
     check_text,
     check_workflow,
     frontmatter,
@@ -88,6 +91,94 @@ class ResourceValidationTests(unittest.TestCase):
                     f"{role}: must instruct a checkpoint before exhausting steps",
                     errors,
                 )
+
+    def test_note_roles_name_their_mcp_tool_and_fallback(self):
+        for role in ("planner", "coder", "tester", "reviewer"):
+            with self.subTest(role=role):
+                content = agent(role)
+                self.assertIn(f"note_{role}_append", content)
+                self.assertIn("fallback", content.lower())
+                mutated = content.replace(f"note_{role}_append", "a note tool", 1)
+                errors = check_agent(role, mutated)
+                self.assertIn(
+                    f"{role}: must name the role note MCP tool note_{role}_append",
+                    errors,
+                )
+                without_fallback = content.replace("fallback", "manual path")
+                errors = check_agent(role, without_fallback)
+                self.assertTrue(
+                    any("manual fallback" in error for error in errors), errors
+                )
+
+    def test_workflow_requires_the_note_mcp_and_fallback_rule(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("note_<role>_append", workflow)
+        for phrase in ("note_<role>_append", "fallback"):
+            with self.subTest(phrase=phrase):
+                stripped = workflow.replace(phrase, "note tool")
+                errors = check_workflow(stripped)
+                self.assertTrue(any(phrase in error for error in errors), errors)
+
+    def test_note_roles_require_the_edit_and_generated_field_rules(self):
+        for role in ("planner", "coder", "tester", "reviewer"):
+            content = agent(role)
+            for phrase in ("task_slug", "`edit`", "não os inclua no texto"):
+                with self.subTest(role=role, phrase=phrase):
+                    mutated = content.replace(phrase, "removed", 1)
+                    errors = check_agent(role, mutated)
+                    self.assertTrue(any(phrase in error for error in errors), errors)
+
+    def test_workflow_requires_the_edit_and_generated_field_rules(self):
+        workflow = (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+        for phrase in ("write the note with `edit`", "do not put them in the text"):
+            with self.subTest(phrase=phrase):
+                errors = check_workflow(workflow.replace(phrase, "removed"))
+                self.assertTrue(any(phrase in error for error in errors), errors)
+
+    def test_task_note_requires_the_edit_and_generated_field_rules(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "templates").mkdir()
+            for name in ("task-note.md", "task-record.md"):
+                shutil.copy(ROOT / f"templates/{name}", root / f"templates/{name}")
+            target = root / "templates/task-note.md"
+            note = target.read_text(encoding="utf-8")
+            target.write_text(
+                note.replace("write the note with `edit`", "removed").replace(
+                    "do not send them in the text", "removed"
+                ),
+                encoding="utf-8",
+            )
+            errors = check_templates(root)
+            self.assertTrue(any("write the note with `edit`" in error for error in errors), errors)
+            self.assertTrue(
+                any("do not send them in the text" in error for error in errors), errors
+            )
+
+    def test_task_note_requires_the_note_mcp_and_fallback_rule(self):
+        note = (ROOT / "templates/task-note.md").read_text(encoding="utf-8")
+        self.assertIn("note_<role>_append", note)
+        self.assertIn("fallback", note)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "templates").mkdir()
+            for name in ("task-note.md", "task-record.md"):
+                shutil.copy(ROOT / f"templates/{name}", root / f"templates/{name}")
+            target = root / "templates/task-note.md"
+            target.write_text(
+                target.read_text(encoding="utf-8").replace("note_<role>_append", "note tool", 1),
+                encoding="utf-8",
+            )
+            errors = check_templates(root)
+            self.assertTrue(any("note_<role>_append" in error for error in errors), errors)
+
+            target.write_text(
+                note.replace("fallback", "manual path"),
+                encoding="utf-8",
+            )
+            errors = check_templates(root)
+            self.assertTrue(any("fallback" in error for error in errors), errors)
+
 
     def test_reviewer_requires_the_final_gate_preflight(self):
         content = re.sub(r"(?i)preflight", "inspeção", agent("reviewer"))
