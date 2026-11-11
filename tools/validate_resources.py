@@ -143,6 +143,36 @@ REVIEWER_REQUIRED_RULES = (
     "preflight",
     "evidence_kind",
 )
+READINESS_RULES = (
+    "evidência operacional",
+    "não é pré-requisito",
+    "testes funcionais",
+    "validação funcional",
+    "pendente",
+    "infraestrutura",
+    "indicativa de código",
+    "`manual_validation` pendente",
+)
+READINESS_FORBIDDEN = (
+    "checks disparados até um estado conclusivo",
+    "não verificável impede a aprovação",
+    "ci pendente ou check inconclusivo",
+    "lint/typecheck/build e ci",
+    "gate pendente, falho, não disparado",
+)
+WORKFLOW_READINESS_PHRASES = (
+    "operational evidence",
+    "never a prerequisite",
+    "functional test",
+    "confirmed code failure",
+    "conditional on local readiness",
+    "`manual_validation` pending",
+)
+WORKFLOW_READINESS_FORBIDDEN = (
+    "remote ci conclusively green",
+    "pending ci",
+)
+READINESS_ERROR = "readiness must not depend on remote CI"
 
 
 def frontmatter(content: str) -> str:
@@ -362,9 +392,16 @@ def check_agent(role: str, content: str) -> list[str]:
         errors.extend(check_research_permissions(header))
 
     if role == "reviewer":
+        low = content.lower()
         for rule in REVIEWER_REQUIRED_RULES:
-            if rule.lower() not in content.lower():
+            if rule.lower() not in low:
                 errors.append(f"reviewer: missing fail-closed rule {rule!r}")
+        for rule in READINESS_RULES:
+            if rule.lower() not in low:
+                errors.append(f"reviewer: missing readiness rule {rule!r}")
+        for phrase in READINESS_FORBIDDEN:
+            if phrase in low:
+                errors.append(f"reviewer: {READINESS_ERROR}: {phrase!r}")
     return errors
 
 
@@ -396,6 +433,13 @@ def check_workflow(text: str) -> list[str]:
     for phrase in WORKFLOW_PHRASES:
         if phrase.lower() not in text.lower():
             errors.append(f"workflow missing invariant: {phrase}")
+    for phrase in WORKFLOW_READINESS_PHRASES:
+        if phrase.lower() not in text.lower():
+            errors.append(f"workflow missing readiness invariant: {phrase}")
+    low = text.lower()
+    for phrase in WORKFLOW_READINESS_FORBIDDEN:
+        if phrase in low:
+            errors.append(f"workflow: {READINESS_ERROR}: {phrase!r}")
     for section in WORKFLOW_SECTIONS:
         if section not in text:
             errors.append(f"workflow missing section: {section}")

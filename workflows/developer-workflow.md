@@ -41,10 +41,14 @@ available to the receiving harness.
    mode must not run full suites, global coverage, broad analysis, or remote
    gates. Then run the approved device-validation phase **before** final review
    when the device is available and the test is safe/authorized.
-8. After review, document the result and present any remaining manual validation
-   instructions. Work is `completed` only after required manual validation is
-   recorded and accepted by the user; agents report evidence but do not accept
-   device/hardware behavior on the user's behalf.
+8. The agent runs the target functional test when it is safe, authorized and
+   feasible, recording the command, output, snapshot and covered scope. When the
+   check depends on the user or a device, it delivers a reproducible procedure
+   with build/version, monitoring/log instructions and the expected result, and
+   the item stays `manual_validation` pending. After review, document the result
+   and present the remaining instructions. Work is `completed` only after
+   required manual validation is recorded and accepted by the user; agents report
+   evidence but do not accept device/hardware behavior on the user's behalf.
 
 ## Task notes and memory
 
@@ -155,8 +159,12 @@ removes a test or bypasses review.
 - `reviewer` is the only agent that runs the complete suite and issues final
   code-gate approval. In `development` mode it gives scoped feedback only and
   does not edit source or tests. `review_feedback_ready` is explicitly
-  non-approving. For device work, final review follows focused and device
-  validation whenever safe and available.
+  non-approving. `review_approved` covers code readiness — implementation reviewed
+  in the diff and behavior, automated tests/coverage and executable functional
+  checks — and may coexist with a manual functional validation explicitly recorded
+  as pending; it never marks the task `completed`. Remote CI is operational
+  evidence recorded afterwards, not a gate. For device work, final review follows
+  focused and device validation whenever safe and available.
 - `analyst` is an optional primary agent that returns requirements.
 - Subagents report blocking questions to `developer`; only `developer` asks the
   user. Within approved scope, choose a conservative, reversible technical
@@ -178,10 +186,30 @@ or missing test, stale gate, or inconclusive required check.
 following:
 
 - `blockers: []` and no unresolved critical risk;
-- every applicable `REQ-*`/`AC-*` linked to implementation and test evidence;
-- complete applicable local tests, lint/format/build/coverage checks;
-- remote CI conclusively green when configured and available;
+- the implementation reviewed in the diff and its behavior, not only the plan or
+  a summary;
+- every applicable `REQ-*`/`AC-*` linked to implementation and to automated test
+  and coverage evidence, plus the functional tests that could be executed;
+- complete applicable local tests, lint/format/build/coverage checks with a
+  conclusive result;
+- the target functional test executed by the agent when safe, authorized and
+  feasible, with command, output, snapshot and covered scope recorded; otherwise a
+  reproducible procedure requested from the user and the item kept as
+  `manual_validation` pending, which does not block code approval but never counts
+  as satisfied;
 - all gate evidence tied to the exact reviewed state (`head` plus timestamp).
+
+Remote CI is operational evidence recorded after local readiness, so it is
+never a prerequisite for readiness. Record the state against the exact commit
+SHA: a `green` run on the same SHA complements the evidence and never replaces a
+local test; a run that is pending, not triggered, unavailable or failed for
+infrastructure reasons is recorded as operational state and does not veto
+readiness; a CI failure indicative
+of code must be investigated and reproduced locally, and a confirmed code failure
+blocks approval until corrected and reviewed; a failure that cannot be classified
+and could hide a required defect keeps the review `review_incomplete` until
+diagnosed. Absence of access is not proof of infrastructure, and a CI run for a
+different SHA never validates the reviewed snapshot.
 
 Development-mode feedback may report focused check results and pending final
 gates. Defer full regression runs, global coverage, broad analysis, and remote CI
@@ -193,8 +221,13 @@ stable diff hash or an equivalent harness-supported snapshot identifier. Never
 claim a commit SHA for uncommitted changes.
 
 `review_incomplete` is not approval. Missing output, an interrupted review, a
-step limit, timeout, unavailable check, pending CI, or unreadable evidence must
-remain incomplete or blocked. If a return is ambiguous, request one bounded
+step limit, timeout, an unavailable or inconclusive required local check,
+unreadable evidence, a device validation required before final review that is
+still pending without the explicit authorized exception, or a CI failure that
+could hide a required defect must remain incomplete or blocked. A remote CI run
+that is pending, unavailable or failed for
+infrastructure reasons is recorded as operational state and does not by itself
+make the review incomplete. If a return is ambiguous, request one bounded
 re-run to reproduce or verify the actionable claims against the current source
 state; route only validated claims and keep the task incomplete when the re-run
 is also inconclusive. A fresh verification does not erase failed gates or bypass
@@ -274,25 +307,36 @@ every command must capture its exit code. A check that is pending, still running
 truncated, or without output is inconclusive, never PASS.
 
 The reviewer may inspect Git and run checks. Commit or push requires explicit
-user authorization in the current task, even on a work branch. Never commit,
-push, or force-push to production branches. Before authorized version control
-operations, inspect branch, status, diff, and stage only intended files.
+user authorization in the current task, even on a work branch; that authorization
+may be conditional on local readiness in the same task and is never automatic,
+and it never replaces a gate or a manual acceptance. Never commit, push, or
+force-push to production branches, and never publish before the local
+`review_approved`. Before authorized version control operations, inspect branch,
+status, diff, and stage only intended files; review the staged diff and record the
+resulting SHA together with the CI state tied to it.
 
-Final delivery records diff/state, commands and exit results, local/remote gate
-state, manual validation requested/completed/pending, residual risks, and any
-user override. Each manual `AC-*` records its evidence kind: measured (command or
-series), reported by the user, or deferred (user decision). A reported or
-deferred item never counts as satisfied, and deferral is a user decision rather
-than an agent default. Manual device validation must identify the firmware/build
-state and the specific behavior tested; generic smoke checks do not prove a
-feature.
+Final delivery records diff/state, commands and exit results, local gate state,
+remote CI state as separate operational evidence, manual validation
+requested/completed/pending, residual risks, and any user override. Each manual
+`AC-*` records its evidence kind: measured (command or series), reported by the
+user, or deferred (user decision). A reported or deferred item never counts as
+satisfied, and deferral is a user decision rather than an agent default. A
+functional validation that was requested but not yet answered is only pending: it
+has no evidence kind, is never recorded as satisfied, and does not block a code
+approval that discriminates it. Manual device validation must identify the
+firmware/build state and the specific behavior tested; generic smoke checks do not
+prove a feature.
 For device-bound changes, record whether device validation preceded final review;
 if it did not, record the blocker/deferment and explicit user authorization for
 the exception.
 
 Tie committed CI evidence to the reviewed content and exact commit SHA. A
 successful check for a different commit or changed worktree does not validate
-the current state. Run broad gates in a detached worktree checked out at the
+the current state. Remote CI is post-approval operational evidence: a `green` run
+on the published SHA confirms the published content, while a code failure found
+afterwards reopens correction and review and invalidates readiness until a new
+snapshot is approved; operational unavailability is recorded and never converted
+into a PASS. Run broad gates in a detached worktree checked out at the
 reviewed state (`git worktree add --detach`) instead of the developer's worktree,
 so the writer keeps working and a moving worktree cannot produce a false
 positive; a dirty worktree requires an immutable diff-snapshot identifier.

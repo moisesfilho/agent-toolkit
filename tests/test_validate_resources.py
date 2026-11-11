@@ -9,11 +9,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from validate_resources import (  # noqa: E402
+    READINESS_ERROR,
+    READINESS_FORBIDDEN,
+    READINESS_RULES,
     RESEARCH_ALLOWED_ACTIONS,
     RESEARCH_FORBIDDEN_ACTIONS,
     RESEARCH_FORBIDDEN_EFFECTS,
     RESEARCH_FORBIDDEN_SEARCH_ACTIONS,
     RESEARCH_SENSITIVE_READ_DENIALS,
+    REVIEWER_REQUIRED_RULES,
+    WORKFLOW_READINESS_FORBIDDEN,
+    WORKFLOW_READINESS_PHRASES,
     check_agent,
     check_repository,
     check_templates,
@@ -26,6 +32,14 @@ from validate_resources import (  # noqa: E402
 
 def agent(name: str) -> str:
     return (ROOT / f"agents/{name}.md").read_text(encoding="utf-8")
+
+
+def workflow_text() -> str:
+    return (ROOT / "workflows/developer-workflow.md").read_text(encoding="utf-8")
+
+
+def normalized(content: str) -> str:
+    return " ".join(content.split())
 
 
 def inject_before_steps(content: str, rules: str) -> str:
@@ -189,6 +203,123 @@ class ResourceValidationTests(unittest.TestCase):
         content = agent("reviewer").replace("evidence_kind", "tipo de evidência")
         errors = check_agent("reviewer", content)
         self.assertIn("reviewer: missing fail-closed rule 'evidence_kind'", errors)
+
+    def test_reviewer_requires_every_readiness_invariant(self):
+        content = agent("reviewer")
+        for rule in READINESS_RULES:
+            with self.subTest(rule=rule):
+                mutated = content.replace(rule, "removido")
+                self.assertNotEqual(mutated, content, rule)
+                self.assertIn(
+                    f"reviewer: missing readiness rule {rule!r}",
+                    check_agent("reviewer", mutated),
+                )
+
+    def test_reviewer_rejects_remote_ci_as_a_readiness_prerequisite(self):
+        content = agent("reviewer")
+        for phrase in READINESS_FORBIDDEN:
+            with self.subTest(phrase=phrase):
+                errors = check_agent("reviewer", content + f"\n{phrase}.\n")
+                self.assertTrue(
+                    any(READINESS_ERROR in error for error in errors), errors
+                )
+
+    def test_reviewer_readiness_names_the_three_sources(self):
+        content = normalized(agent("reviewer"))
+        for source in ("revisão da implementação", "testes automatizados", "funcionais"):
+            with self.subTest(source=source):
+                self.assertIn(source, content)
+        self.assertNotIn("pré-requisito de ci", content.lower())
+
+    def test_reviewer_approval_may_coexist_with_pending_manual_validation(self):
+        content = normalized(agent("reviewer"))
+        self.assertIn("pode coexistir com pendência", content)
+        self.assertIn("não torna a tarefa `completed`", content)
+
+    def test_reviewer_classifies_remote_ci_states(self):
+        content = normalized(agent("reviewer")).lower()
+        for state in ("green", "pending", "infraestrutura", "sha", "review_incomplete"):
+            with self.subTest(state=state):
+                self.assertIn(state, content)
+        self.assertIn("ci de `sha` diferente nunca comprova", content)
+
+    def test_workflow_requires_every_readiness_invariant(self):
+        content = workflow_text()
+        for phrase in WORKFLOW_READINESS_PHRASES:
+            with self.subTest(phrase=phrase):
+                mutated = content.replace(phrase, "local step")
+                self.assertNotEqual(mutated, content, phrase)
+                self.assertIn(
+                    f"workflow missing readiness invariant: {phrase}",
+                    check_workflow(mutated),
+                )
+
+    def test_workflow_rejects_remote_ci_green_as_a_readiness_gate(self):
+        content = workflow_text()
+        for phrase in WORKFLOW_READINESS_FORBIDDEN:
+            with self.subTest(phrase=phrase):
+                errors = check_workflow(content + f"\n{phrase}.\n")
+                self.assertTrue(
+                    any(READINESS_ERROR in error for error in errors), errors
+                )
+
+    def test_workflow_keeps_pending_functional_validation_unevidenced(self):
+        content = normalized(workflow_text())
+        self.assertIn("it has no evidence kind", content)
+        self.assertIn("never recorded as satisfied", content)
+        self.assertIn("never marks the task `completed`", content)
+        self.assertIn("reproducible procedure", content)
+        self.assertIn("monitoring/log", content)
+
+    def test_workflow_requires_authorized_publication_after_local_approval(self):
+        content = normalized(workflow_text())
+        self.assertIn("never publish before the local `review_approved`", content)
+        self.assertIn("force-push to production branches", content)
+        self.assertIn("review the staged diff", content)
+
+    def test_reviewer_remote_ci_does_not_veto_readiness(self):
+        content = normalized(agent("reviewer"))
+        self.assertIn("complementa a evidência e não substitui teste local", content)
+        self.assertIn("não vetam a prontidão", content)
+        self.assertIn("mantém `review_incomplete` até diagnóstico", content)
+
+    def test_workflow_remote_ci_does_not_veto_readiness(self):
+        content = normalized(workflow_text())
+        self.assertIn("never replaces a local test", content)
+        self.assertIn("does not veto readiness", content)
+        self.assertIn("keeps the review `review_incomplete` until diagnosed", content)
+        self.assertIn(
+            "different SHA never validates the reviewed snapshot", content
+        )
+
+    def test_requirements_link_to_automated_tests_and_coverage(self):
+        reviewer = normalized(agent("reviewer"))
+        workflow = normalized(workflow_text())
+        self.assertIn(
+            "`REQ-*`/`AC-*` ligados a testes automatizados e cobertura", reviewer
+        )
+        self.assertIn(
+            "linked to implementation and to automated test and coverage evidence",
+            workflow,
+        )
+
+    def test_reviewer_requires_every_fail_closed_rule(self):
+        content = agent("reviewer")
+        for rule in REVIEWER_REQUIRED_RULES:
+            with self.subTest(rule=rule):
+                mutated = re.sub(rf"(?i){re.escape(rule)}", "removido", content)
+                self.assertNotEqual(mutated, content, rule)
+                self.assertIn(
+                    f"reviewer: missing fail-closed rule {rule!r}",
+                    check_agent("reviewer", mutated),
+                )
+
+    def test_reviewer_publication_needs_local_approval_and_avoids_production(self):
+        content = normalized(agent("reviewer"))
+        self.assertIn("condicional à prontidão local", content)
+        self.assertIn("nunca publique antes do `review_approved` local", content)
+        self.assertIn("branches de produção", content)
+        self.assertIn("confira o staged diff", content)
 
     def test_task_note_requires_gate_exit_codes(self):
         note = (ROOT / "templates/task-note.md").read_text(encoding="utf-8")

@@ -10,6 +10,9 @@ The imported baseline currently covers:
 - TypeSafe AI and Jev integration guidance;
 - the shared clean code skill for implementation, testing, and review;
 - the developer workflow and quality gates;
+- the review readiness gate that derives from implementation review, automated
+  tests/coverage and functional checks, with remote CI as later operational
+  evidence;
 - fail-closed review invariants, session reuse, and bounded decision checkpoints;
 - progressive search and structured decision policies.
 
