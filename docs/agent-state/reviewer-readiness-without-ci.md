@@ -42,9 +42,11 @@ rules are documented and guarded by validator tests.
 - Final reviewer approved the local code gate with no blockers on the reviewed
   snapshot.
 - Commit `410e9ebb57126dd023160ac77d9acc88ae571304` pushed to `develop` and
-  confirmed as `origin/develop`.
-- GitHub Actions Quality run `43093429645` completed successfully on that exact
-  SHA. No applicable local gate or required product manual validation remains
+  confirmed as `origin/develop`; consolidated record and reviewer evidence then
+  published in `a3af5bf8705098280016032b70fdade39482204e`.
+- GitHub Actions Quality run `43093429645` succeeded on the implementation SHA;
+  run `43093866481` succeeded after rerun on the record/evidence SHA. No
+  applicable local gate or required product manual validation remains
   unexecuted.
 
 ## Decisions
@@ -60,11 +62,15 @@ rules are documented and guarded by validator tests.
 
 ## Residual risks
 
-- None identified for this change. No product-specific manual validation was
-  applicable; no manual AC was deferred.
+- Residual risk: occasional contention/flakiness in pre-existing test
+  `CONC-01`; its failed attempt was not reproducible in three targeted reruns,
+  and CI passed on rerun at the same SHA. No product-specific manual validation
+  was applicable; no manual AC was deferred.
 
 ## References
 
 - `docs/agent-state/reviewer-readiness-without-ci/{planner,coder,tester,reviewer}.md`
 - `plans/2026-11-reviewer-readiness-without-ci.md`
-- Commit `410e9ebb57126dd023160ac77d9acc88ae571304`; CI run `43093429645`.
+- Commits `410e9ebb57126dd023160ac77d9acc88ae571304` and
+  `a3af5bf8705098280016032b70fdade39482204e`; CI runs `43093429645` and
+  `43093866481`.
