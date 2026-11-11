@@ -77,3 +77,8 @@ O snapshot foi criado do `HEAD` mais sobreposição das alterações rastreadas 
 ### 2026-11-11 17:11 -03:00 - correção do estado do worktree
 
 - Fact: complemento à entrada imediatamente anterior: após gravar esta evidência, o worktree não está limpo; há apenas a atualização pós-push não commitada desta nota reviewer. `HEAD`/`origin/develop` permanecem sincronizados em `a3af5bf8705098280016032b70fdade39482204e`; nenhum arquivo de implementação ou registro consolidado está modificado após a publicação. Supersedes or discards: somente a afirmação “branch local `develop` sincronizada e limpa”; a sincronização do branch permanece válida.
+
+### 2026-11-11 17:13 -03:00 - correção documental publicada e CI concluída
+
+- Fact: revisei o delta restrito ao task record e esta nota: record atualiza os dois SHAs/CI e registra o risco residual `CONC-01`; nota acrescenta o histórico real da falha inicial e rerun, além de corrigir a afirmação de worktree limpo. Sem achados, links quebrados ou padrões comuns de segredo. `git diff --check` e `python3 tools/validate_resources.py` passaram. Commit `a14f355a67d00f3119cefc31cd1662fcd6303422` publicado em `develop`, `git ls-remote` confirmou o SHA; worktree limpo após publicação. Quality run `43094423526` no SHA exato `a14f355...` concluído `success` (`gh run watch --exit-status`, job validate verde; `gh run view` confirmou). Avisos de runtime Node 20/ubuntu-latest não impediram o gate.
+- Supersedes or discards: pendência de revisão/publicação/CI da correção documental; a conclusão passa a ser update publicado e CI conclusiva.
